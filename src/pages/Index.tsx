@@ -3,7 +3,7 @@ import { BookDisplay } from "@/components/BookDisplay";
 import { BookGallery } from "@/components/BookGallery";
 
 const Index = () => {
-  const [selectedBook, setSelectedBook] = useState(null);
+  const [selectedBook, setSelectedBook] = useState<any>(undefined);
 
   return (
     <div className="min-h-screen bg-background">
