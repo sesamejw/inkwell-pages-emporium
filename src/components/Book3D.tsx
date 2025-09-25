@@ -235,6 +235,7 @@ function Book3DScene({
 
 export const Book3D = ({ book, onClose }: Book3DProps) => {
   const [currentPage, setCurrentPage] = useState(0);
+  const totalPages = Math.floor(pageImages.length / 2);
 
   useEffect(() => {
     // Handle escape key
@@ -248,7 +249,7 @@ export const Book3D = ({ book, onClose }: Book3DProps) => {
     const handleArrows = (e: KeyboardEvent) => {
       if (e.key === "ArrowLeft" && currentPage > 0) {
         setCurrentPage(currentPage - 1);
-      } else if (e.key === "ArrowRight" && currentPage < pageImages.length - 1) {
+      } else if (e.key === "ArrowRight" && currentPage < totalPages - 1) {
         setCurrentPage(currentPage + 1);
       }
     };
@@ -262,7 +263,7 @@ export const Book3D = ({ book, onClose }: Book3DProps) => {
       document.removeEventListener("keydown", handleArrows);
       document.body.style.overflow = "unset";
     };
-  }, [onClose, currentPage]);
+  }, [onClose, currentPage, totalPages]);
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-sm">
@@ -281,8 +282,8 @@ export const Book3D = ({ book, onClose }: Book3DProps) => {
         <Canvas
           shadows
           camera={{ 
-            position: [3, 2, 5], 
-            fov: 50 
+            position: [0, 3, 6], 
+            fov: 45 
           }}
           style={{ background: 'linear-gradient(135deg, #0f172a, #1e293b)' }}
         >
@@ -338,14 +339,14 @@ export const Book3D = ({ book, onClose }: Book3DProps) => {
           </Button>
           
           <span className="text-sm font-medium px-4">
-            Page {currentPage + 1} of {pageImages.length}
+            Spread {currentPage + 1} of {totalPages}
           </span>
           
           <Button
             variant="outline"
             size="sm"
-            onClick={() => setCurrentPage(Math.min(pageImages.length - 1, currentPage + 1))}
-            disabled={currentPage === pageImages.length - 1}
+            onClick={() => setCurrentPage(Math.min(totalPages - 1, currentPage + 1))}
+            disabled={currentPage === totalPages - 1}
           >
             Next
             <ChevronRight className="h-4 w-4 ml-2" />
