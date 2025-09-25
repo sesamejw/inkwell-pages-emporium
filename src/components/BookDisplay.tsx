@@ -13,7 +13,7 @@ import {
   Minus
 } from "lucide-react";
 import bookCover from "@/assets/book-cover-default.jpg";
-import { BookPreview } from "./BookPreview";
+import { Book3D } from "./Book3D";
 
 interface BookVersion {
   type: "ebook" | "paperback" | "hardcover";
@@ -252,7 +252,7 @@ export const BookDisplay = ({ book = defaultBook }: BookDisplayProps) => {
 
       {/* Book Preview Modal */}
       {showPreview && (
-        <BookPreview 
+        <Book3D 
           book={book} 
           onClose={() => setShowPreview(false)} 
         />
