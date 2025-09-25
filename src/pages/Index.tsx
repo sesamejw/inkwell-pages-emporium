@@ -1,12 +1,21 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useState } from "react";
+import { BookDisplay } from "@/components/BookDisplay";
+import { BookGallery } from "@/components/BookGallery";
 
 const Index = () => {
+  const [selectedBook, setSelectedBook] = useState(null);
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
+    <div className="min-h-screen bg-background">
+      {/* Featured Book Section */}
+      <section className="py-12">
+        <div className="container mx-auto">
+          <BookDisplay book={selectedBook} />
+        </div>
+      </section>
+
+      {/* Book Gallery Section */}
+      <BookGallery onBookSelect={setSelectedBook} />
     </div>
   );
 };
