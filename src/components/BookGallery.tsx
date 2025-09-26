@@ -2,80 +2,16 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Star, ShoppingCart } from "lucide-react";
+import { useBooks } from "@/contexts/BooksContext";
 import bookCollection from "@/assets/book-collection.jpg";
-
-interface Book {
-  id: string;
-  title: string;
-  author: string;
-  price: number;
-  rating: number;
-  category: string;
-  cover: string;
-}
-
-const sampleBooks: Book[] = [
-  {
-    id: "2",
-    title: "The Seven Husbands of Evelyn Hugo",
-    author: "Taylor Jenkins Reid",
-    price: 16.99,
-    rating: 4.5,
-    category: "Romance",
-    cover: bookCollection
-  },
-  {
-    id: "3", 
-    title: "Atomic Habits",
-    author: "James Clear",
-    price: 18.99,
-    rating: 4.8,
-    category: "Self-Help",
-    cover: bookCollection
-  },
-  {
-    id: "4",
-    title: "The Silent Patient",
-    author: "Alex Michaelides", 
-    price: 15.99,
-    rating: 4.1,
-    category: "Thriller",
-    cover: bookCollection
-  },
-  {
-    id: "5",
-    title: "Educated",
-    author: "Tara Westover",
-    price: 17.99,
-    rating: 4.6,
-    category: "Memoir",
-    cover: bookCollection
-  },
-  {
-    id: "6",
-    title: "The Invisible Life of Addie LaRue",
-    author: "V.E. Schwab",
-    price: 19.99,
-    rating: 4.3,
-    category: "Fantasy",
-    cover: bookCollection
-  },
-  {
-    id: "7",
-    title: "Sapiens",
-    author: "Yuval Noah Harari",
-    price: 22.99,
-    rating: 4.4,
-    category: "History",
-    cover: bookCollection
-  }
-];
 
 interface BookGalleryProps {
   onBookSelect: (book: any) => void;
 }
 
 export const BookGallery = ({ onBookSelect }: BookGalleryProps) => {
+  const { getActiveBooks } = useBooks();
+  const activeBooks = getActiveBooks();
   const renderStars = (rating: number) => {
     return Array.from({ length: 5 }, (_, i) => (
       <Star
@@ -91,19 +27,19 @@ export const BookGallery = ({ onBookSelect }: BookGalleryProps) => {
     ));
   };
 
-  const handleBookClick = (book: Book) => {
+  const handleBookClick = (book: any) => {
     // Transform the book data to match the BookDisplay interface
     const transformedBook = {
       id: book.id,
       title: book.title,
       author: book.author,
-      cover: book.cover,
-      description: `A captivating ${book.category.toLowerCase()} that will keep you engaged from start to finish. This highly-rated book has garnered critical acclaim and reader praise alike.`,
-      rating: book.rating,
+      cover: book.cover || bookCollection,
+      description: book.description || `A captivating ${book.category.toLowerCase()} that will keep you engaged from start to finish. This highly-rated book has garnered critical acclaim and reader praise alike.`,
+      rating: book.rating || 4.0,
       reviewCount: Math.floor(Math.random() * 2000) + 500,
       category: book.category,
       isbn: `978-${Math.floor(Math.random() * 1000000000)}`,
-      publishedDate: "2023-01-01",
+      publishedDate: book.createdAt || "2023-01-01",
       pages: Math.floor(Math.random() * 400) + 200,
       language: "English",
       versions: [
@@ -132,7 +68,7 @@ export const BookGallery = ({ onBookSelect }: BookGalleryProps) => {
         {/* Horizontal Scrolling Gallery */}
         <div className="overflow-x-auto pb-4">
           <div className="flex space-x-6 w-max">
-            {sampleBooks.map((book) => (
+            {activeBooks.map((book) => (
               <Card
                 key={book.id}
                 className="flex-shrink-0 w-72 cursor-pointer transition-all duration-300 hover:shadow-lg hover:-translate-y-2 bg-card"
@@ -142,9 +78,9 @@ export const BookGallery = ({ onBookSelect }: BookGalleryProps) => {
                   {/* Book Cover */}
                   <div className="relative mb-4 group">
                     <div 
-                      className="w-full h-40 bg-muted bg-cover bg-center book-shadow"
+                      className="w-full h-32 bg-muted bg-cover bg-center book-shadow"
                       style={{ 
-                        backgroundImage: `url(${book.cover})`,
+                        backgroundImage: `url(${book.cover || bookCollection})`,
                         backgroundSize: 'cover',
                         backgroundPosition: 'center'
                       }}
@@ -174,9 +110,9 @@ export const BookGallery = ({ onBookSelect }: BookGalleryProps) => {
                     {/* Rating */}
                     <div className="flex items-center space-x-2">
                       <div className="flex space-x-1">
-                        {renderStars(book.rating)}
+                        {renderStars(book.rating || 4.0)}
                       </div>
-                      <span className="text-sm font-medium">{book.rating}</span>
+                      <span className="text-sm font-medium">{book.rating || 4.0}</span>
                     </div>
 
                     {/* Price */}

@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useBooks } from "@/contexts/BooksContext";
 import { 
   Upload,
   Trash2,
@@ -19,56 +20,8 @@ import {
   MoreHorizontal
 } from "lucide-react";
 
-interface AdminBook {
-  id: string;
-  title: string;
-  author: string;
-  category: string;
-  price: number;
-  stock: number;
-  status: "active" | "draft" | "discontinued";
-  sales: number;
-  createdAt: string;
-}
-
-const sampleBooks: AdminBook[] = [
-  {
-    id: "1",
-    title: "The Midnight Library", 
-    author: "Matt Haig",
-    category: "Fiction",
-    price: 15.99,
-    stock: 245,
-    status: "active",
-    sales: 1247,
-    createdAt: "2023-12-01"
-  },
-  {
-    id: "2",
-    title: "Atomic Habits",
-    author: "James Clear", 
-    category: "Self-Help",
-    price: 18.99,
-    stock: 156,
-    status: "active",
-    sales: 2134,
-    createdAt: "2023-11-15"
-  },
-  {
-    id: "3",
-    title: "The Silent Patient",
-    author: "Alex Michaelides",
-    category: "Thriller", 
-    price: 16.99,
-    stock: 0,
-    status: "discontinued",
-    sales: 892,
-    createdAt: "2023-10-20"
-  }
-];
-
 export const Admin = () => {
-  const [books, setBooks] = useState<AdminBook[]>(sampleBooks);
+  const { books, deleteBook } = useBooks();
   const [showAddBook, setShowAddBook] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -81,10 +34,10 @@ export const Admin = () => {
   });
 
   const handleDeleteBook = (bookId: string) => {
-    setBooks(books.filter(book => book.id !== bookId));
+    deleteBook(bookId);
   };
 
-  const getStatusBadge = (status: AdminBook["status"]) => {
+  const getStatusBadge = (status: "active" | "draft" | "discontinued") => {
     switch (status) {
       case "active":
         return <Badge className="bg-success text-success-foreground">Active</Badge>;

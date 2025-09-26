@@ -110,7 +110,7 @@ export const BookDisplay = ({ book = defaultBook, onAddToCart }: BookDisplayProp
           <img
             src={book.cover || bookCoverDefault}
             alt={book.title}
-            className="w-80 h-auto book-shadow transition-book book-hover cursor-pointer"
+            className="w-64 h-auto book-shadow transition-book book-hover cursor-pointer"
             onClick={() => setShowPreview(true)}
           />
           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
