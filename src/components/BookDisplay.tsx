@@ -12,7 +12,7 @@ import {
   Plus,
   Minus
 } from "lucide-react";
-import bookCover from "@/assets/book-cover-default.jpg";
+import bookCoverDefault from "@/assets/book-cover-default.jpg";
 import { Book3D } from "./Book3D";
 
 interface BookVersion {
@@ -56,10 +56,11 @@ const defaultBook: Book = {
 };
 
 interface BookDisplayProps {
-  book?: Book;
+  book?: Book & { cover?: string };
+  onAddToCart?: (item: any) => void;
 }
 
-export const BookDisplay = ({ book = defaultBook }: BookDisplayProps) => {
+export const BookDisplay = ({ book = defaultBook, onAddToCart }: BookDisplayProps) => {
   const [selectedVersion, setSelectedVersion] = useState<BookVersion["type"]>("paperback");
   const [quantity, setQuantity] = useState(1);
   const [isFavorite, setIsFavorite] = useState(false);
@@ -86,13 +87,28 @@ export const BookDisplay = ({ book = defaultBook }: BookDisplayProps) => {
     return type === "ebook" ? "E-book" : type.charAt(0).toUpperCase() + type.slice(1);
   };
 
+  const handleAddToCart = () => {
+    const selectedVersionData = book.versions.find(v => v.type === selectedVersion);
+    if (selectedVersionData && onAddToCart) {
+      onAddToCart({
+        id: book.id,
+        title: book.title,
+        author: book.author,
+        price: selectedVersionData.price,
+        quantity: quantity,
+        version: selectedVersion,
+        cover: book.cover || bookCoverDefault
+      });
+    }
+  };
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-7xl mx-auto p-6">
       {/* Book Cover */}
       <div className="flex justify-center lg:justify-end">
         <div className="relative group">
           <img
-            src={bookCover}
+            src={book.cover || bookCoverDefault}
             alt={book.title}
             className="w-80 h-auto book-shadow transition-book book-hover cursor-pointer"
             onClick={() => setShowPreview(true)}
@@ -207,6 +223,7 @@ export const BookDisplay = ({ book = defaultBook }: BookDisplayProps) => {
           <Button 
             className="flex-1 btn-professional"
             disabled={!book.versions.find(v => v.type === selectedVersion)?.available}
+            onClick={handleAddToCart}
           >
             <ShoppingCart className="h-5 w-5 mr-2" />
             Add to Cart

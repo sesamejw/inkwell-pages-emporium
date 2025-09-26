@@ -97,6 +97,7 @@ export const BookGallery = ({ onBookSelect }: BookGalleryProps) => {
       id: book.id,
       title: book.title,
       author: book.author,
+      cover: book.cover,
       description: `A captivating ${book.category.toLowerCase()} that will keep you engaged from start to finish. This highly-rated book has garnered critical acclaim and reader praise alike.`,
       rating: book.rating,
       reviewCount: Math.floor(Math.random() * 2000) + 500,
