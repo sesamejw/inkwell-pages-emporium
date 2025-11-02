@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Avatar } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
+import { useToast } from "@/hooks/use-toast";
 import { 
   MessageSquare, 
   Users, 
@@ -86,9 +89,25 @@ const categories = [
 ];
 
 export const Forum = () => {
+  const { user, profile } = useAuth();
+  const navigate = useNavigate();
+  const { toast } = useToast();
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [showNewPost, setShowNewPost] = useState(false);
+
+  const handleNewPost = () => {
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "Please sign in to create a post",
+        variant: "destructive",
+      });
+      navigate("/auth");
+      return;
+    }
+    setShowNewPost(true);
+  };
 
   const filteredPosts = samplePosts.filter(post => {
     const matchesCategory = selectedCategory === "All" || post.category === selectedCategory;
@@ -121,7 +140,7 @@ export const Forum = () => {
             </div>
             <Button 
               className="btn-professional"
-              onClick={() => setShowNewPost(true)}
+              onClick={handleNewPost}
             >
               <Plus className="h-5 w-5 mr-2" />
               New Discussion
@@ -257,7 +276,7 @@ export const Forum = () => {
                     
                     <div className="flex items-center justify-between text-sm text-muted-foreground">
                       <div className="flex items-center space-x-4">
-                        <span>by {post.author}</span>
+                        <span>by {post.author === "You" && profile ? profile.username : post.author}</span>
                         <span>{formatDate(post.createdAt)}</span>
                       </div>
                       

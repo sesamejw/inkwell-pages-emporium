@@ -71,6 +71,9 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Book Gallery Section */}
+      <BookGallery onBookSelect={setSelectedBook} />
+
       {/* About Author Section */}
       <section className="py-16 bg-muted/30">
         <div className="container mx-auto px-4">
@@ -104,9 +107,6 @@ const Index = () => {
           </div>
         </div>
       </section>
-
-      {/* Book Gallery Section */}
-      <BookGallery onBookSelect={setSelectedBook} />
 
       {/* Cart Sidebar */}
       <CartSidebar 
