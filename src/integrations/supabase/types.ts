@@ -29,58 +29,86 @@ export type Database = {
         }
         Relationships: []
       }
-      books: {
+      profiles: {
         Row: {
-          category: string
+          avatar_url: string | null
           created_at: string
-          description: string
-          file_name: string | null
-          file_size: number | null
-          file_url: string | null
+          full_name: string | null
           id: string
-          image_url: string | null
-          name: string
-          price: number
           updated_at: string
+          username: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          full_name?: string | null
+          id: string
+          updated_at?: string
+          username: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          updated_at?: string
+          username?: string
+        }
+        Relationships: []
+      }
+      purchases: {
+        Row: {
+          book_author: string
+          book_cover_url: string | null
+          book_id: string
+          book_title: string
+          book_version: string
+          id: string
+          price: number
+          purchased_at: string
           user_id: string
         }
         Insert: {
-          category: string
-          created_at: string
-          description: string
-          file_name?: string | null
-          file_size?: number | null
-          file_url?: string | null
-          id: string
-          image_url?: string | null
-          name: string
+          book_author: string
+          book_cover_url?: string | null
+          book_id: string
+          book_title: string
+          book_version: string
+          id?: string
           price: number
-          updated_at: string
+          purchased_at?: string
           user_id: string
         }
         Update: {
-          category?: string
-          created_at?: string
-          description?: string
-          file_name?: string | null
-          file_size?: number | null
-          file_url?: string | null
+          book_author?: string
+          book_cover_url?: string | null
+          book_id?: string
+          book_title?: string
+          book_version?: string
           id?: string
-          image_url?: string | null
-          name?: string
           price?: number
-          updated_at?: string
+          purchased_at?: string
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "FK_books_users_user_id"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
       }
       users: {
         Row: {
@@ -114,10 +142,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "moderator" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -244,6 +278,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "moderator", "user"],
+    },
   },
 } as const
