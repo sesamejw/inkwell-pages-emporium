@@ -1,14 +1,14 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { BookDisplay } from "@/components/BookDisplay";
 import { BookGallery } from "@/components/BookGallery";
 import { CartSidebar, CartItem } from "@/components/CartSidebar";
-import { ChronologyTimeline } from "@/components/ChronologyTimeline";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { ShoppingCart, ScrollText } from "lucide-react";
+import { ShoppingCart } from "lucide-react";
 import authorPhoto from "@/assets/author-photo.jpg";
 
 const Index = () => {
+  const navigate = useNavigate();
   const [selectedBook, setSelectedBook] = useState<any>(undefined);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -51,21 +51,13 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       {/* Chronology Button - Left Side */}
       <div className="fixed top-4 left-4 z-50">
-        <Sheet>
-          <SheetTrigger asChild>
-            <Button 
-              variant="outline" 
-              size="icon"
-              className="bg-background/80 backdrop-blur hover:bg-primary/10 hover:border-primary/50 transition-all"
-              title="Open Chronology"
-            >
-              <ScrollText className="h-5 w-5" />
-            </Button>
-          </SheetTrigger>
-          <SheetContent side="left" className="w-[90vw] sm:w-[800px] sm:max-w-[90vw] p-6">
-            <ChronologyTimeline />
-          </SheetContent>
-        </Sheet>
+        <Button 
+          onClick={() => navigate('/chronology')}
+          variant="default"
+          className="bg-primary/90 backdrop-blur hover:bg-primary shadow-lg px-6 py-3 h-auto text-base font-semibold"
+        >
+          Explore the Realms
+        </Button>
       </div>
 
       {/* Header with Cart Button */}

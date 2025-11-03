@@ -14,6 +14,7 @@ import { MyBooks } from "./pages/MyBooks";
 import { Settings } from "./pages/Settings";
 import EventDetail from "./pages/EventDetail";
 import AlmanacCategory from "./pages/AlmanacCategory";
+import { ChronologyTimeline } from "./components/ChronologyTimeline";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -35,6 +36,7 @@ const App = () => (
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/my-books" element={<MyBooks />} />
                 <Route path="/settings" element={<Settings />} />
+                <Route path="/chronology" element={<ChronologyTimeline />} />
                 <Route path="/chronology/:eventId" element={<EventDetail />} />
                 <Route path="/almanac/:categoryId" element={<AlmanacCategory />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
