@@ -2,8 +2,10 @@ import { useState } from "react";
 import { BookDisplay } from "@/components/BookDisplay";
 import { BookGallery } from "@/components/BookGallery";
 import { CartSidebar, CartItem } from "@/components/CartSidebar";
+import { ChronologyTimeline } from "@/components/ChronologyTimeline";
 import { Button } from "@/components/ui/button";
-import { ShoppingCart } from "lucide-react";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { ShoppingCart, ScrollText } from "lucide-react";
 import authorPhoto from "@/assets/author-photo.jpg";
 
 const Index = () => {
@@ -47,6 +49,25 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Chronology Button - Left Side */}
+      <div className="fixed top-4 left-4 z-50">
+        <Sheet>
+          <SheetTrigger asChild>
+            <Button 
+              variant="outline" 
+              size="icon"
+              className="bg-background/80 backdrop-blur hover:bg-primary/10 hover:border-primary/50 transition-all"
+              title="Open Chronology"
+            >
+              <ScrollText className="h-5 w-5" />
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="left" className="w-[90vw] sm:w-[800px] sm:max-w-[90vw] p-6">
+            <ChronologyTimeline />
+          </SheetContent>
+        </Sheet>
+      </div>
+
       {/* Header with Cart Button */}
       <div className="fixed top-4 right-4 z-50">
         <Button 
