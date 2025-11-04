@@ -19,6 +19,7 @@ import {
   Filter,
   MoreHorizontal
 } from "lucide-react";
+import { ChronologyManager } from "@/components/ChronologyManager";
 
 export const Admin = () => {
   const { books, deleteBook } = useBooks();
@@ -111,8 +112,9 @@ export const Admin = () => {
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
         <Tabs defaultValue="books" className="space-y-8">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="books">Book Management</TabsTrigger>
+            <TabsTrigger value="chronology">Chronology</TabsTrigger>
             <TabsTrigger value="orders">Orders</TabsTrigger>
             <TabsTrigger value="customers">Customers</TabsTrigger>
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
@@ -208,6 +210,10 @@ export const Admin = () => {
                 </table>
               </div>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="chronology" className="space-y-6">
+            <ChronologyManager />
           </TabsContent>
 
           <TabsContent value="orders" className="space-y-6">

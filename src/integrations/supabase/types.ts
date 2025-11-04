@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      chronology_events: {
+        Row: {
+          article: string
+          created_at: string
+          date: string
+          description: string
+          era: string
+          id: string
+          order_index: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          article: string
+          created_at?: string
+          date: string
+          description: string
+          era: string
+          id?: string
+          order_index: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          article?: string
+          created_at?: string
+          date?: string
+          description?: string
+          era?: string
+          id?: string
+          order_index?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null

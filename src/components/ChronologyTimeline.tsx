@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { timelineEvents, almanacCategories } from "@/data/chronologyData";
+import { almanacCategories } from "@/data/chronologyData";
+import { supabase } from "@/integrations/supabase/client";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
@@ -18,9 +19,33 @@ const iconMap = {
   BookOpen
 };
 
+interface TimelineEvent {
+  id: string;
+  title: string;
+  date: string;
+  era: string;
+  description: string;
+}
+
 export const ChronologyTimeline = () => {
   const navigate = useNavigate();
   const [activeEra, setActiveEra] = useState<string | null>(null);
+  const [timelineEvents, setTimelineEvents] = useState<TimelineEvent[]>([]);
+
+  useEffect(() => {
+    fetchEvents();
+  }, []);
+
+  const fetchEvents = async () => {
+    const { data, error } = await supabase
+      .from("chronology_events")
+      .select("id, title, date, era, description")
+      .order("order_index", { ascending: true });
+
+    if (data) {
+      setTimelineEvents(data);
+    }
+  };
 
   const handleEventClick = (eventId: string) => {
     navigate(`/chronology/${eventId}`);
