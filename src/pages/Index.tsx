@@ -50,7 +50,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Chronology Button - Left Side */}
-      <div className="fixed top-4 left-4 z-50">
+      <div className="fixed top-24 left-4 z-50">
         <Button 
           onClick={() => navigate('/chronology')}
           variant="default"
