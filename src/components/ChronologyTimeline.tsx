@@ -74,13 +74,13 @@ export const ChronologyTimeline = () => {
               {/* Central Timeline line */}
               <div className="absolute left-1/2 top-0 bottom-0 w-1 -ml-0.5" style={{ backgroundColor: '#d4a574' }} />
 
-              <div className="space-y-32">
+              <div className="space-y-24">
                 {timelineEvents.map((event, index) => {
                   const isLeft = index % 2 === 0;
                   const showMarker = index === 0 || timelineEvents[index - 1].era !== event.era;
 
                   return (
-                    <div key={event.id} className="relative">
+                    <div key={event.id} className="relative min-h-[120px] flex items-center">
                       {/* Era marker on timeline */}
                       {showMarker && (
                         <div 
@@ -95,10 +95,9 @@ export const ChronologyTimeline = () => {
                             onClick={() => handleEventClick(event.id)}
                             className={cn(
                               "cursor-pointer transition-all duration-300",
-                              "absolute w-[45%]",
-                              isLeft ? "right-[52%] text-right" : "left-[52%] text-left"
+                              "w-[45%]",
+                              isLeft ? "mr-auto pr-8 text-right" : "ml-auto pl-8 text-left"
                             )}
-                            style={{ top: showMarker ? '0' : '-20px' }}
                           >
                             {/* Era label */}
                             {showMarker && (
