@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { ensureImagesBucket } from "@/lib/storageSetup";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -93,6 +94,10 @@ export const AlmanacManager = () => {
   const { toast } = useToast();
 
   useEffect(() => {
+    ensureImagesBucket().catch(console.error);
+  }, []);
+
+  useEffect(() => {
     fetchEntries();
   }, [activeCategory]);
 
@@ -124,28 +129,48 @@ export const AlmanacManager = () => {
   };
 
   const handleImageUpload = async (file: File): Promise<string | null> => {
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${Math.random()}.${fileExt}`;
-    const filePath = `almanac/${fileName}`;
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+      const filePath = `almanac/${fileName}`;
 
-    const { error: uploadError } = await supabase.storage
-      .from('images')
-      .upload(filePath, file);
+      const { error: uploadError } = await supabase.storage
+        .from('images')
+        .upload(filePath, file, { upsert: false });
 
-    if (uploadError) {
+      if (uploadError) {
+        console.error("Upload error:", uploadError);
+
+        if (uploadError.message?.includes("not found")) {
+          toast({
+            title: "Error",
+            description: "Storage bucket not configured. Please contact administrator.",
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Error",
+            description: `Failed to upload image: ${uploadError.message}`,
+            variant: "destructive",
+          });
+        }
+        return null;
+      }
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('images')
+        .getPublicUrl(filePath);
+
+      return publicUrl;
+    } catch (error) {
+      console.error("Image upload exception:", error);
       toast({
         title: "Error",
-        description: "Failed to upload image",
+        description: "An unexpected error occurred during upload",
         variant: "destructive",
       });
       return null;
     }
-
-    const { data: { publicUrl } } = supabase.storage
-      .from('images')
-      .getPublicUrl(filePath);
-
-    return publicUrl;
   };
 
   const handleSubmit = async () => {
