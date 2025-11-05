@@ -373,7 +373,7 @@ export const BookManager = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium mb-2">Pages</label>
                 <Input
@@ -389,18 +389,6 @@ export const BookManager = () => {
                   value={formData.language}
                   onChange={(e) => setFormData({ ...formData, language: e.target.value })}
                   placeholder="English"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-2">Rating (0-5)</label>
-                <Input
-                  type="number"
-                  step="0.1"
-                  min="0"
-                  max="5"
-                  value={formData.rating}
-                  onChange={(e) => setFormData({ ...formData, rating: e.target.value })}
-                  placeholder="4.2"
                 />
               </div>
             </div>

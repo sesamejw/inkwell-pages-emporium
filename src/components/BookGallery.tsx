@@ -1,8 +1,9 @@
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Star, ShoppingCart } from "lucide-react";
-import { useBooks } from "@/contexts/BooksContext";
+import { supabase } from "@/integrations/supabase/client";
 import bookCollection from "@/assets/book-collection.jpg";
 
 interface BookGalleryProps {
@@ -10,8 +11,32 @@ interface BookGalleryProps {
 }
 
 export const BookGallery = ({ onBookSelect }: BookGalleryProps) => {
-  const { getActiveBooks } = useBooks();
-  const activeBooks = getActiveBooks();
+  const [activeBooks, setActiveBooks] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetchBooks();
+  }, []);
+
+  const fetchBooks = async () => {
+    const { data, error } = await supabase
+      .from("books")
+      .select(`
+        *,
+        book_versions (
+          id,
+          version_type,
+          price,
+          available
+        )
+      `)
+      .eq("status", "active")
+      .gt("stock", 0)
+      .order("created_at", { ascending: false });
+
+    if (data) {
+      setActiveBooks(data);
+    }
+  };
   const renderStars = (rating: number) => {
     return Array.from({ length: 5 }, (_, i) => (
       <Star
@@ -29,23 +54,29 @@ export const BookGallery = ({ onBookSelect }: BookGalleryProps) => {
 
   const handleBookClick = (book: any) => {
     // Transform the book data to match the BookDisplay interface
+    const versions = book.book_versions?.map((v: any) => ({
+      type: v.version_type as "ebook" | "paperback" | "hardcover",
+      price: parseFloat(v.price),
+      available: v.available
+    })) || [];
+
     const transformedBook = {
       id: book.id,
       title: book.title,
       author: book.author,
-      cover: book.cover || bookCollection,
+      cover: book.cover_image_url || bookCollection,
       description: book.description || `A captivating ${book.category.toLowerCase()} that will keep you engaged from start to finish. This highly-rated book has garnered critical acclaim and reader praise alike.`,
       rating: book.rating || 4.0,
       reviewCount: Math.floor(Math.random() * 2000) + 500,
       category: book.category,
-      isbn: `978-${Math.floor(Math.random() * 1000000000)}`,
-      publishedDate: book.createdAt || "2023-01-01",
-      pages: Math.floor(Math.random() * 400) + 200,
-      language: "English",
-      versions: [
-        { type: "ebook" as const, price: book.price - 3, available: true },
-        { type: "paperback" as const, price: book.price, available: true },
-        { type: "hardcover" as const, price: book.price + 8, available: true }
+      isbn: book.isbn || `978-${Math.floor(Math.random() * 1000000000)}`,
+      publishedDate: book.published_date || "2023-01-01",
+      pages: book.pages || 288,
+      language: book.language || "English",
+      versions: versions.length > 0 ? versions : [
+        { type: "ebook" as const, price: 9.99, available: true },
+        { type: "paperback" as const, price: 12.99, available: true },
+        { type: "hardcover" as const, price: 19.99, available: true }
       ]
     };
     
@@ -80,7 +111,7 @@ export const BookGallery = ({ onBookSelect }: BookGalleryProps) => {
                     <div 
                       className="w-full h-32 bg-muted bg-cover bg-center book-shadow"
                       style={{ 
-                        backgroundImage: `url(${book.cover || bookCollection})`,
+                        backgroundImage: `url(${book.cover_image_url || bookCollection})`,
                         backgroundSize: 'cover',
                         backgroundPosition: 'center'
                       }}
@@ -117,12 +148,16 @@ export const BookGallery = ({ onBookSelect }: BookGalleryProps) => {
 
                     {/* Price */}
                     <div className="flex items-center justify-between pt-2">
-                      <span className="text-lg font-bold text-accent">
-                        ${book.price}
-                      </span>
-                      <span className="text-xs text-muted-foreground">
-                        from ${(book.price - 3).toFixed(2)}
-                      </span>
+                      {book.book_versions && book.book_versions.length > 0 && (
+                        <>
+                          <span className="text-lg font-bold text-accent">
+                            ${Math.max(...book.book_versions.map((v: any) => parseFloat(v.price))).toFixed(2)}
+                          </span>
+                          <span className="text-xs text-muted-foreground">
+                            from ${Math.min(...book.book_versions.map((v: any) => parseFloat(v.price))).toFixed(2)}
+                          </span>
+                        </>
+                      )}
                     </div>
                   </div>
                 </div>

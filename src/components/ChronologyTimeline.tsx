@@ -69,7 +69,7 @@ export const ChronologyTimeline = () => {
   };
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#e8dcc8' }}>
+    <div className="min-h-screen" style={{ backgroundColor: '#faf6f0' }}>
       {/* Hero Banner with World Map */}
       <div className="relative h-[400px] w-full overflow-hidden">
         <img 
@@ -77,7 +77,7 @@ export const ChronologyTimeline = () => {
           alt="World Map of the Realms" 
           className="w-full h-full object-cover object-center"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-[#e8dcc8]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-[#faf6f0]" />
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="text-center space-y-4 px-4">
             <h1 className="text-5xl md:text-7xl font-heading font-bold text-white drop-shadow-2xl">
@@ -97,7 +97,7 @@ export const ChronologyTimeline = () => {
           <div className="flex-1">
             <div className="relative max-w-5xl mx-auto">
               {/* Central Timeline line */}
-              <div className="absolute left-1/2 top-0 bottom-0 w-1 -ml-0.5" style={{ backgroundColor: '#d4a574' }} />
+              <div className="absolute left-1/2 top-0 bottom-0 w-1 -ml-0.5" style={{ backgroundColor: '#d4af37' }} />
 
               <div className="space-y-24">
                 {timelineEvents.map((event, index) => {
@@ -110,7 +110,7 @@ export const ChronologyTimeline = () => {
                       {showMarker && (
                         <div 
                           className="absolute left-1/2 -ml-4 w-8 h-8 rounded-full border-4 z-10"
-                          style={{ backgroundColor: '#d4a574', borderColor: '#e8dcc8' }}
+                          style={{ backgroundColor: '#d4af37', borderColor: '#faf6f0' }}
                         />
                       )}
 
@@ -126,7 +126,7 @@ export const ChronologyTimeline = () => {
                           >
                             {/* Era label */}
                             {showMarker && (
-                              <p className="text-sm mb-2 font-medium" style={{ color: '#c85a3e' }}>
+                              <p className="text-sm mb-2 font-medium" style={{ color: '#b8860b' }}>
                                 {event.era === 'BGD' ? 'The Age of Beasts' : 
                                  event.era === 'GD' ? 'The Great Darkening' : 
                                  'After Great Darkening'}
@@ -136,29 +136,29 @@ export const ChronologyTimeline = () => {
                             {/* Event title */}
                             <h3 
                               className="text-2xl font-heading font-bold mb-2 hover:opacity-80 transition-opacity"
-                              style={{ color: '#2c1810' }}
+                              style={{ color: '#3d2817' }}
                             >
                               {event.title}
                             </h3>
                             
                             {/* Date */}
-                            <p className="text-lg font-semibold" style={{ color: '#d4a574' }}>
+                            <p className="text-lg font-semibold" style={{ color: '#d4af37' }}>
                               {event.date}
                             </p>
                           </div>
                         </HoverCardTrigger>
                         <HoverCardContent 
                           side={isLeft ? "left" : "right"}
-                          className="w-96 bg-[#f5f0e8] border-[#d4a574] shadow-xl"
+                          className="w-96 bg-[#fffef8] border-[#d4af37] shadow-xl"
                         >
                           <div className="space-y-2">
-                            <h4 className="font-semibold text-lg" style={{ color: '#2c1810' }}>
+                            <h4 className="font-semibold text-lg" style={{ color: '#3d2817' }}>
                               {event.title}
                             </h4>
                             <p className="text-sm leading-relaxed" style={{ color: '#5a4a3a' }}>
                               {event.description}
                             </p>
-                            <Separator className="my-2" style={{ backgroundColor: '#d4a574' }} />
+                            <Separator className="my-2" style={{ backgroundColor: '#d4af37' }} />
                             <p className="text-xs italic" style={{ color: '#8a7a6a' }}>
                               Click to read the full chronicle
                             </p>
@@ -173,9 +173,9 @@ export const ChronologyTimeline = () => {
           </div>
 
           {/* Witnesses Almanac Sidebar */}
-          <div className="lg:w-80 lg:border-l lg:pl-8 lg:sticky lg:top-4 lg:self-start" style={{ borderColor: '#d4a574' }}>
+          <div className="lg:w-80 lg:border-l lg:pl-8 lg:sticky lg:top-4 lg:self-start" style={{ borderColor: '#d4af37' }}>
             <div className="mb-6">
-              <h3 className="text-2xl font-heading font-bold mb-2" style={{ color: '#2c1810' }}>
+              <h3 className="text-2xl font-heading font-bold mb-2" style={{ color: '#3d2817' }}>
                 Witnesses Almanac
               </h3>
               <p className="text-sm" style={{ color: '#5a4a3a' }}>Explore the world's lore</p>
@@ -190,20 +190,20 @@ export const ChronologyTimeline = () => {
                     onClick={() => handleAlmanacClick(category.id)}
                     className="w-full flex items-center gap-3 p-4 rounded-lg transition-all duration-200 text-left group border"
                     style={{ 
-                      backgroundColor: '#f5f0e8',
-                      borderColor: '#d4a574'
+                      backgroundColor: '#fffef8',
+                      borderColor: '#d4af37'
                     }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = '#e8dcc8';
-                      e.currentTarget.style.borderColor = '#c85a3e';
+                      e.currentTarget.style.backgroundColor = '#f5ecd0';
+                      e.currentTarget.style.borderColor = '#b8860b';
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = '#f5f0e8';
-                      e.currentTarget.style.borderColor = '#d4a574';
+                      e.currentTarget.style.backgroundColor = '#fffef8';
+                      e.currentTarget.style.borderColor = '#d4af37';
                     }}
                   >
                     <Icon className="w-5 h-5 transition-colors" style={{ color: '#8a7a6a' }} />
-                    <span className="font-medium" style={{ color: '#2c1810' }}>
+                    <span className="font-medium" style={{ color: '#3d2817' }}>
                       {category.title}
                     </span>
                   </button>
