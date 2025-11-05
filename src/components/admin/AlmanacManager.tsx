@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { ensureImagesBucket } from "@/lib/storageSetup";
+import { STORAGE_BUCKET } from "@/lib/storageSetup";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -94,10 +94,6 @@ export const AlmanacManager = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    ensureImagesBucket().catch(console.error);
-  }, []);
-
-  useEffect(() => {
     fetchEntries();
   }, [activeCategory]);
 
@@ -135,7 +131,7 @@ export const AlmanacManager = () => {
       const filePath = `almanac/${fileName}`;
 
       const { error: uploadError } = await supabase.storage
-        .from('images')
+        .from(STORAGE_BUCKET)
         .upload(filePath, file, { upsert: false });
 
       if (uploadError) {
@@ -158,7 +154,7 @@ export const AlmanacManager = () => {
       }
 
       const { data: { publicUrl } } = supabase.storage
-        .from('images')
+        .from(STORAGE_BUCKET)
         .getPublicUrl(filePath);
 
       return publicUrl;
