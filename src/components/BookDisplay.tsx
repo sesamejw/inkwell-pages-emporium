@@ -36,35 +36,30 @@ interface Book {
   versions: BookVersion[];
 }
 
-const defaultBook: Book = {
-  id: "1",
-  title: "The Midnight Library",
-  author: "Matt Haig",
-  description: "Between life and death there is a library, and within that library, the shelves go on forever. Every book provides a chance to try another life you could have lived. To see how things would be if you had made other choices... Would you have done anything different, if you had the chance to undo your regrets?",
-  rating: 4.2,
-  reviewCount: 1284,
-  category: "Fiction",
-  isbn: "978-0525559474",
-  publishedDate: "2020-08-13",
-  pages: 288,
-  language: "English",
-  versions: [
-    { type: "ebook", price: 12.99, available: true },
-    { type: "paperback", price: 15.99, available: true },
-    { type: "hardcover", price: 24.99, available: true }
-  ]
-};
-
 interface BookDisplayProps {
   book?: Book & { cover?: string };
   onAddToCart?: (item: any) => void;
 }
 
-export const BookDisplay = ({ book = defaultBook, onAddToCart }: BookDisplayProps) => {
+export const BookDisplay = ({ book, onAddToCart }: BookDisplayProps) => {
   const [selectedVersion, setSelectedVersion] = useState<BookVersion["type"]>("paperback");
   const [quantity, setQuantity] = useState(1);
   const [isFavorite, setIsFavorite] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
+
+  if (!book) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 px-4 text-center">
+        <div className="max-w-md">
+          <ShoppingCart className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+          <h2 className="text-2xl font-heading font-bold mb-2">No Books Available</h2>
+          <p className="text-muted-foreground">
+            There are currently no books in our collection. Please check back later or contact us for more information.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   const selectedPrice = book.versions.find(v => v.type === selectedVersion)?.price || 0;
   
