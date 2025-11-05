@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   Star, 
   Heart, 
@@ -14,6 +15,8 @@ import {
 } from "lucide-react";
 import bookCoverDefault from "@/assets/book-cover-default.jpg";
 import { Book3D } from "./Book3D";
+import { ReviewList } from "./ReviewList";
+import { ReviewForm } from "./ReviewForm";
 
 interface BookVersion {
   type: "ebook" | "paperback" | "hardcover";
@@ -46,6 +49,7 @@ export const BookDisplay = ({ book, onAddToCart }: BookDisplayProps) => {
   const [quantity, setQuantity] = useState(1);
   const [isFavorite, setIsFavorite] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
+  const [reviewsKey, setReviewsKey] = useState(0);
 
   if (!book) {
     return (
@@ -97,8 +101,14 @@ export const BookDisplay = ({ book, onAddToCart }: BookDisplayProps) => {
     }
   };
 
+  const handleReviewSubmitted = () => {
+    setReviewsKey(prev => prev + 1);
+  };
+
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-7xl mx-auto p-6">
+    <div className="max-w-7xl mx-auto p-6 space-y-8">
+      {/* Book Display Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
       {/* Book Cover */}
       <div className="flex justify-center lg:justify-end">
         <div className="relative group">
@@ -260,6 +270,23 @@ export const BookDisplay = ({ book, onAddToCart }: BookDisplayProps) => {
             </div>
           </div>
         </Card>
+      </div>
+    </div>
+
+      {/* Reviews Section */}
+      <div className="max-w-5xl mx-auto">
+        <Tabs defaultValue="reviews" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="reviews">Reviews</TabsTrigger>
+            <TabsTrigger value="write">Write a Review</TabsTrigger>
+          </TabsList>
+          <TabsContent value="reviews" className="mt-6">
+            <ReviewList key={reviewsKey} bookId={book.id} />
+          </TabsContent>
+          <TabsContent value="write" className="mt-6">
+            <ReviewForm bookId={book.id} onReviewSubmitted={handleReviewSubmitted} />
+          </TabsContent>
+        </Tabs>
       </div>
 
       {/* Book Preview Modal */}
