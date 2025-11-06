@@ -39,12 +39,16 @@ export const BookManager = () => {
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const [ebookPDFFile, setEbookPDFFile] = useState<File | null>(null);
+  const [previewPDFFile, setPreviewPDFFile] = useState<File | null>(null);
   const [formData, setFormData] = useState({
     title: "",
     author: "",
     category: "",
     description: "",
     cover_image_url: "",
+    ebook_pdf_url: "",
+    preview_pdf_url: "",
     isbn: "",
     published_date: "",
     pages: "",
@@ -218,12 +222,20 @@ export const BookManager = () => {
       .select("*")
       .eq("book_id", book.id);
 
+    const { data: bookData } = await supabase
+      .from("books")
+      .select("ebook_pdf_url, preview_pdf_url")
+      .eq("id", book.id)
+      .maybeSingle();
+
     setFormData({
       title: book.title,
       author: book.author,
       category: book.category,
       description: book.description || "",
       cover_image_url: book.cover_image_url || "",
+      ebook_pdf_url: bookData?.ebook_pdf_url || "",
+      preview_pdf_url: bookData?.preview_pdf_url || "",
       isbn: book.isbn || "",
       published_date: book.published_date || "",
       pages: book.pages?.toString() || "",
@@ -273,6 +285,8 @@ export const BookManager = () => {
       category: "",
       description: "",
       cover_image_url: "",
+      ebook_pdf_url: "",
+      preview_pdf_url: "",
       isbn: "",
       published_date: "",
       pages: "",
@@ -287,6 +301,8 @@ export const BookManager = () => {
       ]
     });
     setImageFile(null);
+    setEbookPDFFile(null);
+    setPreviewPDFFile(null);
     setIsAdding(false);
     setEditingId(null);
   };
@@ -424,6 +440,31 @@ export const BookManager = () => {
               {formData.cover_image_url && (
                 <p className="text-xs text-muted-foreground mt-1">Current: {formData.cover_image_url}</p>
               )}
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium mb-2">E-book PDF File</label>
+                <Input
+                  type="file"
+                  accept=".pdf"
+                  onChange={(e) => setEbookPDFFile(e.target.files?.[0] || null)}
+                />
+                {formData.ebook_pdf_url && (
+                  <p className="text-xs text-muted-foreground mt-1">Current: {formData.ebook_pdf_url}</p>
+                )}
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">Preview PDF File</label>
+                <Input
+                  type="file"
+                  accept=".pdf"
+                  onChange={(e) => setPreviewPDFFile(e.target.files?.[0] || null)}
+                />
+                {formData.preview_pdf_url && (
+                  <p className="text-xs text-muted-foreground mt-1">Current: {formData.preview_pdf_url}</p>
+                )}
+              </div>
             </div>
 
             <div>

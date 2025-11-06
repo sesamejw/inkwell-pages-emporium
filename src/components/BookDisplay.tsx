@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -50,6 +51,29 @@ export const BookDisplay = ({ book, onAddToCart }: BookDisplayProps) => {
   const [isFavorite, setIsFavorite] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [reviewsKey, setReviewsKey] = useState(0);
+  const [rating, setRating] = useState(0);
+  const [reviewCount, setReviewCount] = useState(0);
+
+  useEffect(() => {
+    const fetchRatingData = async () => {
+      if (!book?.id) return;
+      
+      const { data, error } = await supabase
+        .from("reviews")
+        .select("rating")
+        .eq("book_id", book.id);
+
+      if (!error && data) {
+        const avgRating = data.length > 0 
+          ? data.reduce((sum, review) => sum + review.rating, 0) / data.length 
+          : 0;
+        setRating(avgRating);
+        setReviewCount(data.length);
+      }
+    };
+
+    fetchRatingData();
+  }, [book?.id, reviewsKey]);
 
   if (!book) {
     return (
@@ -150,11 +174,11 @@ export const BookDisplay = ({ book, onAddToCart }: BookDisplayProps) => {
         {/* Rating and Reviews */}
         <div className="flex items-center space-x-4">
           <div className="flex items-center space-x-1">
-            {renderStars(book.rating)}
+            {renderStars(rating)}
           </div>
-          <span className="text-lg font-medium">{book.rating}</span>
+          <span className="text-lg font-medium">{rating.toFixed(1)}</span>
           <span className="text-muted-foreground">
-            ({book.reviewCount.toLocaleString()} reviews)
+            ({reviewCount.toLocaleString()} {reviewCount === 1 ? 'review' : 'reviews'})
           </span>
         </div>
 

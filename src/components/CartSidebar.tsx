@@ -1,3 +1,5 @@
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Separator } from "@/components/ui/separator";
@@ -29,6 +31,9 @@ export const CartSidebar = ({
   onUpdateQuantity, 
   onRemoveItem 
 }: CartSidebarProps) => {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+
   const formatVersionName = (type: "ebook" | "paperback" | "hardcover") => {
     return type === "ebook" ? "E-book" : type.charAt(0).toUpperCase() + type.slice(1);
   };
@@ -36,6 +41,15 @@ export const CartSidebar = ({
   const subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const tax = subtotal * 0.08; // 8% tax
   const total = subtotal + tax;
+
+  const handleCheckout = () => {
+    if (!user) {
+      navigate("/auth", { state: { returnTo: "/checkout", items } });
+    } else {
+      navigate("/checkout", { state: { items } });
+    }
+    onClose();
+  };
 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
@@ -143,7 +157,11 @@ export const CartSidebar = ({
                 </div>
               </div>
 
-              <Button className="w-full btn-professional" size="lg">
+              <Button 
+                className="w-full btn-professional" 
+                size="lg"
+                onClick={handleCheckout}
+              >
                 Proceed to Checkout
               </Button>
             </div>

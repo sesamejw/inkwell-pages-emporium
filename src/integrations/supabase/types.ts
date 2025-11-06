@@ -347,10 +347,12 @@ export type Database = {
           cover_image_url: string | null
           created_at: string | null
           description: string | null
+          ebook_pdf_url: string | null
           id: string
           isbn: string | null
           language: string | null
           pages: number | null
+          preview_pdf_url: string | null
           published_date: string | null
           rating: number | null
           sales: number | null
@@ -365,10 +367,12 @@ export type Database = {
           cover_image_url?: string | null
           created_at?: string | null
           description?: string | null
+          ebook_pdf_url?: string | null
           id?: string
           isbn?: string | null
           language?: string | null
           pages?: number | null
+          preview_pdf_url?: string | null
           published_date?: string | null
           rating?: number | null
           sales?: number | null
@@ -383,10 +387,12 @@ export type Database = {
           cover_image_url?: string | null
           created_at?: string | null
           description?: string | null
+          ebook_pdf_url?: string | null
           id?: string
           isbn?: string | null
           language?: string | null
           pages?: number | null
+          preview_pdf_url?: string | null
           published_date?: string | null
           rating?: number | null
           sales?: number | null

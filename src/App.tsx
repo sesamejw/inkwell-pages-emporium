@@ -11,6 +11,7 @@ import { Forum } from "./pages/Forum";
 import { Admin } from "./pages/Admin";
 import { Auth } from "./pages/Auth";
 import { MyBooks } from "./pages/MyBooks";
+import { Checkout } from "./pages/Checkout";
 import { Settings } from "./pages/Settings";
 import EventDetail from "./pages/EventDetail";
 import AlmanacCategory from "./pages/AlmanacCategory";
@@ -35,6 +36,7 @@ const App = () => (
                 <Route path="/admin" element={<Admin />} />
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/my-books" element={<MyBooks />} />
+                <Route path="/checkout" element={<Checkout />} />
                 <Route path="/settings" element={<Settings />} />
                 <Route path="/chronology" element={<ChronologyTimeline />} />
                 <Route path="/chronology/:eventId" element={<EventDetail />} />
