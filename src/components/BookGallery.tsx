@@ -8,14 +8,15 @@ import bookCollection from "@/assets/book-collection.jpg";
 
 interface BookGalleryProps {
   onBookSelect: (book: any) => void;
+  selectedBookId?: string;
 }
 
-export const BookGallery = ({ onBookSelect }: BookGalleryProps) => {
+export const BookGallery = ({ onBookSelect, selectedBookId }: BookGalleryProps) => {
   const [activeBooks, setActiveBooks] = useState<any[]>([]);
 
   useEffect(() => {
     fetchBooks();
-  }, []);
+  }, [selectedBookId]);
 
   const fetchBooks = async () => {
     const { data, error } = await supabase
@@ -31,10 +32,14 @@ export const BookGallery = ({ onBookSelect }: BookGalleryProps) => {
       `)
       .eq("status", "active")
       .gt("stock", 0)
-      .order("created_at", { ascending: false });
+      .order("updated_at", { ascending: false });
 
     if (data) {
-      setActiveBooks(data);
+      // Filter out the currently selected book
+      const filteredBooks = selectedBookId 
+        ? data.filter(book => book.id !== selectedBookId)
+        : data;
+      setActiveBooks(filteredBooks);
     }
   };
   const renderStars = (rating: number) => {
@@ -108,14 +113,13 @@ export const BookGallery = ({ onBookSelect }: BookGalleryProps) => {
                 <div className="p-6">
                   {/* Book Cover */}
                   <div className="relative mb-4 group">
-                    <div 
-                      className="w-full h-32 bg-muted bg-cover bg-center book-shadow"
-                      style={{ 
-                        backgroundImage: `url(${book.cover_image_url || bookCollection})`,
-                        backgroundSize: 'cover',
-                        backgroundPosition: 'center'
-                      }}
-                    />
+                    <div className="w-full aspect-[2/3] bg-muted rounded-md overflow-hidden book-shadow">
+                      <img
+                        src={book.cover_image_url || bookCollection}
+                        alt={book.title}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
                       <Button size="sm" variant="secondary" className="bg-background/90 backdrop-blur">
                         <ShoppingCart className="h-4 w-4 mr-2" />
