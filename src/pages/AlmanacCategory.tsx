@@ -46,12 +46,12 @@ const AlmanacCategory = () => {
     if (!tableName) return;
 
     const { data, error } = await supabase
-      .from(tableName)
+      .from(tableName as any)
       .select("*")
       .order("order_index", { ascending: true });
 
     if (!error && data) {
-      setEntries(data);
+      setEntries(data as any);
     }
     setLoading(false);
   };

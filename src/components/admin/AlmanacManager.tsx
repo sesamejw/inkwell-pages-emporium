@@ -101,7 +101,7 @@ export const AlmanacManager = () => {
 
   const fetchEntries = async () => {
     const { data, error } = await supabase
-      .from(config.table)
+      .from(config.table as any)
       .select("*")
       .order("order_index", { ascending: true });
 
@@ -114,7 +114,7 @@ export const AlmanacManager = () => {
       return;
     }
 
-    setEntries(data || []);
+    setEntries((data as any) || []);
   };
 
   const generateSlug = (name: string) => {
@@ -204,7 +204,7 @@ export const AlmanacManager = () => {
 
     if (editingId) {
       const { error } = await supabase
-        .from(config.table)
+        .from(config.table as any)
         .update(entryData)
         .eq("id", editingId);
 
@@ -218,7 +218,7 @@ export const AlmanacManager = () => {
       }
     } else {
       const { error } = await supabase
-        .from(config.table)
+        .from(config.table as any)
         .insert(entryData);
 
       if (error) {
@@ -261,7 +261,7 @@ export const AlmanacManager = () => {
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this entry?")) return;
 
-    const { error } = await supabase.from(config.table).delete().eq("id", id);
+    const { error } = await supabase.from(config.table as any).delete().eq("id", id);
 
     if (error) {
       toast({
