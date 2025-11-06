@@ -130,7 +130,7 @@ export const Checkout = () => {
           subtotal,
           tax,
           total,
-          status: "completed",
+          status: "pending",
         })
         .select()
         .single();
