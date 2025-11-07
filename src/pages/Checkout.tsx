@@ -8,7 +8,8 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "@/hooks/use-toast";
-import { CreditCard, ShoppingCart } from "lucide-react";
+import { ShoppingCart } from "lucide-react";
+import { usePaystackPayment } from "react-paystack";
 
 interface CartItem {
   id: string;
@@ -83,8 +84,7 @@ export const Checkout = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSuccess = async (reference: any) => {
     setProcessing(true);
 
     try {
@@ -117,8 +117,8 @@ export const Checkout = () => {
         customerId = newCustomer.id;
       }
 
-      // Generate order number
-      const orderNumber = `ORD-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      // Generate order number (use reference from payment)
+      const orderNumber = reference.reference;
 
       // Create order
       const { data: order, error: orderError } = await supabase
@@ -129,7 +129,7 @@ export const Checkout = () => {
           subtotal,
           tax: 0,
           total,
-          status: "pending",
+          status: "completed",
         })
         .select()
         .single();
@@ -182,21 +182,98 @@ export const Checkout = () => {
       }
 
       toast({
-        title: "Order Completed!",
-        description: `Your order ${orderNumber} has been processed successfully.`,
+        title: "Payment Successful!",
+        description: `Your order has been completed. Reference: ${reference.reference}`,
       });
 
       navigate("/my-books");
     } catch (error: any) {
       console.error("Checkout error:", error);
       toast({
-        title: "Checkout Failed",
-        description: error.message || "An error occurred during checkout",
+        title: "Order Failed",
+        description: error.message || "An error occurred while processing your order",
         variant: "destructive",
       });
     } finally {
       setProcessing(false);
     }
+  };
+
+  const onClose = () => {
+    toast({
+      title: "Payment Cancelled",
+      description: "You cancelled the payment process",
+    });
+  };
+
+  // Paystack configuration
+  const paystackConfig = {
+    reference: `ORD-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+    email: formData.email,
+    amount: Math.round(total * 100), // Convert to cents
+    publicKey: "pk_test_6f642162c7fa968894f117624d5a95cca9590fe9",
+    currency: "USD",
+    metadata: {
+      custom_fields: [
+        {
+          display_name: "Full Name",
+          variable_name: "full_name",
+          value: formData.fullName,
+        },
+        {
+          display_name: "Phone",
+          variable_name: "phone",
+          value: formData.phone,
+        },
+        {
+          display_name: "Address",
+          variable_name: "address",
+          value: formData.address,
+        },
+        {
+          display_name: "City",
+          variable_name: "city",
+          value: formData.city,
+        },
+        {
+          display_name: "Country",
+          variable_name: "country",
+          value: formData.country,
+        },
+        {
+          display_name: "Postal Code",
+          variable_name: "postal_code",
+          value: formData.postalCode,
+        },
+      ],
+      cart_items: cartItems.map(item => ({
+        id: item.id,
+        title: item.title,
+        version: item.version,
+        quantity: item.quantity,
+        price: item.price,
+      })),
+    },
+  };
+
+  const initializePayment = usePaystackPayment(paystackConfig);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Validate form before opening payment
+    if (!formData.fullName || !formData.email || !formData.address || 
+        !formData.city || !formData.country || !formData.postalCode) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in all required shipping information",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Open Paystack payment popup
+    initializePayment({ onSuccess, onClose } as any);
   };
 
   return (
