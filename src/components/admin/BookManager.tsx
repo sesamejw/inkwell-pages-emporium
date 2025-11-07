@@ -237,7 +237,7 @@ export const BookManager = () => {
 
     // Insert versions for both new and edited books
     const versions = formData.versions
-      .filter(v => v.price)
+      .filter(v => v.price && v.price.trim() !== "" && parseFloat(v.price) > 0)
       .map(v => ({
         book_id: bookId,
         version_type: v.version_type,
@@ -246,7 +246,15 @@ export const BookManager = () => {
       }));
 
     if (versions.length > 0) {
-      await supabase.from("book_versions").insert(versions);
+      const { error: versionError } = await supabase.from("book_versions").insert(versions);
+      if (versionError) {
+        console.error("Error inserting versions:", versionError);
+        toast({
+          title: "Warning",
+          description: "Book saved but some version data may not have been saved correctly",
+          variant: "destructive",
+        });
+      }
     }
 
     // Upload PDFs and update book record with URLs
