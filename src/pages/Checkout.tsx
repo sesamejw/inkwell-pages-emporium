@@ -139,10 +139,13 @@ export const Checkout = () => {
 
       // Create order items and purchases
       for (const item of cartItems) {
+        // Extract the actual book UUID (remove version suffix if present)
+        const bookId = item.id.split('-').slice(0, 5).join('-');
+        
         // Insert order item
         const { error: orderItemError } = await supabase.from("order_items").insert({
           order_id: order.id,
-          book_id: item.id,
+          book_id: bookId,
           quantity: item.quantity,
           price: item.price,
           version_type: item.version,
@@ -157,14 +160,14 @@ export const Checkout = () => {
         const { data: book } = await supabase
           .from("books")
           .select("title, author, cover_image_url")
-          .eq("id", item.id)
+          .eq("id", bookId)
           .single();
 
         // Create purchase record for each quantity
         for (let i = 0; i < item.quantity; i++) {
           const { error: purchaseError } = await supabase.from("purchases").insert({
             user_id: user.id,
-            book_id: item.id,
+            book_id: bookId,
             price: item.price,
             book_title: book?.title || item.title,
             book_author: book?.author || item.author,
