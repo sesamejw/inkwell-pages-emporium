@@ -1,14 +1,17 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useBooks } from "@/contexts/BooksContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import {
   BookOpen,
   DollarSign,
   Users,
-  TrendingUp
+  TrendingUp,
+  Shield
 } from "lucide-react";
 import { ChronologyManager } from "@/components/ChronologyManager";
 import { BookManager } from "@/components/admin/BookManager";
@@ -19,6 +22,10 @@ import { AnalyticsManager } from "@/components/admin/AnalyticsManager";
 
 export const Admin = () => {
   const { books } = useBooks();
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
     totalBooks: 0,
     monthlyRevenue: 0,
@@ -27,8 +34,32 @@ export const Admin = () => {
   });
 
   useEffect(() => {
+    checkAdminAccess();
+  }, [user]);
+
+  const checkAdminAccess = async () => {
+    if (!user) {
+      navigate("/admin-auth");
+      return;
+    }
+
+    // Check if user has admin role
+    const { data, error } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", user.id)
+      .eq("role", "admin")
+      .single();
+
+    if (!data || error) {
+      navigate("/admin-auth");
+      return;
+    }
+
+    setIsAdmin(true);
+    setLoading(false);
     fetchStats();
-  }, []);
+  };
 
   const fetchStats = async () => {
     // Fetch total books
@@ -64,6 +95,25 @@ export const Admin = () => {
     });
   };
 
+  const handleLogout = async () => {
+    await signOut();
+    navigate("/admin-auth");
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Card className="p-6">
+          <p className="text-muted-foreground">Verifying admin access...</p>
+        </Card>
+      </div>
+    );
+  }
+
+  if (!isAdmin) {
+    return null;
+  }
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -78,6 +128,14 @@ export const Admin = () => {
                 Manage your bookstore inventory and sales
               </p>
             </div>
+            <Button 
+              variant="outline" 
+              onClick={handleLogout}
+              className="flex items-center gap-2"
+            >
+              <Shield className="h-4 w-4" />
+              Logout
+            </Button>
           </div>
 
           {/* Dashboard Stats */}
