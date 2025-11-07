@@ -15,8 +15,8 @@ export const PDFViewer = ({ pdfUrl, title, isOpen, onClose }: PDFViewerProps) =>
   
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-3xl h-[95vh] w-[90vw] sm:w-[70vw] flex flex-col p-6">
-        <DialogHeader className="pb-4">
+      <DialogContent className="w-[45vw] max-w-[600px] aspect-[1/2] max-h-[95vh] flex flex-col p-6">
+        <DialogHeader className="pb-4 flex-shrink-0">
           <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
         <div className="flex-1 overflow-hidden relative min-h-0">
