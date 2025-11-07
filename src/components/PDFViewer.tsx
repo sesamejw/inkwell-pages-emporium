@@ -15,7 +15,7 @@ export const PDFViewer = ({ pdfUrl, title, isOpen, onClose }: PDFViewerProps) =>
   
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-6xl h-[95vh] flex flex-col p-6">
+      <DialogContent className="max-w-3xl h-[95vh] w-[90vw] sm:w-[70vw] flex flex-col p-6">
         <DialogHeader className="pb-4">
           <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
