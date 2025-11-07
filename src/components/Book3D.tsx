@@ -52,55 +52,56 @@ export const Book3D = ({ book, onClose }: Book3DProps) => {
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm">
-      <Button
-        variant="ghost"
-        size="icon"
-        className="absolute top-4 right-4 z-10 bg-background/80 backdrop-blur hover:bg-background text-foreground"
-        onClick={onClose}
-      >
-        <X className="h-6 w-6" />
-      </Button>
+  <Button
+    variant="ghost"
+    size="icon"
+    className="absolute top-4 right-4 z-10 bg-background/80 backdrop-blur hover:bg-background text-foreground"
+    onClick={onClose}
+  >
+    <X className="h-6 w-6" />
+  </Button>
 
-      <div className="w-full max-w-4xl h-[80vh] flex flex-col items-center justify-center p-4">
-        <div className="text-center mb-4 bg-background/80 backdrop-blur px-6 py-3 rounded-lg">
-          <h3 className="text-xl font-semibold text-primary">{book.title}</h3>
-          <p className="text-muted-foreground">by {book.author}</p>
+  <div className="w-full max-w-4xl h-[80vh] flex flex-col items-center justify-center p-4">
+    <div className="text-center mb-4 bg-background/80 backdrop-blur px-6 py-3 rounded-lg">
+      <h3 className="text-xl font-semibold text-primary">{book.title}</h3>
+      <p className="text-muted-foreground">by {book.author}</p>
+    </div>
+
+    <div className="relative w-full h-full flex items-center justify-center">
+      {isLoading ? (
+        <div className="w-full h-full bg-background rounded-lg shadow-2xl p-4">
+          <Skeleton className="w-full h-full" />
         </div>
-
-        <div className="relative w-full h-full flex items-center justify-center">
-          {isLoading ? (
-            <div className="w-full h-full bg-background rounded-lg shadow-2xl p-4">
+      ) : previewPDF ? (
+        <div className="relative aspect-[3/4] max-h-full max-w-full bg-background rounded-lg shadow-2xl overflow-hidden">
+          {iframeLoading && (
+            <div className="absolute inset-0 flex items-center justify-center bg-background z-10">
               <Skeleton className="w-full h-full" />
             </div>
-          ) : previewPDF ? (
-            <div className="w-full h-full bg-background rounded-lg shadow-2xl overflow-hidden relative">
-              {iframeLoading && (
-                <div className="absolute inset-0 flex items-center justify-center bg-background z-10">
-                  <Skeleton className="w-full h-full" />
-                </div>
-              )}
-              <iframe
-                src={`https://docs.google.com/viewer?url=${encodeURIComponent(previewPDF)}&embedded=true`}
-                className="w-full h-full border-0"
-                title={`${book.title} Preview`}
-                onLoad={() => setIframeLoading(false)}
-              />
-            </div>
-          ) : (
-            <div className="w-full h-full bg-background rounded-lg shadow-2xl flex flex-col items-center justify-center p-8 text-center">
-              <FileX className="h-16 w-16 text-muted-foreground mb-4" />
-              <h4 className="text-lg font-semibold text-foreground mb-2">No Preview Available</h4>
-              <p className="text-sm text-muted-foreground">
-                A preview has not been uploaded for this book yet.
-              </p>
-            </div>
           )}
+          <iframe
+            src={`https://docs.google.com/viewer?url=${encodeURIComponent(previewPDF)}&embedded=true`}
+            className="w-full h-full border-0"
+            title={`${book.title} Preview`}
+            onLoad={() => setIframeLoading(false)}
+          />
         </div>
-
-        <p className="text-xs text-muted-foreground mt-4 text-center">
-          Press ESC to close
-        </p>
-      </div>
+      ) : (
+        <div className="w-full h-full bg-background rounded-lg shadow-2xl flex flex-col items-center justify-center p-8 text-center">
+          <FileX className="h-16 w-16 text-muted-foreground mb-4" />
+          <h4 className="text-lg font-semibold text-foreground mb-2">No Preview Available</h4>
+          <p className="text-sm text-muted-foreground">
+            A preview has not been uploaded for this book yet.
+          </p>
+        </div>
+      )}
     </div>
+
+    <p className="text-xs text-muted-foreground mt-4 text-center">
+      Press ESC to close
+    </p>
+  </div>
+</div>
+
   );
 };
