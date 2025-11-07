@@ -33,6 +33,7 @@ interface ForumPost {
   replies_count: number;
   likes_count: number;
   is_sticky?: boolean;
+  user_has_liked?: boolean;
 }
 
 const categories = [
@@ -65,6 +66,10 @@ export const Forum = () => {
     category: "Book Discussion",
     content: "",
   });
+  const [showReplyModal, setShowReplyModal] = useState(false);
+  const [selectedPost, setSelectedPost] = useState<ForumPost | null>(null);
+  const [replyContent, setReplyContent] = useState("");
+  const [replies, setReplies] = useState<any[]>([]);
 
   useEffect(() => {
     fetchPosts();
@@ -92,6 +97,16 @@ export const Forum = () => {
 
       if (error) throw error;
 
+      // Check which posts the user has liked
+      let userLikes: string[] = [];
+      if (user) {
+        const { data: likesData } = await supabase
+          .from("forum_likes")
+          .select("post_id")
+          .eq("user_id", user.id);
+        userLikes = likesData?.map((like) => like.post_id) || [];
+      }
+
       const formattedPosts = data.map((post: any) => ({
         id: post.id,
         title: post.title,
@@ -103,6 +118,7 @@ export const Forum = () => {
         replies_count: post.replies_count,
         likes_count: post.likes_count,
         is_sticky: post.is_sticky,
+        user_has_liked: userLikes.includes(post.id),
       }));
 
       setPosts(formattedPosts);
@@ -202,6 +218,120 @@ export const Forum = () => {
       post.content.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
   });
+
+  const handleLikePost = async (postId: string, currentlyLiked: boolean) => {
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "Please sign in to like posts",
+        variant: "destructive",
+      });
+      navigate("/auth");
+      return;
+    }
+
+    try {
+      if (currentlyLiked) {
+        // Unlike the post
+        const { error } = await supabase
+          .from("forum_likes")
+          .delete()
+          .eq("post_id", postId)
+          .eq("user_id", user.id);
+
+        if (error) throw error;
+      } else {
+        // Like the post
+        const { error } = await supabase
+          .from("forum_likes")
+          .insert({ post_id: postId, user_id: user.id });
+
+        if (error) throw error;
+      }
+
+      // Refresh posts to update counts
+      fetchPosts();
+    } catch (error: any) {
+      console.error("Error liking post:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update like",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleOpenReply = async (post: ForumPost) => {
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "Please sign in to reply",
+        variant: "destructive",
+      });
+      navigate("/auth");
+      return;
+    }
+
+    setSelectedPost(post);
+    setShowReplyModal(true);
+
+    // Fetch replies for this post
+    try {
+      const { data, error } = await supabase
+        .from("forum_replies")
+        .select(`
+          id,
+          content,
+          created_at,
+          author_id,
+          profiles (username)
+        `)
+        .eq("post_id", post.id)
+        .order("created_at", { ascending: true });
+
+      if (error) throw error;
+      setReplies(data || []);
+    } catch (error) {
+      console.error("Error fetching replies:", error);
+    }
+  };
+
+  const handleCreateReply = async () => {
+    if (!user || !selectedPost || !replyContent.trim()) {
+      toast({
+        title: "Missing information",
+        description: "Please enter a reply",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const { error } = await supabase.from("forum_replies").insert({
+        post_id: selectedPost.id,
+        author_id: user.id,
+        content: replyContent,
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Your reply has been posted",
+      });
+
+      setReplyContent("");
+      setShowReplyModal(false);
+      fetchPosts();
+    } catch (error: any) {
+      console.error("Error creating reply:", error);
+      toast({
+        title: "Error",
+        description: "Failed to post reply",
+        variant: "destructive",
+      });
+    }
+  };
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -381,14 +511,22 @@ export const Forum = () => {
                         </div>
 
                         <div className="flex items-center space-x-4">
-                          <div className="flex items-center space-x-1">
-                            <ThumbsUp className="h-4 w-4" />
+                          <button
+                            onClick={() => handleLikePost(post.id, post.user_has_liked || false)}
+                            className={`flex items-center space-x-1 hover:text-accent transition-colors ${
+                              post.user_has_liked ? "text-accent" : ""
+                            }`}
+                          >
+                            <ThumbsUp className={`h-4 w-4 ${post.user_has_liked ? "fill-current" : ""}`} />
                             <span>{post.likes_count}</span>
-                          </div>
-                          <div className="flex items-center space-x-1">
+                          </button>
+                          <button
+                            onClick={() => handleOpenReply(post)}
+                            className="flex items-center space-x-1 hover:text-accent transition-colors"
+                          >
                             <MessageCircle className="h-4 w-4" />
                             <span>{post.replies_count}</span>
-                          </div>
+                          </button>
                         </div>
                       </div>
                     </div>
@@ -399,6 +537,91 @@ export const Forum = () => {
           </div>
         </div>
       </div>
+
+      {/* Reply Modal */}
+      {showReplyModal && selectedPost && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <Card className="w-full max-w-2xl mx-4 max-h-[80vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-playfair font-bold">
+                  {selectedPost.title}
+                </h2>
+                <Button variant="ghost" size="icon" onClick={() => setShowReplyModal(false)}>
+                  ×
+                </Button>
+              </div>
+
+              {/* Original Post */}
+              <Card className="p-4 mb-6 bg-muted/30">
+                <div className="flex items-start space-x-3 mb-3">
+                  <Avatar className="w-8 h-8 bg-accent/10 flex items-center justify-center">
+                    <span className="text-xs font-medium text-accent">
+                      {selectedPost.author_username.charAt(0).toUpperCase()}
+                    </span>
+                  </Avatar>
+                  <div>
+                    <p className="font-medium">{selectedPost.author_username}</p>
+                    <p className="text-xs text-muted-foreground">{formatDate(selectedPost.created_at)}</p>
+                  </div>
+                </div>
+                <p className="text-sm">{selectedPost.content}</p>
+              </Card>
+
+              {/* Replies List */}
+              <div className="space-y-4 mb-6">
+                <h3 className="font-semibold">
+                  Replies ({replies.length})
+                </h3>
+                {replies.length === 0 ? (
+                  <p className="text-sm text-muted-foreground text-center py-4">
+                    No replies yet. Be the first to reply!
+                  </p>
+                ) : (
+                  replies.map((reply: any) => (
+                    <Card key={reply.id} className="p-4">
+                      <div className="flex items-start space-x-3 mb-2">
+                        <Avatar className="w-8 h-8 bg-accent/10 flex items-center justify-center">
+                          <span className="text-xs font-medium text-accent">
+                            {reply.profiles?.username?.charAt(0).toUpperCase()}
+                          </span>
+                        </Avatar>
+                        <div>
+                          <p className="font-medium text-sm">{reply.profiles?.username || "Unknown"}</p>
+                          <p className="text-xs text-muted-foreground">{formatDate(reply.created_at)}</p>
+                        </div>
+                      </div>
+                      <p className="text-sm ml-11">{reply.content}</p>
+                    </Card>
+                  ))
+                )}
+              </div>
+
+              {/* Reply Form */}
+              <div className="space-y-4">
+                <Separator />
+                <div>
+                  <label className="block text-sm font-medium mb-2">Your Reply</label>
+                  <Textarea
+                    placeholder="Share your thoughts..."
+                    rows={4}
+                    value={replyContent}
+                    onChange={(e) => setReplyContent(e.target.value)}
+                  />
+                </div>
+                <div className="flex justify-end space-x-3">
+                  <Button variant="outline" onClick={() => setShowReplyModal(false)}>
+                    Cancel
+                  </Button>
+                  <Button className="btn-professional" onClick={handleCreateReply}>
+                    Post Reply
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </Card>
+        </div>
+      )}
 
       {/* New Post Modal */}
       {showNewPost && (
