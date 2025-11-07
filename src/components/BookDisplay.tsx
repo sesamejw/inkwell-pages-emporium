@@ -206,13 +206,17 @@ export const BookDisplay = ({ book, onAddToCart }: BookDisplayProps) => {
                 } ${!version.available ? "opacity-50 cursor-not-allowed" : ""}`}
                 onClick={() => version.available && setSelectedVersion(version.type)}
               >
-                <div className="text-center">
-                  <p className="font-medium">{formatVersionName(version.type)}</p>
-                  <p className="text-lg font-bold text-accent">
+                <div className="text-center relative">
+                  <p className={`font-medium ${!version.available ? "line-through" : ""}`}>
+                    {formatVersionName(version.type)}
+                  </p>
+                  <p className={`text-lg font-bold text-accent ${!version.available ? "line-through" : ""}`}>
                     ${version.price.toFixed(2)}
                   </p>
                   {!version.available && (
-                    <p className="text-xs text-destructive mt-1">Out of Stock</p>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <Badge variant="destructive" className="text-xs">Unavailable</Badge>
+                    </div>
                   )}
                 </div>
               </Card>

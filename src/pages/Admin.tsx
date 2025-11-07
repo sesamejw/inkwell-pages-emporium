@@ -1,7 +1,9 @@
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useBooks } from "@/contexts/BooksContext";
+import { supabase } from "@/integrations/supabase/client";
 import {
   BookOpen,
   DollarSign,
@@ -17,6 +19,50 @@ import { AnalyticsManager } from "@/components/admin/AnalyticsManager";
 
 export const Admin = () => {
   const { books } = useBooks();
+  const [stats, setStats] = useState({
+    totalBooks: 0,
+    monthlyRevenue: 0,
+    totalSales: 0,
+    totalCustomers: 0
+  });
+
+  useEffect(() => {
+    fetchStats();
+  }, []);
+
+  const fetchStats = async () => {
+    // Fetch total books
+    const { count: booksCount } = await supabase
+      .from("books")
+      .select("*", { count: "exact", head: true });
+
+    // Fetch monthly revenue (current month)
+    const currentMonth = new Date();
+    const firstDay = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1).toISOString();
+    const { data: monthlyOrders } = await supabase
+      .from("orders")
+      .select("total")
+      .gte("created_at", firstDay);
+    
+    const monthlyRevenue = monthlyOrders?.reduce((sum, order) => sum + Number(order.total), 0) || 0;
+
+    // Fetch total sales
+    const { count: salesCount } = await supabase
+      .from("orders")
+      .select("*", { count: "exact", head: true });
+
+    // Fetch total customers
+    const { count: customersCount } = await supabase
+      .from("customers")
+      .select("*", { count: "exact", head: true });
+
+    setStats({
+      totalBooks: booksCount || 0,
+      monthlyRevenue,
+      totalSales: salesCount || 0,
+      totalCustomers: customersCount || 0
+    });
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -40,7 +86,7 @@ export const Admin = () => {
               <div className="flex items-center space-x-3">
                 <BookOpen className="h-8 w-8 text-accent" />
                 <div>
-                  <p className="text-3xl font-bold">{books.length}</p>
+                  <p className="text-3xl font-bold">{stats.totalBooks}</p>
                   <p className="text-sm text-muted-foreground">Total Books</p>
                 </div>
               </div>
@@ -49,7 +95,7 @@ export const Admin = () => {
               <div className="flex items-center space-x-3">
                 <DollarSign className="h-8 w-8 text-success" />
                 <div>
-                  <p className="text-3xl font-bold">$24,567</p>
+                  <p className="text-3xl font-bold">${stats.monthlyRevenue.toFixed(2)}</p>
                   <p className="text-sm text-muted-foreground">Monthly Revenue</p>
                 </div>
               </div>
@@ -58,7 +104,7 @@ export const Admin = () => {
               <div className="flex items-center space-x-3">
                 <TrendingUp className="h-8 w-8 text-accent" />
                 <div>
-                  <p className="text-3xl font-bold">4,273</p>
+                  <p className="text-3xl font-bold">{stats.totalSales}</p>
                   <p className="text-sm text-muted-foreground">Total Sales</p>
                 </div>
               </div>
@@ -67,7 +113,7 @@ export const Admin = () => {
               <div className="flex items-center space-x-3">
                 <Users className="h-8 w-8 text-accent" />
                 <div>
-                  <p className="text-3xl font-bold">1,234</p>
+                  <p className="text-3xl font-bold">{stats.totalCustomers}</p>
                   <p className="text-sm text-muted-foreground">Customers</p>
                 </div>
               </div>

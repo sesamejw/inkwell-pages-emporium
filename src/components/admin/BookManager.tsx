@@ -233,19 +233,20 @@ export const BookManager = () => {
       }
 
       bookId = newBook.id;
+    }
 
-      const versions = formData.versions
-        .filter(v => v.price)
-        .map(v => ({
-          book_id: newBook.id,
-          version_type: v.version_type,
-          price: parseFloat(v.price),
-          available: v.available,
-        }));
+    // Insert versions for both new and edited books
+    const versions = formData.versions
+      .filter(v => v.price)
+      .map(v => ({
+        book_id: bookId,
+        version_type: v.version_type,
+        price: parseFloat(v.price),
+        available: v.available,
+      }));
 
-      if (versions.length > 0) {
-        await supabase.from("book_versions").insert(versions);
-      }
+    if (versions.length > 0) {
+      await supabase.from("book_versions").insert(versions);
     }
 
     // Upload PDFs and update book record with URLs
@@ -557,7 +558,21 @@ export const BookManager = () => {
                         setFormData({ ...formData, versions: newVersions });
                       }}
                       placeholder="0.00"
+                      className="mb-3"
                     />
+                    <label className="flex items-center space-x-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={version.available}
+                        onChange={(e) => {
+                          const newVersions = [...formData.versions];
+                          newVersions[index].available = e.target.checked;
+                          setFormData({ ...formData, versions: newVersions });
+                        }}
+                        className="w-4 h-4 rounded border-input"
+                      />
+                      <span className="text-sm font-medium">Available</span>
+                    </label>
                   </Card>
                 ))}
               </div>
