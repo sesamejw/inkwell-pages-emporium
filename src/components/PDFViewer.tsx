@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface PDFViewerProps {
   pdfUrl: string;
@@ -11,7 +10,7 @@ interface PDFViewerProps {
 }
 
 export const PDFViewer = ({ pdfUrl, title, isOpen, onClose }: PDFViewerProps) => {
-  // Use Google Docs viewer to prevent downloads
+  const [isLoading, setIsLoading] = useState(true);
   const viewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(pdfUrl)}&embedded=true`;
   
   return (
@@ -20,11 +19,17 @@ export const PDFViewer = ({ pdfUrl, title, isOpen, onClose }: PDFViewerProps) =>
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
-        <div className="flex-1 overflow-hidden">
+        <div className="flex-1 overflow-hidden relative">
+          {isLoading && (
+            <div className="absolute inset-0 flex items-center justify-center bg-background z-10">
+              <Skeleton className="w-full h-full" />
+            </div>
+          )}
           <iframe
             src={viewerUrl}
             className="w-full h-full border-0"
             title={title}
+            onLoad={() => setIsLoading(false)}
           />
         </div>
       </DialogContent>
