@@ -19,7 +19,10 @@ import {
   MessageCircle,
   Plus,
   Search,
-  Filter
+  Filter,
+  Edit,
+  Trash2,
+  MoreVertical
 } from "lucide-react";
 
 interface ForumPost {
@@ -70,6 +73,12 @@ export const Forum = () => {
   const [selectedPost, setSelectedPost] = useState<ForumPost | null>(null);
   const [replyContent, setReplyContent] = useState("");
   const [replies, setReplies] = useState<any[]>([]);
+  const [editingPost, setEditingPost] = useState<ForumPost | null>(null);
+  const [editPostData, setEditPostData] = useState({
+    title: "",
+    category: "",
+    content: "",
+  });
 
   useEffect(() => {
     fetchPosts();
@@ -333,6 +342,84 @@ export const Forum = () => {
     }
   };
 
+  const handleEditPost = (post: ForumPost) => {
+    setEditingPost(post);
+    setEditPostData({
+      title: post.title,
+      category: post.category,
+      content: post.content,
+    });
+  };
+
+  const handleUpdatePost = async () => {
+    if (!editingPost || !editPostData.title || !editPostData.content) {
+      toast({
+        title: "Missing information",
+        description: "Please fill in all fields",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from("forum_posts")
+        .update({
+          title: editPostData.title,
+          content: editPostData.content,
+          category: editPostData.category,
+        })
+        .eq("id", editingPost.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Your post has been updated",
+      });
+
+      setEditingPost(null);
+      fetchPosts();
+    } catch (error: any) {
+      console.error("Error updating post:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update post",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDeletePost = async (postId: string) => {
+    if (!confirm("Are you sure you want to delete this post? This action cannot be undone.")) {
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from("forum_posts")
+        .delete()
+        .eq("id", postId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Post deleted successfully",
+      });
+
+      fetchPosts();
+      fetchStats();
+    } catch (error: any) {
+      console.error("Error deleting post:", error);
+      toast({
+        title: "Error",
+        description: "Failed to delete post",
+        variant: "destructive",
+      });
+    }
+  };
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       month: 'short',
@@ -494,9 +581,32 @@ export const Forum = () => {
                         </Badge>
                       </div>
 
-                      <h3 className="font-semibold text-lg mb-2 hover:text-accent cursor-pointer">
-                        {post.title}
-                      </h3>
+                      <div className="flex items-center justify-between mb-2">
+                        <h3 className="font-semibold text-lg hover:text-accent cursor-pointer">
+                          {post.title}
+                        </h3>
+                        
+                        {user?.id === post.author_id && (
+                          <div className="flex items-center gap-2">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleEditPost(post)}
+                              className="h-8 w-8"
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleDeletePost(post.id)}
+                              className="h-8 w-8 text-destructive hover:text-destructive"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        )}
+                      </div>
 
                       <p className="text-muted-foreground mb-4 line-clamp-2">
                         {post.content}
@@ -615,6 +725,73 @@ export const Forum = () => {
                   </Button>
                   <Button className="btn-professional" onClick={handleCreateReply}>
                     Post Reply
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </Card>
+        </div>
+      )}
+
+      {/* Edit Post Modal */}
+      {editingPost && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <Card className="w-full max-w-2xl mx-4 max-h-[80vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-playfair font-bold">Edit Discussion</h2>
+                <Button variant="ghost" size="icon" onClick={() => setEditingPost(null)}>
+                  ×
+                </Button>
+              </div>
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2">Title</label>
+                  <Input
+                    placeholder="What would you like to discuss?"
+                    value={editPostData.title}
+                    onChange={(e) =>
+                      setEditPostData({ ...editPostData, title: e.target.value })
+                    }
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-2">Category</label>
+                  <select
+                    className="w-full border border-input bg-background px-3 py-2 rounded-md"
+                    value={editPostData.category}
+                    onChange={(e) =>
+                      setEditPostData({ ...editPostData, category: e.target.value })
+                    }
+                  >
+                    {categories.slice(1).map((category) => (
+                      <option key={category} value={category}>
+                        {category}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-2">Content</label>
+                  <Textarea
+                    placeholder="Share your thoughts, ask questions, or start a discussion..."
+                    rows={8}
+                    value={editPostData.content}
+                    onChange={(e) =>
+                      setEditPostData({ ...editPostData, content: e.target.value })
+                    }
+                  />
+                </div>
+
+                <div className="flex justify-end space-x-3">
+                  <Button variant="outline" onClick={() => setEditingPost(null)}>
+                    Cancel
+                  </Button>
+                  <Button className="btn-professional" onClick={handleUpdatePost}>
+                    Update Discussion
                   </Button>
                 </div>
               </div>
