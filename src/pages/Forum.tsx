@@ -85,7 +85,7 @@ export const Forum = () => {
           replies_count,
           likes_count,
           is_sticky,
-          profiles!forum_posts_author_id_fkey (username)
+          profiles (username)
         `)
         .order("is_sticky", { ascending: false })
         .order("created_at", { ascending: false });
