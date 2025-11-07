@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,58 +26,14 @@ interface ForumPost {
   id: string;
   title: string;
   content: string;
-  author: string;
+  author_id: string;
+  author_username: string;
   category: string;
-  createdAt: string;
-  replies: number;
-  likes: number;
-  isSticky?: boolean;
+  created_at: string;
+  replies_count: number;
+  likes_count: number;
+  is_sticky?: boolean;
 }
-
-const samplePosts: ForumPost[] = [
-  {
-    id: "1",
-    title: "What are your thoughts on 'The Midnight Library'?",
-    content: "Just finished reading this amazing book and I'm blown away by the concept. The idea of exploring different life paths through a magical library is so intriguing...",
-    author: "BookLover23",
-    category: "Book Discussion",
-    createdAt: "2024-01-15",
-    replies: 42,
-    likes: 156,
-    isSticky: true
-  },
-  {
-    id: "2", 
-    title: "Looking for similar books to Atomic Habits",
-    content: "I recently read Atomic Habits and found it incredibly helpful. Can anyone recommend similar books about productivity and habit formation?",
-    author: "ProductivityGuru",
-    category: "Recommendations",
-    createdAt: "2024-01-14",
-    replies: 23,
-    likes: 89
-  },
-  {
-    id: "3",
-    title: "Monthly Reading Challenge - January 2024",
-    content: "Welcome to our January reading challenge! This month's theme is 'New Beginnings'. Share what books you're planning to read...",
-    author: "Moderator",
-    category: "Challenges",
-    createdAt: "2024-01-01",
-    replies: 78,
-    likes: 234,
-    isSticky: true
-  },
-  {
-    id: "4",
-    title: "Best mystery novels of 2023?",
-    content: "I'm looking to catch up on some great mystery novels from last year. What were your favorites?",
-    author: "MysteryFan",
-    category: "Recommendations",
-    createdAt: "2024-01-13",
-    replies: 31,
-    likes: 67
-  }
-];
 
 const categories = [
   "All",
@@ -95,6 +52,96 @@ export const Forum = () => {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [showNewPost, setShowNewPost] = useState(false);
+  const [posts, setPosts] = useState<ForumPost[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState({
+    totalPosts: 0,
+    totalMembers: 0,
+    activeToday: 0,
+    newThisWeek: 0,
+  });
+  const [newPostData, setNewPostData] = useState({
+    title: "",
+    category: "Book Discussion",
+    content: "",
+  });
+
+  useEffect(() => {
+    fetchPosts();
+    fetchStats();
+  }, []);
+
+  const fetchPosts = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("forum_posts")
+        .select(`
+          id,
+          title,
+          content,
+          author_id,
+          category,
+          created_at,
+          replies_count,
+          likes_count,
+          is_sticky,
+          profiles!forum_posts_author_id_fkey (username)
+        `)
+        .order("is_sticky", { ascending: false })
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+
+      const formattedPosts = data.map((post: any) => ({
+        id: post.id,
+        title: post.title,
+        content: post.content,
+        author_id: post.author_id,
+        author_username: post.profiles?.username || "Unknown",
+        category: post.category,
+        created_at: post.created_at,
+        replies_count: post.replies_count,
+        likes_count: post.likes_count,
+        is_sticky: post.is_sticky,
+      }));
+
+      setPosts(formattedPosts);
+    } catch (error: any) {
+      console.error("Error fetching posts:", error);
+      toast({
+        title: "Error",
+        description: "Failed to load forum posts",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchStats = async () => {
+    try {
+      const [postsCount, profilesCount] = await Promise.all([
+        supabase.from("forum_posts").select("id", { count: "exact", head: true }),
+        supabase.from("profiles").select("id", { count: "exact", head: true }),
+      ]);
+
+      const weekAgo = new Date();
+      weekAgo.setDate(weekAgo.getDate() - 7);
+      const { count: newThisWeek } = await supabase
+        .from("forum_posts")
+        .select("id", { count: "exact", head: true })
+        .gte("created_at", weekAgo.toISOString());
+
+      setStats({
+        totalPosts: postsCount.count || 0,
+        totalMembers: profilesCount.count || 0,
+        activeToday: Math.floor((profilesCount.count || 0) * 0.12), // Approximation
+        newThisWeek: newThisWeek || 0,
+      });
+    } catch (error) {
+      console.error("Error fetching stats:", error);
+    }
+  };
 
   const handleNewPost = () => {
     if (!user) {
@@ -109,10 +156,50 @@ export const Forum = () => {
     setShowNewPost(true);
   };
 
-  const filteredPosts = samplePosts.filter(post => {
+  const handleCreatePost = async () => {
+    if (!user || !newPostData.title || !newPostData.content) {
+      toast({
+        title: "Missing information",
+        description: "Please fill in all fields",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const { error } = await supabase.from("forum_posts").insert({
+        title: newPostData.title,
+        content: newPostData.content,
+        category: newPostData.category,
+        author_id: user.id,
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Your post has been created",
+      });
+
+      setShowNewPost(false);
+      setNewPostData({ title: "", category: "Book Discussion", content: "" });
+      fetchPosts();
+      fetchStats();
+    } catch (error: any) {
+      console.error("Error creating post:", error);
+      toast({
+        title: "Error",
+        description: "Failed to create post",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const filteredPosts = posts.filter((post) => {
     const matchesCategory = selectedCategory === "All" || post.category === selectedCategory;
-    const matchesSearch = post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         post.content.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch =
+      post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      post.content.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
   });
 
@@ -153,7 +240,7 @@ export const Forum = () => {
               <div className="flex items-center space-x-3">
                 <MessageSquare className="h-8 w-8 text-accent" />
                 <div>
-                  <p className="text-2xl font-bold">2,847</p>
+                  <p className="text-2xl font-bold">{stats.totalPosts}</p>
                   <p className="text-sm text-muted-foreground">Total Posts</p>
                 </div>
               </div>
@@ -162,7 +249,7 @@ export const Forum = () => {
               <div className="flex items-center space-x-3">
                 <Users className="h-8 w-8 text-accent" />
                 <div>
-                  <p className="text-2xl font-bold">1,234</p>
+                  <p className="text-2xl font-bold">{stats.totalMembers}</p>
                   <p className="text-sm text-muted-foreground">Members</p>
                 </div>
               </div>
@@ -171,7 +258,7 @@ export const Forum = () => {
               <div className="flex items-center space-x-3">
                 <TrendingUp className="h-8 w-8 text-accent" />
                 <div>
-                  <p className="text-2xl font-bold">156</p>
+                  <p className="text-2xl font-bold">{stats.activeToday}</p>
                   <p className="text-sm text-muted-foreground">Active Today</p>
                 </div>
               </div>
@@ -180,7 +267,7 @@ export const Forum = () => {
               <div className="flex items-center space-x-3">
                 <Clock className="h-8 w-8 text-accent" />
                 <div>
-                  <p className="text-2xl font-bold">42</p>
+                  <p className="text-2xl font-bold">{stats.newThisWeek}</p>
                   <p className="text-sm text-muted-foreground">New This Week</p>
                 </div>
               </div>
@@ -245,56 +332,70 @@ export const Forum = () => {
 
           {/* Posts List */}
           <div className="lg:w-3/4 space-y-4">
-            {filteredPosts.map((post) => (
-              <Card key={post.id} className="p-6 hover:shadow-md transition-shadow">
-                <div className="flex items-start space-x-4">
-                  <Avatar className="w-10 h-10 bg-accent/10 flex items-center justify-center">
-                    <span className="text-sm font-medium text-accent">
-                      {post.author.charAt(0).toUpperCase()}
-                    </span>
-                  </Avatar>
-                  
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center space-x-2 mb-2">
-                      {post.isSticky && (
-                        <Badge variant="secondary" className="text-xs">
-                          Pinned
+            {loading ? (
+              <Card className="p-6">
+                <p className="text-center text-muted-foreground">Loading posts...</p>
+              </Card>
+            ) : filteredPosts.length === 0 ? (
+              <Card className="p-6">
+                <p className="text-center text-muted-foreground">
+                  No posts found. Be the first to start a discussion!
+                </p>
+              </Card>
+            ) : (
+              filteredPosts.map((post) => (
+                <Card key={post.id} className="p-6 hover:shadow-md transition-shadow">
+                  <div className="flex items-start space-x-4">
+                    <Avatar className="w-10 h-10 bg-accent/10 flex items-center justify-center">
+                      <span className="text-sm font-medium text-accent">
+                        {post.author_username.charAt(0).toUpperCase()}
+                      </span>
+                    </Avatar>
+
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center space-x-2 mb-2">
+                        {post.is_sticky && (
+                          <Badge variant="secondary" className="text-xs">
+                            Pinned
+                          </Badge>
+                        )}
+                        <Badge variant="outline" className="text-xs">
+                          {post.category}
                         </Badge>
-                      )}
-                      <Badge variant="outline" className="text-xs">
-                        {post.category}
-                      </Badge>
-                    </div>
-                    
-                    <h3 className="font-semibold text-lg mb-2 hover:text-accent cursor-pointer">
-                      {post.title}
-                    </h3>
-                    
-                    <p className="text-muted-foreground mb-4 line-clamp-2">
-                      {post.content}
-                    </p>
-                    
-                    <div className="flex items-center justify-between text-sm text-muted-foreground">
-                      <div className="flex items-center space-x-4">
-                        <span>by {post.author === "You" && profile ? profile.username : post.author}</span>
-                        <span>{formatDate(post.createdAt)}</span>
                       </div>
-                      
-                      <div className="flex items-center space-x-4">
-                        <div className="flex items-center space-x-1">
-                          <ThumbsUp className="h-4 w-4" />
-                          <span>{post.likes}</span>
+
+                      <h3 className="font-semibold text-lg mb-2 hover:text-accent cursor-pointer">
+                        {post.title}
+                      </h3>
+
+                      <p className="text-muted-foreground mb-4 line-clamp-2">
+                        {post.content}
+                      </p>
+
+                      <div className="flex items-center justify-between text-sm text-muted-foreground">
+                        <div className="flex items-center space-x-4">
+                          <span>
+                            by {user?.id === post.author_id && profile ? profile.username : post.author_username}
+                          </span>
+                          <span>{formatDate(post.created_at)}</span>
                         </div>
-                        <div className="flex items-center space-x-1">
-                          <MessageCircle className="h-4 w-4" />
-                          <span>{post.replies}</span>
+
+                        <div className="flex items-center space-x-4">
+                          <div className="flex items-center space-x-1">
+                            <ThumbsUp className="h-4 w-4" />
+                            <span>{post.likes_count}</span>
+                          </div>
+                          <div className="flex items-center space-x-1">
+                            <MessageCircle className="h-4 w-4" />
+                            <span>{post.replies_count}</span>
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              </Card>
-            ))}
+                </Card>
+              ))
+            )}
           </div>
         </div>
       </div>
@@ -314,12 +415,24 @@ export const Forum = () => {
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium mb-2">Title</label>
-                  <Input placeholder="What would you like to discuss?" />
+                  <Input
+                    placeholder="What would you like to discuss?"
+                    value={newPostData.title}
+                    onChange={(e) =>
+                      setNewPostData({ ...newPostData, title: e.target.value })
+                    }
+                  />
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium mb-2">Category</label>
-                  <select className="w-full border border-input bg-background px-3 py-2">
+                  <select
+                    className="w-full border border-input bg-background px-3 py-2 rounded-md"
+                    value={newPostData.category}
+                    onChange={(e) =>
+                      setNewPostData({ ...newPostData, category: e.target.value })
+                    }
+                  >
                     {categories.slice(1).map((category) => (
                       <option key={category} value={category}>
                         {category}
@@ -327,20 +440,24 @@ export const Forum = () => {
                     ))}
                   </select>
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium mb-2">Content</label>
                   <Textarea
                     placeholder="Share your thoughts, ask questions, or start a discussion..."
                     rows={8}
+                    value={newPostData.content}
+                    onChange={(e) =>
+                      setNewPostData({ ...newPostData, content: e.target.value })
+                    }
                   />
                 </div>
-                
+
                 <div className="flex justify-end space-x-3">
                   <Button variant="outline" onClick={() => setShowNewPost(false)}>
                     Cancel
                   </Button>
-                  <Button className="btn-professional">
+                  <Button className="btn-professional" onClick={handleCreatePost}>
                     Post Discussion
                   </Button>
                 </div>
