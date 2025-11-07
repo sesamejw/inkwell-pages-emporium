@@ -96,7 +96,7 @@ export const Book3D = ({ book, onClose }: Book3DProps) => {
           {previewPDF ? (
             <div className="w-full h-[600px] bg-background rounded-lg shadow-2xl overflow-hidden">
               <iframe
-                src={previewPDF}
+                src={`https://docs.google.com/viewer?url=${encodeURIComponent(previewPDF)}&embedded=true`}
                 className="w-full h-full border-0"
                 title={`${book.title} Preview`}
               />

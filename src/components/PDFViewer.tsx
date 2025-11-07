@@ -11,6 +11,9 @@ interface PDFViewerProps {
 }
 
 export const PDFViewer = ({ pdfUrl, title, isOpen, onClose }: PDFViewerProps) => {
+  // Use Google Docs viewer to prevent downloads
+  const viewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(pdfUrl)}&embedded=true`;
+  
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl h-[90vh]">
@@ -19,7 +22,7 @@ export const PDFViewer = ({ pdfUrl, title, isOpen, onClose }: PDFViewerProps) =>
         </DialogHeader>
         <div className="flex-1 overflow-hidden">
           <iframe
-            src={pdfUrl}
+            src={viewerUrl}
             className="w-full h-full border-0"
             title={title}
           />
