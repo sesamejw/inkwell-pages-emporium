@@ -80,43 +80,53 @@ export const MyBooks = () => {
   const paperbacks = purchases.filter(p => p.book_version === "paperback");
   const hardcovers = purchases.filter(p => p.book_version === "hardcover");
 
-  const renderBookCard = (purchase: Purchase) => (
-    <Card key={purchase.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-      <div className="aspect-[2/3] relative bg-muted">
-        {purchase.book_cover_url ? (
-          <img
-            src={purchase.book_cover_url}
-            alt={purchase.book_title}
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center">
-            <BookOpen className="h-16 w-16 text-muted-foreground" />
-          </div>
-        )}
-      </div>
-      <CardHeader>
-        <CardTitle className="line-clamp-2">{purchase.book_title}</CardTitle>
-        <CardDescription>{purchase.book_author}</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-2 text-sm text-muted-foreground">
-          <p>Version: {purchase.book_version}</p>
-          <p>Purchased: {new Date(purchase.purchased_at).toLocaleDateString()}</p>
-          {purchase.book_version === "ebook" && purchase.ebook_pdf_url && (
-            <Button 
-              size="sm" 
-              className="w-full mt-2"
-              onClick={() => setSelectedPDF({ url: purchase.ebook_pdf_url!, title: purchase.book_title })}
-            >
-              <FileText className="h-4 w-4 mr-2" />
-              Read Now
-            </Button>
+  const renderBookCard = (purchase: Purchase) => {
+    const isEbook = purchase.book_version === "ebook" && purchase.ebook_pdf_url;
+    
+    return (
+      <Card 
+        key={purchase.id} 
+        className={`overflow-hidden hover:shadow-lg transition-shadow ${isEbook ? 'cursor-pointer' : ''}`}
+        onClick={() => isEbook && setSelectedPDF({ url: purchase.ebook_pdf_url!, title: purchase.book_title })}
+      >
+        <div className="aspect-[2/3] relative bg-muted">
+          {purchase.book_cover_url ? (
+            <img
+              src={purchase.book_cover_url}
+              alt={purchase.book_title}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center">
+              <BookOpen className="h-16 w-16 text-muted-foreground" />
+            </div>
+          )}
+          {isEbook && (
+            <div className="absolute inset-0 bg-black/0 hover:bg-black/10 transition-all duration-300 flex items-center justify-center opacity-0 hover:opacity-100">
+              <Button
+                variant="secondary"
+                size="sm"
+                className="bg-background/90 backdrop-blur pointer-events-none"
+              >
+                <FileText className="h-4 w-4 mr-2" />
+                Read Now
+              </Button>
+            </div>
           )}
         </div>
-      </CardContent>
-    </Card>
-  );
+        <CardHeader>
+          <CardTitle className="line-clamp-2">{purchase.book_title}</CardTitle>
+          <CardDescription>{purchase.book_author}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-2 text-sm text-muted-foreground">
+            <p>Version: {purchase.book_version}</p>
+            <p>Purchased: {new Date(purchase.purchased_at).toLocaleDateString()}</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  };
 
   return (
     <div className="min-h-screen bg-background py-12">
