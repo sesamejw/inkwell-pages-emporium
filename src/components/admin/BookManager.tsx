@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { STORAGE_BUCKET } from "@/lib/storageSetup";
+import { STORAGE_BUCKET, BOOK_FILES_BUCKET } from "@/lib/storageSetup";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -131,6 +131,42 @@ export const BookManager = () => {
     }
   };
 
+  const handlePDFUpload = async (file: File, folder: string): Promise<string | null> => {
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+      const filePath = `${folder}/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from(BOOK_FILES_BUCKET)
+        .upload(filePath, file, { upsert: false });
+
+      if (uploadError) {
+        console.error("PDF upload error:", uploadError);
+        toast({
+          title: "Error",
+          description: `Failed to upload PDF: ${uploadError.message}`,
+          variant: "destructive",
+        });
+        return null;
+      }
+
+      const { data: { publicUrl } } = supabase.storage
+        .from(BOOK_FILES_BUCKET)
+        .getPublicUrl(filePath);
+
+      return publicUrl;
+    } catch (error) {
+      console.error("PDF upload exception:", error);
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred during PDF upload",
+        variant: "destructive",
+      });
+      return null;
+    }
+  };
+
   const handleSubmit = async () => {
     if (!formData.title || !formData.author || !formData.category) {
       toast({
@@ -161,6 +197,8 @@ export const BookManager = () => {
       stock: parseInt(formData.stock) || 0,
     };
 
+    let bookId: string;
+
     if (editingId) {
       const { error } = await supabase
         .from("books")
@@ -176,6 +214,7 @@ export const BookManager = () => {
         return;
       }
 
+      bookId = editingId;
       await supabase.from("book_versions").delete().eq("book_id", editingId);
     } else {
       const { data: newBook, error } = await supabase
@@ -193,6 +232,8 @@ export const BookManager = () => {
         return;
       }
 
+      bookId = newBook.id;
+
       const versions = formData.versions
         .filter(v => v.price)
         .map(v => ({
@@ -204,6 +245,39 @@ export const BookManager = () => {
 
       if (versions.length > 0) {
         await supabase.from("book_versions").insert(versions);
+      }
+    }
+
+    // Upload PDFs and update book record with URLs
+    const pdfUpdates: { ebook_pdf_url?: string; preview_pdf_url?: string } = {};
+
+    if (ebookPDFFile) {
+      const ebookUrl = await handlePDFUpload(ebookPDFFile, "ebooks");
+      if (ebookUrl) {
+        pdfUpdates.ebook_pdf_url = ebookUrl;
+      }
+    }
+
+    if (previewPDFFile) {
+      const previewUrl = await handlePDFUpload(previewPDFFile, "previews");
+      if (previewUrl) {
+        pdfUpdates.preview_pdf_url = previewUrl;
+      }
+    }
+
+    // Update book with PDF URLs if any were uploaded
+    if (Object.keys(pdfUpdates).length > 0) {
+      const { error: updateError } = await supabase
+        .from("books")
+        .update(pdfUpdates)
+        .eq("id", bookId);
+
+      if (updateError) {
+        toast({
+          title: "Warning",
+          description: "Book saved but failed to update PDF URLs",
+          variant: "destructive",
+        });
       }
     }
 
