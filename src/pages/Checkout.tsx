@@ -140,13 +140,18 @@ export const Checkout = () => {
       // Create order items and purchases
       for (const item of cartItems) {
         // Insert order item
-        await supabase.from("order_items").insert({
+        const { error: orderItemError } = await supabase.from("order_items").insert({
           order_id: order.id,
           book_id: item.id,
           quantity: item.quantity,
           price: item.price,
           version_type: item.version,
         });
+
+        if (orderItemError) {
+          console.error("Order item error:", orderItemError);
+          throw orderItemError;
+        }
 
         // Get book details for purchase
         const { data: book } = await supabase
@@ -155,9 +160,9 @@ export const Checkout = () => {
           .eq("id", item.id)
           .single();
 
-        // Create purchase record
+        // Create purchase record for each quantity
         for (let i = 0; i < item.quantity; i++) {
-          await supabase.from("purchases").insert({
+          const { error: purchaseError } = await supabase.from("purchases").insert({
             user_id: user.id,
             book_id: item.id,
             price: item.price,
@@ -166,6 +171,11 @@ export const Checkout = () => {
             book_cover_url: book?.cover_image_url || item.cover,
             book_version: item.version,
           });
+
+          if (purchaseError) {
+            console.error("Purchase error:", purchaseError);
+            throw purchaseError;
+          }
         }
       }
 

@@ -11,6 +11,9 @@ import {
 import { ChronologyManager } from "@/components/ChronologyManager";
 import { BookManager } from "@/components/admin/BookManager";
 import { AlmanacManager } from "@/components/admin/AlmanacManager";
+import { OrdersManager } from "@/components/admin/OrdersManager";
+import { CustomersManager } from "@/components/admin/CustomersManager";
+import { AnalyticsManager } from "@/components/admin/AnalyticsManager";
 
 export const Admin = () => {
   const { books } = useBooks();
@@ -99,33 +102,15 @@ export const Admin = () => {
 
 
           <TabsContent value="orders" className="space-y-6">
-            <Card className="p-8 text-center">
-              <h3 className="text-xl font-semibold mb-2">Order Management</h3>
-              <p className="text-muted-foreground mb-4">
-                View and manage customer orders, process shipments, and handle returns.
-              </p>
-              <Button variant="outline">Coming Soon</Button>
-            </Card>
+            <OrdersManager />
           </TabsContent>
 
           <TabsContent value="customers" className="space-y-6">
-            <Card className="p-8 text-center">
-              <h3 className="text-xl font-semibold mb-2">Customer Management</h3>
-              <p className="text-muted-foreground mb-4">
-                View customer profiles, purchase history, and manage customer relationships.
-              </p>
-              <Button variant="outline">Coming Soon</Button>
-            </Card>
+            <CustomersManager />
           </TabsContent>
 
           <TabsContent value="analytics" className="space-y-6">
-            <Card className="p-8 text-center">
-              <h3 className="text-xl font-semibold mb-2">Sales Analytics</h3>
-              <p className="text-muted-foreground mb-4">
-                Detailed reports on sales performance, customer behavior, and inventory insights.
-              </p>
-              <Button variant="outline">Coming Soon</Button>
-            </Card>
+            <AnalyticsManager />
           </TabsContent>
         </Tabs>
       </div>
