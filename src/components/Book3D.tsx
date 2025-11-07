@@ -51,7 +51,7 @@ export const Book3D = ({ book, onClose }: Book3DProps) => {
   }, [onClose]);
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm">
   <Button
     variant="ghost"
     size="icon"
@@ -61,8 +61,9 @@ export const Book3D = ({ book, onClose }: Book3DProps) => {
     <X className="h-6 w-6" />
   </Button>
 
-  <div className="w-full max-w-4xl h-[80vh] flex flex-col items-center justify-center p-4">
-    <div className="text-center mb-4 bg-background/80 backdrop-blur px-6 py-3 rounded-lg">
+  {/* Reduced padding + increased modal width */}
+  <div className="w-full max-w-5xl h-[85vh] flex flex-col items-center justify-center p-3">
+    <div className="text-center mb-3 bg-background/80 backdrop-blur px-5 py-2 rounded-lg">
       <h3 className="text-xl font-semibold text-primary">{book.title}</h3>
       <p className="text-muted-foreground">by {book.author}</p>
     </div>
@@ -73,7 +74,7 @@ export const Book3D = ({ book, onClose }: Book3DProps) => {
           <Skeleton className="w-full h-full" />
         </div>
       ) : previewPDF ? (
-        <div className="relative aspect-[3/4] max-h-full max-w-full bg-background rounded-lg shadow-2xl overflow-hidden">
+        <div className="relative aspect-[3/4] max-h-full max-w-[85%] bg-background rounded-lg shadow-2xl overflow-hidden">
           {iframeLoading && (
             <div className="absolute inset-0 flex items-center justify-center bg-background z-10">
               <Skeleton className="w-full h-full" />
@@ -97,11 +98,10 @@ export const Book3D = ({ book, onClose }: Book3DProps) => {
       )}
     </div>
 
-    <p className="text-xs text-muted-foreground mt-4 text-center">
+    <p className="text-xs text-muted-foreground mt-3 text-center">
       Press ESC to close
     </p>
   </div>
 </div>
-
   );
 };
