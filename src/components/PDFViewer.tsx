@@ -15,11 +15,11 @@ export const PDFViewer = ({ pdfUrl, title, isOpen, onClose }: PDFViewerProps) =>
   
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl h-[90vh]">
-        <DialogHeader>
+      <DialogContent className="max-w-6xl h-[95vh] flex flex-col p-6">
+        <DialogHeader className="pb-4">
           <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
-        <div className="flex-1 overflow-hidden relative">
+        <div className="flex-1 overflow-hidden relative min-h-0">
           {isLoading && (
             <div className="absolute inset-0 flex items-center justify-center bg-background z-10">
               <Skeleton className="w-full h-full" />
