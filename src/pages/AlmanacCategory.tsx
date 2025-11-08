@@ -180,7 +180,7 @@ const AlmanacCategory = () => {
                 }}
               >
                 {entry.image_url && (
-                  <div className="w-full h-72 overflow-hidden">
+                  <div className="w-full h-80 overflow-hidden">
                     <img
                       src={entry.image_url}
                       alt={entry.name}
