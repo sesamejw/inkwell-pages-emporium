@@ -207,54 +207,43 @@ export const Checkout = () => {
   };
 
   // Paystack configuration
-  const paystackConfig = {
-    reference: `ORD-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-    email: formData.email,
-    amount: Math.round(total * 100), // Convert to cents
-    publicKey: "pk_test_6f642162c7fa968894f117624d5a95cca9590fe9",
-    currency: "USD",
-    metadata: {
-      custom_fields: [
-        {
-          display_name: "Full Name",
-          variable_name: "full_name",
-          value: formData.fullName,
-        },
-        {
-          display_name: "Phone",
-          variable_name: "phone",
-          value: formData.phone,
-        },
-        {
-          display_name: "Address",
-          variable_name: "address",
-          value: formData.address,
-        },
-        {
-          display_name: "City",
-          variable_name: "city",
-          value: formData.city,
-        },
-        {
-          display_name: "Country",
-          variable_name: "country",
-          value: formData.country,
-        },
-        {
-          display_name: "Postal Code",
-          variable_name: "postal_code",
-          value: formData.postalCode,
-        },
-      ],
-      cart_items: cartItems.map(item => ({
-        id: item.id,
-        title: item.title,
-        version: item.version,
-        quantity: item.quantity,
-        price: item.price,
-      })),
-    },
-  };
+  
+  // Example: total price is in USD (user sees this)
+const priceUSD = total;
+
+// You can fetch a live exchange rate or define your own
+const usdToGhsRate = 15.0; // Example: 1 USD = 15 GHS
+
+// Convert USD → GHS for Paystack
+const amountInGHS = Math.round(priceUSD * usdToGhsRate * 100); // Paystack uses pesewas
+
+const paystackConfig = {
+  reference: `ORD-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+  email: formData.email,
+  amount: amountInGHS, // GHS equivalent, multiplied by 100
+  publicKey: "pk_test_6f642162c7fa968894f117624d5a95cca9590fe9",
+  currency: "GHS", // actual currency to be charged
+  metadata: {
+    display_currency: "USD",
+    display_amount: priceUSD.toFixed(2),
+    custom_fields: [
+      { display_name: "Full Name", variable_name: "full_name", value: formData.fullName },
+      { display_name: "Phone", variable_name: "phone", value: formData.phone },
+      { display_name: "Address", variable_name: "address", value: formData.address },
+      { display_name: "City", variable_name: "city", value: formData.city },
+      { display_name: "Country", variable_name: "country", value: formData.country },
+      { display_name: "Postal Code", variable_name: "postal_code", value: formData.postalCode },
+    ],
+    cart_items: cartItems.map(item => ({
+      id: item.id,
+      title: item.title,
+      version: item.version,
+      quantity: item.quantity,
+      price_usd: item.price,
+    })),
+  },
+};
+
 
   const initializePayment = usePaystackPayment(paystackConfig);
 
