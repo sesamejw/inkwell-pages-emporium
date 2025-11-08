@@ -212,7 +212,7 @@ export const Checkout = () => {
 const priceUSD = total;
 
 // You can fetch a live exchange rate or define your own
-const usdToGhsRate = 15.0; // Example: 1 USD = 15 GHS
+const usdToGhsRate = 11.0; // Example: 1 USD = 15 GHS
 
 // Convert USD → GHS for Paystack
 const amountInGHS = Math.round(priceUSD * usdToGhsRate * 100); // Paystack uses pesewas
