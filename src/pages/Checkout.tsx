@@ -411,6 +411,10 @@ const paystackConfig = {
                       <span>Total:</span>
                       <span>${total.toFixed(2)}</span>
                     </div>
+                    <div className="flex justify-between font-semibold text-lg">
+                      <span>Total:</span>
+                      <span>${total.toFixed(2)}</span>
+                    </div>
                     
                   </div>
                 </CardContent>
