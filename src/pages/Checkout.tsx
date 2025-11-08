@@ -412,8 +412,8 @@ const paystackConfig = {
                       <span>${total.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between font-semibold text-lg">
-                      <span>Total:</span>
-                      <span>${total.toFixed(2)}</span>
+                  
+                      <span>You will be charged the equivalent of ${total.toFixed(2)} in GHS</span>
                     </div>
                     
                   </div>
