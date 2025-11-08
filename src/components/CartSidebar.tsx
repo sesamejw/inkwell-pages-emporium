@@ -39,8 +39,8 @@ export const CartSidebar = ({
   };
 
   const subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  
-  const total = subtotal;
+  const tax = subtotal * 0.08; // 8% tax
+  const total = subtotal + tax;
 
   const handleCheckout = () => {
     if (!user) {
@@ -146,7 +146,10 @@ export const CartSidebar = ({
                   <span>Subtotal:</span>
                   <span>${subtotal.toFixed(2)}</span>
                 </div>
-              
+                <div className="flex justify-between text-sm">
+                  <span>Tax:</span>
+                  <span>${tax.toFixed(2)}</span>
+                </div>
                 <Separator />
                 <div className="flex justify-between font-semibold">
                   <span>Total:</span>
