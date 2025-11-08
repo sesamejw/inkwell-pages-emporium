@@ -13,13 +13,8 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
     storage: localStorage,
     persistSession: true,
     autoRefreshToken: true,
-    detectSessionInUrl: true,
+    
   }
 });
 
-supabase.auth.onAuthStateChange((event) => {
-  if (event === "TOKEN_REFRESH_FAILED") {
-    console.warn("❌ Token refresh failed — forcing logout to prevent 401 loops.");
-    localStorage.clear();
-  }
-});
+
