@@ -24,6 +24,7 @@ import {
   LogOut,
   Library
 } from "lucide-react";
+import thouartLogo from "@/assets/thouart-logo.png";
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -50,9 +51,9 @@ export const Header = () => {
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
-            <BookOpen className="h-8 w-8 text-accent" />
+            <img src={thouartLogo} alt="ThouArt Logo" className="h-10 w-10" />
             <span className="text-2xl font-playfair font-bold text-primary">
-              BookHaven
+              ThouArt
             </span>
           </Link>
 
