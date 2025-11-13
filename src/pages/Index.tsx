@@ -105,25 +105,26 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Chronology Button - Left Side */}
-      <div className="fixed top-24 left-4 z-50">
+      <div className="fixed top-20 md:top-24 left-2 md:left-4 z-50">
         <Button 
           onClick={() => navigate('/chronology')}
           variant="default"
-          className="bg-primary/90 backdrop-blur hover:bg-primary shadow-lg px-6 py-3 h-auto text-base font-semibold"
+          className="bg-primary/90 backdrop-blur hover:bg-primary shadow-lg px-3 py-2 md:px-6 md:py-3 h-auto text-sm md:text-base font-semibold"
         >
-          Explore the Realms
+          <span className="hidden sm:inline">Explore the Realms</span>
+          <span className="sm:hidden">Realms</span>
         </Button>
       </div>
 
       {/* Header with Cart Button */}
-      <div className="fixed top-4 right-4 z-50">
+      <div className="fixed top-20 md:top-4 right-2 md:right-4 z-50">
         <Button 
           variant="outline" 
           size="icon"
-          className="bg-background/80 backdrop-blur"
+          className="bg-background/80 backdrop-blur h-9 w-9 md:h-10 md:w-10"
           onClick={() => setIsCartOpen(true)}
         >
-          <ShoppingCart className="h-5 w-5" />
+          <ShoppingCart className="h-4 w-4 md:h-5 md:w-5" />
           {cartItems.length > 0 && (
             <span className="absolute -top-2 -right-2 bg-accent text-accent-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center">
               {cartItems.reduce((sum, item) => sum + item.quantity, 0)}
@@ -133,7 +134,7 @@ const Index = () => {
       </div>
 
       {/* Featured Book Section */}
-      <section className="py-12">
+      <section className="py-6 md:py-12 px-4 md:px-0">
         <div className="container mx-auto">
           <BookDisplay book={selectedBook} onAddToCart={handleAddToCart} />
         </div>
@@ -143,11 +144,11 @@ const Index = () => {
       <BookGallery onBookSelect={setSelectedBook} selectedBookId={selectedBook?.id} />
 
       {/* About Author Section */}
-      <section className="py-16 bg-muted/30">
+      <section className="py-8 md:py-16 bg-muted/30">
         <div className="container mx-auto px-4">
           <div className="max-w-5xl mx-auto">
-            <h2 className="text-4xl font-heading font-bold text-center mb-12">About the Author</h2>
-            <div className="grid md:grid-cols-2 gap-8 items-center">
+            <h2 className="text-2xl md:text-4xl font-heading font-bold text-center mb-8 md:mb-12">About the Author</h2>
+            <div className="grid md:grid-cols-2 gap-6 md:gap-8 items-center">
               <div className="order-2 md:order-1">
                 <h3 className="text-2xl font-heading font-semibold mb-4">Jane Mitchell</h3>
                 <p className="text-muted-foreground mb-4 leading-relaxed">

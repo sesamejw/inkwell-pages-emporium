@@ -90,27 +90,27 @@ export const BookGallery = ({ onBookSelect, selectedBookId }: BookGalleryProps) 
   };
 
   return (
-    <section className="py-12 bg-gradient-subtle">
+    <section className="py-8 md:py-12 bg-gradient-subtle">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-8">
-          <h2 className="text-3xl font-playfair font-bold text-primary mb-2">
+        <div className="text-center mb-6 md:mb-8">
+          <h2 className="text-2xl md:text-3xl font-playfair font-bold text-primary mb-2">
             More Books You'll Love
           </h2>
-          <p className="text-muted-foreground">
+          <p className="text-sm md:text-base text-muted-foreground">
             Discover our curated selection of bestsellers and hidden gems
           </p>
         </div>
 
         {/* Horizontal Scrolling Gallery */}
-        <div className="overflow-x-auto pb-4">
-          <div className="flex space-x-6 w-max">
+        <div className="overflow-x-auto pb-4 -mx-4 px-4">
+          <div className="flex space-x-4 md:space-x-6 w-max">
             {activeBooks.map((book) => (
               <Card
                 key={book.id}
-                className="flex-shrink-0 w-72 cursor-pointer transition-all duration-300 hover:shadow-lg hover:-translate-y-2 bg-card"
+                className="flex-shrink-0 w-56 md:w-72 cursor-pointer transition-all duration-300 hover:shadow-lg hover:-translate-y-2 bg-card"
                 onClick={() => handleBookClick(book)}
               >
-                <div className="p-6">
+                <div className="p-4 md:p-6">
                   {/* Book Cover */}
                   <div className="relative mb-4 group">
                     <div className="w-full aspect-[2/3] bg-muted rounded-md overflow-hidden book-shadow">
