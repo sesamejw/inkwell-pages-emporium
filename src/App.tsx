@@ -9,6 +9,7 @@ import { Header } from "./components/Header";
 import Index from "./pages/Index";
 import { Forum } from "./pages/Forum";
 import { Admin } from "./pages/Admin";
+import { AdminAuth } from "./pages/AdminAuth";
 import { Auth } from "./pages/Auth";
 import { MyBooks } from "./pages/MyBooks";
 import { Checkout } from "./pages/Checkout";
@@ -34,6 +35,7 @@ const App = () => (
                 <Route path="/" element={<Index />} />
                 <Route path="/forum" element={<Forum />} />
                 <Route path="/admin" element={<Admin />} />
+                <Route path="/admin-auth" element={<AdminAuth />} />
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/my-books" element={<MyBooks />} />
                 <Route path="/checkout" element={<Checkout />} />

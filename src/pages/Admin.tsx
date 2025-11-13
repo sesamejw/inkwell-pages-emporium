@@ -1,14 +1,17 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useBooks } from "@/contexts/BooksContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import {
   BookOpen,
   DollarSign,
   Users,
-  TrendingUp
+  TrendingUp,
+  LogOut
 } from "lucide-react";
 import { ChronologyManager } from "@/components/ChronologyManager";
 import { BookManager } from "@/components/admin/BookManager";
@@ -19,6 +22,8 @@ import { AnalyticsManager } from "@/components/admin/AnalyticsManager";
 
 export const Admin = () => {
   const { books } = useBooks();
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
   const [stats, setStats] = useState({
     totalBooks: 0,
     monthlyRevenue: 0,
@@ -27,8 +32,32 @@ export const Admin = () => {
   });
 
   useEffect(() => {
+    checkAdminAccess();
     fetchStats();
-  }, []);
+  }, [user]);
+
+  const checkAdminAccess = async () => {
+    if (!user) {
+      navigate("/admin-auth");
+      return;
+    }
+
+    const { data } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", user.id)
+      .eq("role", "admin")
+      .maybeSingle();
+
+    if (!data) {
+      navigate("/admin-auth");
+    }
+  };
+
+  const handleLogout = async () => {
+    await signOut();
+    navigate("/admin-auth");
+  };
 
   const fetchStats = async () => {
     // Fetch total books
@@ -78,6 +107,10 @@ export const Admin = () => {
                 Manage your bookstore inventory and sales
               </p>
             </div>
+            <Button variant="outline" onClick={handleLogout}>
+              <LogOut className="mr-2 h-4 w-4" />
+              Logout
+            </Button>
           </div>
 
           {/* Dashboard Stats */}

@@ -35,7 +35,6 @@ export const Header = () => {
   const navigation = [
     { name: "Books", href: "/", icon: BookOpen },
     { name: "Forum", href: "/forum", icon: MessageSquare },
-    { name: "Admin", href: "/admin", icon: SettingsIcon },
   ];
 
   const handleSignOut = async () => {
