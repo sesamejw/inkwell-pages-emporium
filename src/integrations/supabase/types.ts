@@ -855,6 +855,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      verify_password: {
+        Args: { input_password: string; stored_hash: string }
+        Returns: boolean
+      }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
