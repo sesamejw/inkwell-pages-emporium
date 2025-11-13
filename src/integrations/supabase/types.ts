@@ -14,6 +14,27 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin: {
+        Row: {
+          created_at: string | null
+          email: string
+          id: string
+          password_hash: string
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          id?: string
+          password_hash: string
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          id?: string
+          password_hash?: string
+        }
+        Relationships: []
+      }
       almanac_concepts: {
         Row: {
           article: string

@@ -1,10 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Lock } from "lucide-react";
@@ -14,79 +13,63 @@ export const AdminAuth = () => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { signIn, user } = useAuth();
   const { toast } = useToast();
-
-  useEffect(() => {
-    // If user is already logged in, check if they're admin
-    if (user) {
-      checkAdminAccess();
-    }
-  }, [user]);
-
-  const checkAdminAccess = async () => {
-    if (!user) return;
-
-    const { data } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", user.id)
-      .eq("role", "admin")
-      .maybeSingle();
-
-    if (data) {
-      navigate("/admin");
-    } else {
-      toast({
-        title: "Access Denied",
-        description: "You don't have admin privileges.",
-        variant: "destructive",
-      });
-    }
-  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      const { error } = await signIn(email, password);
-      
+      // Query admin table to verify credentials
+      const { data: admins, error } = await supabase
+        .from("admin")
+        .select("id, email, password_hash")
+        .eq("email", email);
+
       if (error) {
+        throw error;
+      }
+
+      if (!admins || admins.length === 0) {
         toast({
           title: "Login Failed",
-          description: error.message,
+          description: "Invalid email or password",
           variant: "destructive",
         });
         setLoading(false);
         return;
       }
 
-      // Check admin role
-      const { data: authData } = await supabase.auth.getUser();
-      if (authData.user) {
-        const { data: roleData } = await supabase
-          .from("user_roles")
-          .select("role")
-          .eq("user_id", authData.user.id)
-          .eq("role", "admin")
-          .maybeSingle();
+      const admin = admins[0];
 
-        if (roleData) {
-          toast({
-            title: "Welcome Admin",
-            description: "Successfully logged in.",
-          });
-          navigate("/admin");
-        } else {
-          await supabase.auth.signOut();
-          toast({
-            title: "Access Denied",
-            description: "You don't have admin privileges.",
-            variant: "destructive",
-          });
-        }
+      // Verify password using pgcrypto's crypt function
+      const { data: passwordMatch, error: cryptError } = await supabase
+        .rpc('verify_password', { 
+          stored_hash: admin.password_hash, 
+          input_password: password 
+        })
+        .single();
+
+      if (cryptError || !passwordMatch) {
+        toast({
+          title: "Login Failed",
+          description: "Invalid email or password",
+          variant: "destructive",
+        });
+        setLoading(false);
+        return;
       }
+
+      // Store admin session in localStorage
+      localStorage.setItem("admin_id", admin.id);
+      localStorage.setItem("admin_email", admin.email);
+
+      toast({
+        title: "Welcome Admin",
+        description: "Successfully logged in.",
+      });
+      
+      navigate("/admin");
     } catch (error: any) {
       toast({
         title: "Error",
