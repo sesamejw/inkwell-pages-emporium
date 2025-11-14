@@ -4,7 +4,6 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useBooks } from "@/contexts/BooksContext";
-import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import {
   BookOpen,
@@ -22,7 +21,6 @@ import { AnalyticsManager } from "@/components/admin/AnalyticsManager";
 
 export const Admin = () => {
   const { books } = useBooks();
-  const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const [stats, setStats] = useState({
     totalBooks: 0,
@@ -34,28 +32,18 @@ export const Admin = () => {
   useEffect(() => {
     checkAdminAccess();
     fetchStats();
-  }, [user]);
+  }, []);
 
-  const checkAdminAccess = async () => {
-    if (!user) {
-      navigate("/admin-auth");
-      return;
-    }
-
-    const { data } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", user.id)
-      .eq("role", "admin")
-      .maybeSingle();
-
-    if (!data) {
+  const checkAdminAccess = () => {
+    const adminId = localStorage.getItem("admin_id");
+    if (!adminId) {
       navigate("/admin-auth");
     }
   };
 
-  const handleLogout = async () => {
-    await signOut();
+  const handleLogout = () => {
+    localStorage.removeItem("admin_id");
+    localStorage.removeItem("admin_email");
     navigate("/admin-auth");
   };
 
