@@ -5,9 +5,9 @@ import { BookGallery } from "@/components/BookGallery";
 import { CartSidebar, CartItem } from "@/components/CartSidebar";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart } from "lucide-react";
-import authorPhoto from "@/assets/author-photo.jpg";
 import { supabase } from "@/integrations/supabase/client";
 import bookCollection from "@/assets/book-collection.jpg";
+import { Footer } from "@/components/Footer";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -143,39 +143,8 @@ const Index = () => {
       {/* Book Gallery Section */}
       <BookGallery onBookSelect={setSelectedBook} selectedBookId={selectedBook?.id} />
 
-      {/* About Author Section */}
-      <section className="py-8 md:py-16 bg-muted/30">
-        <div className="container mx-auto px-4">
-          <div className="max-w-5xl mx-auto">
-            <h2 className="text-2xl md:text-4xl font-heading font-bold text-center mb-8 md:mb-12">About the Author</h2>
-            <div className="grid md:grid-cols-2 gap-6 md:gap-8 items-center">
-              <div className="order-2 md:order-1">
-                <h3 className="text-2xl font-heading font-semibold mb-4">Jane Mitchell</h3>
-                <p className="text-muted-foreground mb-4 leading-relaxed">
-                  Jane Mitchell is an acclaimed author with over a decade of experience crafting compelling narratives 
-                  that captivate readers worldwide. Her unique storytelling approach blends literary excellence with 
-                  profound emotional depth.
-                </p>
-                <p className="text-muted-foreground mb-4 leading-relaxed">
-                  With numerous bestsellers and literary awards to her name, Jane continues to push the boundaries 
-                  of contemporary fiction, exploring themes of identity, connection, and the human experience.
-                </p>
-                <p className="text-muted-foreground leading-relaxed">
-                  When she's not writing, Jane enjoys reading in her personal library, traveling to gather inspiration, 
-                  and engaging with her passionate community of readers.
-                </p>
-              </div>
-              <div className="order-1 md:order-2">
-                <img 
-                  src={authorPhoto} 
-                  alt="Jane Mitchell - Author" 
-                  className="w-full rounded-lg shadow-lg object-cover aspect-square"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Footer */}
+      <Footer />
 
       {/* Cart Sidebar */}
       <CartSidebar 
