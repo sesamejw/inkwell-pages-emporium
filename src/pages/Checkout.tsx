@@ -189,6 +189,51 @@ export const Checkout = () => {
       navigate("/my-books");
     } catch (error: any) {
       console.error("Checkout error:", error);
+      
+      // Record failed order
+      try {
+        const { data: existingCustomer } = await supabase
+          .from("customers")
+          .select("id")
+          .eq("user_id", user.id)
+          .maybeSingle();
+
+        let customerId = existingCustomer?.id;
+
+        if (!customerId) {
+          const { data: newCustomer } = await supabase
+            .from("customers")
+            .insert({
+              user_id: user.id,
+              email: formData.email,
+              full_name: formData.fullName,
+              phone: formData.phone,
+              address: formData.address,
+              city: formData.city,
+              country: formData.country,
+              postal_code: formData.postalCode,
+            })
+            .select()
+            .single();
+
+          if (newCustomer) customerId = newCustomer.id;
+        }
+
+        if (customerId) {
+          const orderNumber = `ORD-FAILED-${Date.now()}`;
+          await supabase.from("orders").insert({
+            customer_id: customerId,
+            order_number: orderNumber,
+            subtotal,
+            tax: 0,
+            total,
+            status: "failed",
+          });
+        }
+      } catch (recordError) {
+        console.error("Error recording failed order:", recordError);
+      }
+
       toast({
         title: "Order Failed",
         description: error.message || "An error occurred while processing your order",
@@ -199,7 +244,71 @@ export const Checkout = () => {
     }
   };
 
-  const onClose = () => {
+  const onClose = async () => {
+    try {
+      // Create or get customer
+      const { data: existingCustomer } = await supabase
+        .from("customers")
+        .select("id")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      let customerId = existingCustomer?.id;
+
+      if (!customerId) {
+        const { data: newCustomer, error: customerError } = await supabase
+          .from("customers")
+          .insert({
+            user_id: user.id,
+            email: formData.email,
+            full_name: formData.fullName,
+            phone: formData.phone,
+            address: formData.address,
+            city: formData.city,
+            country: formData.country,
+            postal_code: formData.postalCode,
+          })
+          .select()
+          .single();
+
+        if (customerError) throw customerError;
+        customerId = newCustomer.id;
+      }
+
+      // Create cancelled order
+      const orderNumber = `ORD-CANCELLED-${Date.now()}`;
+      await supabase.from("orders").insert({
+        customer_id: customerId,
+        order_number: orderNumber,
+        subtotal,
+        tax: 0,
+        total,
+        status: "cancelled",
+      });
+
+      // Create order items (but no purchases)
+      const { data: order } = await supabase
+        .from("orders")
+        .select("id")
+        .eq("order_number", orderNumber)
+        .single();
+
+      if (order) {
+        for (const item of cartItems) {
+          const bookId = item.id.split('-').slice(0, 5).join('-');
+          await supabase.from("order_items").insert({
+            order_id: order.id,
+            book_id: bookId,
+            quantity: item.quantity,
+            price: item.price,
+            version_type: item.version,
+          });
+        }
+      }
+    } catch (error) {
+      console.error("Error recording cancelled order:", error);
+    }
+
     toast({
       title: "Payment Cancelled",
       description: "You cancelled the payment process",
