@@ -605,6 +605,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "forum_replies_author_id_profiles_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "forum_replies_post_id_fkey"
             columns: ["post_id"]
             isOneToOne: false
