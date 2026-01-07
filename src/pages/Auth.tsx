@@ -7,7 +7,8 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { BookOpen } from "lucide-react";
+import { BookOpen, CheckCircle, X } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -21,6 +22,7 @@ export const Auth = () => {
   const [resetEmail, setResetEmail] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showEmailConfirmed, setShowEmailConfirmed] = useState(false);
   
   const { signIn, signUp, user, resetPassword, updatePassword } = useAuth();
   const navigate = useNavigate();
@@ -31,13 +33,20 @@ export const Auth = () => {
       navigate("/");
     }
 
-    // Check if this is a password reset redirect
+    // Check URL parameters for email confirmation or password reset
     const hashParams = new URLSearchParams(window.location.hash.substring(1));
-    const type = hashParams.get('type');
+    const urlParams = new URLSearchParams(window.location.search);
+    const type = hashParams.get('type') || urlParams.get('type');
     
     if (type === 'recovery') {
       setShowResetPassword(true);
       setIsLogin(true);
+    } else if (type === 'signup' || type === 'email_confirmation' || hashParams.get('access_token')) {
+      // User came from email confirmation link
+      setShowEmailConfirmed(true);
+      setIsLogin(true);
+      // Clear the URL params
+      window.history.replaceState(null, "", window.location.pathname);
     }
   }, [user, navigate]);
 
@@ -186,6 +195,22 @@ export const Auth = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
+          {showEmailConfirmed && (
+            <Alert className="mb-4 border-green-500 bg-green-50 dark:bg-green-950/30">
+              <CheckCircle className="h-4 w-4 text-green-600" />
+              <AlertDescription className="flex items-center justify-between">
+                <span className="text-green-700 dark:text-green-400">
+                  Email confirmed successfully! You can now sign in.
+                </span>
+                <button
+                  onClick={() => setShowEmailConfirmed(false)}
+                  className="text-green-600 hover:text-green-800"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </AlertDescription>
+            </Alert>
+          )}
           {showResetPassword ? (
             <form onSubmit={handleUpdatePassword} className="space-y-4">
               <div className="space-y-2">
