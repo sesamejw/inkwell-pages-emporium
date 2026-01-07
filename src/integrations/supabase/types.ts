@@ -772,6 +772,51 @@ export type Database = {
         }
         Relationships: []
       }
+      reading_progress: {
+        Row: {
+          book_id: string
+          completed: boolean
+          completed_at: string | null
+          created_at: string
+          current_page: number
+          id: string
+          last_read_at: string
+          progress_percentage: number
+          time_spent_seconds: number
+          total_pages: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          book_id: string
+          completed?: boolean
+          completed_at?: string | null
+          created_at?: string
+          current_page?: number
+          id?: string
+          last_read_at?: string
+          progress_percentage?: number
+          time_spent_seconds?: number
+          total_pages?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          book_id?: string
+          completed?: boolean
+          completed_at?: string | null
+          created_at?: string
+          current_page?: number
+          id?: string
+          last_read_at?: string
+          progress_percentage?: number
+          time_spent_seconds?: number
+          total_pages?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       reviews: {
         Row: {
           book_id: string

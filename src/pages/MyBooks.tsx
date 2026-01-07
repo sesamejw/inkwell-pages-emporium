@@ -2,11 +2,13 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { BookOpen, FileText } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { BookOpen } from "lucide-react";
 import { PDFViewer } from "@/components/PDFViewer";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ReadingStats } from "@/components/ReadingStats";
+import { BookProgressCard } from "@/components/BookProgressCard";
+import { useReadingProgress } from "@/hooks/useReadingProgress";
 
 interface Purchase {
   id: string;
@@ -18,6 +20,7 @@ interface Purchase {
   price: number;
   purchased_at: string;
   ebook_pdf_url?: string | null;
+  pages?: number;
 }
 
 export const MyBooks = () => {
@@ -25,7 +28,14 @@ export const MyBooks = () => {
   const navigate = useNavigate();
   const [purchases, setPurchases] = useState<Purchase[]>([]);
   const [loadingPurchases, setLoadingPurchases] = useState(true);
-  const [selectedPDF, setSelectedPDF] = useState<{url: string, title: string} | null>(null);
+  const [selectedBook, setSelectedBook] = useState<{
+    url: string; 
+    title: string; 
+    bookId: string;
+    totalPages: number;
+  } | null>(null);
+
+  const { allProgress, stats, getProgressForBook, refetch } = useReadingProgress();
 
   useEffect(() => {
     if (!loading && !user) {
@@ -44,18 +54,22 @@ export const MyBooks = () => {
         .order("purchased_at", { ascending: false });
 
       if (!purchaseError && purchaseData) {
-        // Fetch book PDF URLs
+        // Fetch book PDF URLs and pages
         const bookIds = [...new Set(purchaseData.map(p => p.book_id))];
         const { data: booksData } = await supabase
           .from("books")
-          .select("id, ebook_pdf_url")
+          .select("id, ebook_pdf_url, pages")
           .in("id", bookIds);
 
-        const booksMap = new Map(booksData?.map(b => [b.id, b.ebook_pdf_url]) || []);
+        const booksMap = new Map(booksData?.map(b => [b.id, { 
+          ebook_pdf_url: b.ebook_pdf_url, 
+          pages: b.pages 
+        }]) || []);
         
         const enrichedPurchases = purchaseData.map(p => ({
           ...p,
-          ebook_pdf_url: booksMap.get(p.book_id)
+          ebook_pdf_url: booksMap.get(p.book_id)?.ebook_pdf_url,
+          pages: booksMap.get(p.book_id)?.pages || 100
         }));
 
         setPurchases(enrichedPurchases);
@@ -67,6 +81,11 @@ export const MyBooks = () => {
       fetchPurchases();
     }
   }, [user]);
+
+  const handleCloseViewer = () => {
+    setSelectedBook(null);
+    refetch(); // Refresh progress after reading
+  };
 
   if (loading || loadingPurchases) {
     return (
@@ -80,51 +99,36 @@ export const MyBooks = () => {
   const paperbacks = purchases.filter(p => p.book_version === "paperback");
   const hardcovers = purchases.filter(p => p.book_version === "hardcover");
 
+  // Get recently read books (sorted by last_read_at)
+  const recentlyRead = ebooks
+    .filter(p => getProgressForBook(p.book_id))
+    .sort((a, b) => {
+      const progressA = getProgressForBook(a.book_id);
+      const progressB = getProgressForBook(b.book_id);
+      if (!progressA || !progressB) return 0;
+      return new Date(progressB.last_read_at).getTime() - new Date(progressA.last_read_at).getTime();
+    })
+    .slice(0, 3);
+
   const renderBookCard = (purchase: Purchase) => {
-    const isEbook = purchase.book_version === "ebook" && purchase.ebook_pdf_url;
+    const progress = getProgressForBook(purchase.book_id);
     
     return (
-      <Card 
-        key={purchase.id} 
-        className={`overflow-hidden hover:shadow-lg transition-shadow ${isEbook ? 'cursor-pointer' : ''}`}
-        onClick={() => isEbook && setSelectedPDF({ url: purchase.ebook_pdf_url!, title: purchase.book_title })}
-      >
-        <div className="aspect-[2/3] relative bg-muted">
-          {purchase.book_cover_url ? (
-            <img
-              src={purchase.book_cover_url}
-              alt={purchase.book_title}
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center">
-              <BookOpen className="h-16 w-16 text-muted-foreground" />
-            </div>
-          )}
-          {isEbook && (
-            <div className="absolute inset-0 bg-black/0 hover:bg-black/10 transition-all duration-300 flex items-center justify-center opacity-0 hover:opacity-100">
-              <Button
-                variant="secondary"
-                size="sm"
-                className="bg-background/90 backdrop-blur pointer-events-none"
-              >
-                <FileText className="h-4 w-4 mr-2" />
-                Read Now
-              </Button>
-            </div>
-          )}
-        </div>
-        <CardHeader>
-          <CardTitle className="line-clamp-2">{purchase.book_title}</CardTitle>
-          <CardDescription>{purchase.book_author}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2 text-sm text-muted-foreground">
-            <p>Version: {purchase.book_version}</p>
-            <p>Purchased: {new Date(purchase.purchased_at).toLocaleDateString()}</p>
-          </div>
-        </CardContent>
-      </Card>
+      <BookProgressCard
+        key={purchase.id}
+        purchase={purchase}
+        progress={progress}
+        onRead={() => {
+          if (purchase.ebook_pdf_url) {
+            setSelectedBook({
+              url: purchase.ebook_pdf_url,
+              title: purchase.book_title,
+              bookId: purchase.book_id,
+              totalPages: purchase.pages || 100
+            });
+          }
+        }}
+      />
     );
   };
 
@@ -134,8 +138,21 @@ export const MyBooks = () => {
         <div className="max-w-6xl mx-auto">
           <div className="mb-8">
             <h1 className="text-4xl font-heading font-bold mb-2">My Books</h1>
-            <p className="text-muted-foreground">Access all your purchased books</p>
+            <p className="text-muted-foreground">Access all your purchased books and track your reading progress</p>
           </div>
+
+          {/* Reading Statistics */}
+          {ebooks.length > 0 && <ReadingStats stats={stats} />}
+
+          {/* Continue Reading Section */}
+          {recentlyRead.length > 0 && (
+            <div className="mb-8">
+              <h2 className="text-2xl font-heading font-semibold mb-4">Continue Reading</h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {recentlyRead.map(renderBookCard)}
+              </div>
+            </div>
+          )}
 
           {purchases.length === 0 ? (
             <Card>
@@ -190,12 +207,14 @@ export const MyBooks = () => {
         </div>
       </div>
 
-      {selectedPDF && (
+      {selectedBook && (
         <PDFViewer
-          pdfUrl={selectedPDF.url}
-          title={selectedPDF.title}
+          pdfUrl={selectedBook.url}
+          title={selectedBook.title}
+          bookId={selectedBook.bookId}
+          totalPages={selectedBook.totalPages}
           isOpen={true}
-          onClose={() => setSelectedPDF(null)}
+          onClose={handleCloseViewer}
         />
       )}
     </div>
