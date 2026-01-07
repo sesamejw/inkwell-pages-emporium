@@ -4,7 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { BookOpen } from "lucide-react";
-import { PDFViewer } from "@/components/PDFViewer";
+import { EbookReader } from "@/components/EbookReader";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ReadingStats } from "@/components/ReadingStats";
 import { BookProgressCard } from "@/components/BookProgressCard";
@@ -32,7 +32,6 @@ export const MyBooks = () => {
     url: string; 
     title: string; 
     bookId: string;
-    totalPages: number;
   } | null>(null);
 
   const { allProgress, stats, getProgressForBook, refetch } = useReadingProgress();
@@ -124,7 +123,6 @@ export const MyBooks = () => {
               url: purchase.ebook_pdf_url,
               title: purchase.book_title,
               bookId: purchase.book_id,
-              totalPages: purchase.pages || 100
             });
           }
         }}
@@ -208,11 +206,10 @@ export const MyBooks = () => {
       </div>
 
       {selectedBook && (
-        <PDFViewer
+        <EbookReader
           pdfUrl={selectedBook.url}
           title={selectedBook.title}
           bookId={selectedBook.bookId}
-          totalPages={selectedBook.totalPages}
           isOpen={true}
           onClose={handleCloseViewer}
         />
