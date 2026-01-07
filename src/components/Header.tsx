@@ -25,6 +25,7 @@ import {
   Library
 } from "lucide-react";
 import thouartLogo from "@/assets/thouart-logo.png";
+import { ThemeToggle } from "./ThemeToggle";
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -86,7 +87,9 @@ export const Header = () => {
           </div>
 
           {/* Right Side Actions */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2">
+            {/* Theme Toggle */}
+            <ThemeToggle />
             {/* User Account */}
             {user ? (
               <DropdownMenu>
