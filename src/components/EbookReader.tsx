@@ -1,32 +1,28 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
-  ChevronLeft,
-  ChevronRight,
-  Clock,
+  X,
   ZoomIn,
   ZoomOut,
   Maximize,
   Minimize,
-  BookOpen,
-  List,
-  X,
   RotateCw,
+  BookOpen,
+  ChevronUp,
+  ChevronDown,
 } from "lucide-react";
-import { useReadingProgress, formatReadingTime } from "@/hooks/useReadingProgress";
-import { cn } from "@/lib/utils";
+import { useReadingProgress } from "@/hooks/useReadingProgress";
 
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
 
-// Set up PDF.js worker
+// Configure PDF.js worker
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
 interface EbookReaderProps {
@@ -49,40 +45,32 @@ export const EbookReader = ({
   const [pageInput, setPageInput] = useState("1");
   const [scale, setScale] = useState(1);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [showThumbnails, setShowThumbnails] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [pdfError, setPdfError] = useState<string | null>(null);
   
   const containerRef = useRef<HTMLDivElement>(null);
-  const pageRef = useRef<HTMLDivElement>(null);
+  const pageRefs = useRef<Map<number, HTMLDivElement>>(new Map());
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const isScrollingProgrammatically = useRef(false);
 
-  const {
-    progress,
-    updateProgress,
-    startTimeTracking,
-    stopTimeTracking,
-  } = useReadingProgress(bookId);
+  const { progress, updateProgress, loading: progressLoading } = useReadingProgress(bookId);
 
   // Initialize from saved progress
   useEffect(() => {
-    if (progress && isOpen && numPages > 0) {
-      const savedPage = Math.min(progress.current_page, numPages);
-      setCurrentPage(savedPage);
-      setPageInput(String(savedPage));
+    if (progress && !progressLoading && numPages > 0) {
+      const savedPage = progress.current_page;
+      if (savedPage > 1 && savedPage <= numPages) {
+        setCurrentPage(savedPage);
+        setPageInput(savedPage.toString());
+        // Scroll to saved page after a short delay to ensure pages are rendered
+        setTimeout(() => {
+          scrollToPage(savedPage, false);
+        }, 500);
+      }
     }
-  }, [progress, isOpen, numPages]);
+  }, [progress, progressLoading, numPages]);
 
-  // Start/stop time tracking
-  useEffect(() => {
-    if (isOpen) {
-      startTimeTracking();
-    }
-    return () => {
-      stopTimeTracking();
-    };
-  }, [isOpen, startTimeTracking, stopTimeTracking]);
-
-  // Save progress on page change
+  // Update progress when current page changes
   useEffect(() => {
     if (!isOpen || numPages === 0) return;
 
@@ -93,30 +81,58 @@ export const EbookReader = ({
     return () => clearTimeout(timer);
   }, [currentPage, numPages, isOpen, updateProgress]);
 
+  // Intersection observer to track current page
+  useEffect(() => {
+    if (!isOpen || numPages === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (isScrollingProgrammatically.current) return;
+        
+        // Find the page that is most visible
+        let mostVisiblePage = currentPage;
+        let maxRatio = 0;
+
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && entry.intersectionRatio > maxRatio) {
+            const pageNum = parseInt(entry.target.getAttribute("data-page") || "1");
+            maxRatio = entry.intersectionRatio;
+            mostVisiblePage = pageNum;
+          }
+        });
+
+        if (mostVisiblePage !== currentPage && maxRatio > 0.3) {
+          setCurrentPage(mostVisiblePage);
+          setPageInput(mostVisiblePage.toString());
+        }
+      },
+      {
+        root: scrollContainerRef.current,
+        threshold: [0, 0.25, 0.5, 0.75, 1],
+        rootMargin: "-10% 0px -10% 0px",
+      }
+    );
+
+    pageRefs.current.forEach((ref) => {
+      if (ref) observer.observe(ref);
+    });
+
+    return () => observer.disconnect();
+  }, [isOpen, numPages, currentPage]);
+
   // Handle keyboard navigation
   useEffect(() => {
     if (!isOpen) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
       switch (e.key) {
-        case "ArrowLeft":
-        case "ArrowUp":
-          e.preventDefault();
-          goToPage(currentPage - 1);
-          break;
-        case "ArrowRight":
-        case "ArrowDown":
-        case " ":
-          e.preventDefault();
-          goToPage(currentPage + 1);
-          break;
         case "Home":
           e.preventDefault();
-          goToPage(1);
+          scrollToPage(1);
           break;
         case "End":
           e.preventDefault();
-          goToPage(numPages);
+          scrollToPage(numPages);
           break;
         case "+":
         case "=":
@@ -137,32 +153,36 @@ export const EbookReader = ({
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen, currentPage, numPages, scale, isFullscreen]);
+  }, [isOpen, numPages, scale, isFullscreen]);
 
-  const handleClose = useCallback(async () => {
-    await stopTimeTracking();
-    if (numPages > 0) {
-      await updateProgress(currentPage, numPages);
+  const scrollToPage = useCallback((pageNum: number, smooth = true) => {
+    const pageRef = pageRefs.current.get(pageNum);
+    if (pageRef && scrollContainerRef.current) {
+      isScrollingProgrammatically.current = true;
+      pageRef.scrollIntoView({ behavior: smooth ? "smooth" : "auto", block: "start" });
+      setCurrentPage(pageNum);
+      setPageInput(pageNum.toString());
+      
+      setTimeout(() => {
+        isScrollingProgrammatically.current = false;
+      }, 500);
     }
-    onClose();
-  }, [stopTimeTracking, updateProgress, currentPage, numPages, onClose]);
+  }, []);
 
   const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
     setNumPages(numPages);
     setIsLoading(false);
-    setError(null);
+    setPdfError(null);
   };
 
   const onDocumentLoadError = (error: Error) => {
     console.error("PDF load error:", error);
-    setError("Failed to load the PDF. Please try again.");
+    setPdfError("Failed to load PDF. Please try again.");
     setIsLoading(false);
   };
 
-  const goToPage = (page: number) => {
-    const validPage = Math.max(1, Math.min(page, numPages));
-    setCurrentPage(validPage);
-    setPageInput(String(validPage));
+  const handleZoom = (newScale: number) => {
+    setScale(Math.max(0.5, Math.min(3, newScale)));
   };
 
   const handlePageInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -171,14 +191,12 @@ export const EbookReader = ({
 
   const handlePageInputSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const page = parseInt(pageInput, 10);
-    if (!isNaN(page)) {
-      goToPage(page);
+    const page = parseInt(pageInput);
+    if (page >= 1 && page <= numPages) {
+      scrollToPage(page);
+    } else {
+      setPageInput(currentPage.toString());
     }
-  };
-
-  const handleZoom = (newScale: number) => {
-    setScale(Math.max(0.5, Math.min(3, newScale)));
   };
 
   const toggleFullscreen = () => {
@@ -195,48 +213,39 @@ export const EbookReader = ({
     const handleFullscreenChange = () => {
       setIsFullscreen(!!document.fullscreenElement);
     };
+
     document.addEventListener("fullscreenchange", handleFullscreenChange);
     return () => document.removeEventListener("fullscreenchange", handleFullscreenChange);
   }, []);
 
-  const progressPercent = numPages > 0 ? (currentPage / numPages) * 100 : 0;
+  const progressPercentage = numPages > 0 ? Math.round((currentPage / numPages) * 100) : 0;
+
+  const setPageRef = useCallback((pageNum: number, ref: HTMLDivElement | null) => {
+    if (ref) {
+      pageRefs.current.set(pageNum, ref);
+    } else {
+      pageRefs.current.delete(pageNum);
+    }
+  }, []);
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent 
         ref={containerRef}
-        className={cn(
-          "flex flex-col p-0 gap-0 bg-background",
-          isFullscreen
-            ? "w-screen h-screen max-w-none max-h-none rounded-none"
-            : "w-[95vw] max-w-[1200px] h-[95vh]"
-        )}
+        className="max-w-[95vw] w-[95vw] h-[95vh] max-h-[95vh] p-0 flex flex-col bg-background"
       >
         {/* Header */}
         <header className="flex items-center justify-between px-4 py-3 border-b bg-card shrink-0">
-          <div className="flex items-center gap-4">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setShowThumbnails(!showThumbnails)}
-              className="hidden md:flex"
-            >
-              <List className="h-5 w-5" />
-            </Button>
-            <div>
-              <h2 className="font-semibold text-sm md:text-base line-clamp-1">{title}</h2>
-              {progress && (
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <Clock className="h-3 w-3" />
-                  <span>{formatReadingTime(progress.time_spent_seconds)}</span>
-                </div>
-              )}
-            </div>
+          <div className="flex items-center gap-3">
+            <BookOpen className="h-5 w-5 text-primary" />
+            <h2 className="font-semibold text-lg truncate max-w-[200px] sm:max-w-[400px]">
+              {title}
+            </h2>
           </div>
 
           <div className="flex items-center gap-2">
-            {/* Zoom controls */}
-            <div className="hidden md:flex items-center gap-1 border rounded-md px-2 py-1">
+            {/* Zoom controls - desktop */}
+            <div className="hidden md:flex items-center gap-2 px-3 py-1 bg-muted rounded-lg">
               <Button
                 variant="ghost"
                 size="icon"
@@ -246,7 +255,9 @@ export const EbookReader = ({
               >
                 <ZoomOut className="h-4 w-4" />
               </Button>
-              <span className="text-xs w-12 text-center">{Math.round(scale * 100)}%</span>
+              <span className="text-sm font-medium w-12 text-center">
+                {Math.round(scale * 100)}%
+              </span>
               <Button
                 variant="ghost"
                 size="icon"
@@ -258,71 +269,34 @@ export const EbookReader = ({
               </Button>
             </div>
 
+            {/* Fullscreen toggle */}
             <Button
               variant="ghost"
               size="icon"
               onClick={toggleFullscreen}
-              className="hidden md:flex"
+              className="hidden sm:flex"
             >
               {isFullscreen ? (
-                <Minimize className="h-5 w-5" />
+                <Minimize className="h-4 w-4" />
               ) : (
-                <Maximize className="h-5 w-5" />
+                <Maximize className="h-4 w-4" />
               )}
             </Button>
 
-            <Button variant="ghost" size="icon" onClick={handleClose}>
-              <X className="h-5 w-5" />
+            {/* Close button */}
+            <Button variant="ghost" size="icon" onClick={onClose}>
+              <X className="h-4 w-4" />
             </Button>
           </div>
         </header>
 
-        {/* Progress bar */}
-        <div className="px-4 py-2 border-b bg-muted/30 shrink-0">
-          <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
-            <span>{progressPercent.toFixed(0)}% complete</span>
-            <span>
-              Page {currentPage} of {numPages || "..."}
-            </span>
-          </div>
-          <Progress value={progressPercent} className="h-1.5" />
-        </div>
-
         {/* Main content area */}
-        <div className="flex flex-1 min-h-0 overflow-hidden">
-          {/* Thumbnails sidebar */}
-          {showThumbnails && (
-            <aside className="w-32 border-r bg-muted/20 shrink-0 hidden md:block">
-              <ScrollArea className="h-full">
-                <div className="p-2 space-y-2">
-                  {Array.from({ length: numPages }, (_, i) => i + 1).map((pageNum) => (
-                    <button
-                      key={pageNum}
-                      onClick={() => goToPage(pageNum)}
-                      className={cn(
-                        "w-full aspect-[3/4] border-2 rounded overflow-hidden transition-all",
-                        currentPage === pageNum
-                          ? "border-accent ring-2 ring-accent/20"
-                          : "border-border hover:border-accent/50"
-                      )}
-                    >
-                      <Document file={pdfUrl} loading={null}>
-                        <Page
-                          pageNumber={pageNum}
-                          width={100}
-                          renderTextLayer={false}
-                          renderAnnotationLayer={false}
-                        />
-                      </Document>
-                    </button>
-                  ))}
-                </div>
-              </ScrollArea>
-            </aside>
-          )}
-
-          {/* PDF viewer */}
-          <main className="flex-1 overflow-auto bg-muted/10" ref={pageRef}>
+        <div className="flex-1 flex overflow-hidden min-h-0">
+          {/* PDF viewer with vertical scroll */}
+          <main 
+            ref={scrollContainerRef}
+            className="flex-1 overflow-auto bg-muted/10"
+          >
             {isLoading && (
               <div className="flex items-center justify-center h-full">
                 <div className="text-center space-y-4">
@@ -332,19 +306,18 @@ export const EbookReader = ({
               </div>
             )}
 
-            {error && (
+            {pdfError && (
               <div className="flex items-center justify-center h-full">
                 <div className="text-center space-y-4">
-                  <BookOpen className="h-12 w-12 mx-auto text-muted-foreground" />
-                  <p className="text-destructive">{error}</p>
-                  <Button onClick={() => window.location.reload()}>
-                    Try Again
+                  <p className="text-destructive">{pdfError}</p>
+                  <Button variant="outline" onClick={onClose}>
+                    Close
                   </Button>
                 </div>
               </div>
             )}
 
-            <div className="flex justify-center p-4 min-h-full">
+            <div className="flex flex-col items-center py-4 gap-4">
               <Document
                 file={pdfUrl}
                 onLoadSuccess={onDocumentLoadSuccess}
@@ -352,29 +325,38 @@ export const EbookReader = ({
                 loading={null}
                 className="max-w-full"
               >
-                <Page
-                  pageNumber={currentPage}
-                  scale={scale}
-                  className="shadow-lg"
-                  loading={
-                    <Skeleton className="w-[600px] h-[800px]" />
-                  }
-                />
+                {Array.from({ length: numPages }, (_, index) => (
+                  <div
+                    key={`page_${index + 1}`}
+                    ref={(ref) => setPageRef(index + 1, ref)}
+                    data-page={index + 1}
+                    className="mb-4"
+                  >
+                    <Page
+                      pageNumber={index + 1}
+                      scale={scale}
+                      className="shadow-lg bg-white"
+                      loading={
+                        <Skeleton className="w-[600px] h-[800px]" />
+                      }
+                    />
+                  </div>
+                ))}
               </Document>
             </div>
           </main>
         </div>
 
-        {/* Footer navigation */}
+        {/* Footer */}
         <footer className="flex items-center justify-between px-4 py-3 border-t bg-card shrink-0">
           <Button
             variant="outline"
             size="sm"
-            onClick={() => goToPage(currentPage - 1)}
+            onClick={() => scrollToPage(Math.max(1, currentPage - 1))}
             disabled={currentPage <= 1}
             className="gap-1"
           >
-            <ChevronLeft className="h-4 w-4" />
+            <ChevronUp className="h-4 w-4" />
             <span className="hidden sm:inline">Previous</span>
           </Button>
 
@@ -401,19 +383,23 @@ export const EbookReader = ({
                 min={1}
                 max={numPages}
               />
-              <span className="text-sm text-muted-foreground">/ {numPages || "..."}</span>
+              <span className="text-sm text-muted-foreground">of {numPages}</span>
             </form>
+
+            <span className="text-sm text-muted-foreground ml-2 hidden sm:inline">
+              ({progressPercentage}%)
+            </span>
           </div>
 
           <Button
             variant="outline"
             size="sm"
-            onClick={() => goToPage(currentPage + 1)}
+            onClick={() => scrollToPage(Math.min(numPages, currentPage + 1))}
             disabled={currentPage >= numPages}
             className="gap-1"
           >
             <span className="hidden sm:inline">Next</span>
-            <ChevronRight className="h-4 w-4" />
+            <ChevronDown className="h-4 w-4" />
           </Button>
         </footer>
       </DialogContent>
