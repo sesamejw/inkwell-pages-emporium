@@ -361,6 +361,33 @@ export type Database = {
           },
         ]
       }
+      bookmarks: {
+        Row: {
+          book_id: string
+          created_at: string
+          id: string
+          label: string | null
+          page_number: number
+          user_id: string
+        }
+        Insert: {
+          book_id: string
+          created_at?: string
+          id?: string
+          label?: string | null
+          page_number: number
+          user_id: string
+        }
+        Update: {
+          book_id?: string
+          created_at?: string
+          id?: string
+          label?: string | null
+          page_number?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       books: {
         Row: {
           author: string

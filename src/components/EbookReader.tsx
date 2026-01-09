@@ -7,6 +7,11 @@ import { Slider } from "@/components/ui/slider";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
   X,
   ZoomIn,
   ZoomOut,
@@ -16,8 +21,12 @@ import {
   BookOpen,
   ChevronUp,
   ChevronDown,
+  Bookmark,
+  BookmarkCheck,
+  Trash2,
 } from "lucide-react";
 import { useReadingProgress } from "@/hooks/useReadingProgress";
+import { useBookmarks } from "@/hooks/useBookmarks";
 
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
@@ -54,6 +63,8 @@ export const EbookReader = ({
   const isScrollingProgrammatically = useRef(false);
 
   const { progress, updateProgress, loading: progressLoading } = useReadingProgress(bookId);
+  const { bookmarks, addBookmark, removeBookmark, isPageBookmarked, getBookmarkForPage } = useBookmarks(bookId);
+  const [showBookmarks, setShowBookmarks] = useState(false);
 
   // Initialize from saved progress
   useEffect(() => {
@@ -244,6 +255,79 @@ export const EbookReader = ({
           </div>
 
           <div className="flex items-center gap-2">
+            {/* Bookmark current page button */}
+            <Button
+              variant={isPageBookmarked(currentPage) ? "default" : "ghost"}
+              size="icon"
+              onClick={() => {
+                const existing = getBookmarkForPage(currentPage);
+                if (existing) {
+                  removeBookmark(existing.id);
+                } else {
+                  addBookmark(currentPage);
+                }
+              }}
+              title={isPageBookmarked(currentPage) ? "Remove bookmark" : "Add bookmark"}
+            >
+              {isPageBookmarked(currentPage) ? (
+                <BookmarkCheck className="h-4 w-4" />
+              ) : (
+                <Bookmark className="h-4 w-4" />
+              )}
+            </Button>
+
+            {/* Bookmarks list */}
+            <Popover open={showBookmarks} onOpenChange={setShowBookmarks}>
+              <PopoverTrigger asChild>
+                <Button variant="ghost" size="sm" className="gap-1">
+                  <Bookmark className="h-4 w-4" />
+                  <span className="hidden sm:inline">Bookmarks</span>
+                  {bookmarks.length > 0 && (
+                    <span className="text-xs bg-primary text-primary-foreground rounded-full px-1.5 py-0.5 ml-1">
+                      {bookmarks.length}
+                    </span>
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-64 p-2" align="end">
+                <div className="text-sm font-medium mb-2">Bookmarks</div>
+                {bookmarks.length === 0 ? (
+                  <p className="text-sm text-muted-foreground py-4 text-center">
+                    No bookmarks yet
+                  </p>
+                ) : (
+                  <ScrollArea className="max-h-[300px]">
+                    <div className="space-y-1">
+                      {bookmarks.map((bookmark) => (
+                        <div
+                          key={bookmark.id}
+                          className="flex items-center justify-between gap-2 p-2 rounded-md hover:bg-muted group"
+                        >
+                          <button
+                            onClick={() => {
+                              scrollToPage(bookmark.page_number);
+                              setShowBookmarks(false);
+                            }}
+                            className="flex-1 text-left text-sm truncate"
+                          >
+                            {bookmark.label || `Page ${bookmark.page_number}`}
+                          </button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                            onClick={() => removeBookmark(bookmark.id)}
+                          >
+                            <Trash2 className="h-3 w-3 text-destructive" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  </ScrollArea>
+                )}
+              </PopoverContent>
+            </Popover>
+
             {/* Zoom controls - desktop */}
             <div className="hidden md:flex items-center gap-2 px-3 py-1 bg-muted rounded-lg">
               <Button
