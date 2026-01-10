@@ -22,7 +22,8 @@ import {
   MessageSquare,
   Settings as SettingsIcon,
   LogOut,
-  Library
+  Library,
+  Heart
 } from "lucide-react";
 import thouartLogo from "@/assets/thouart-logo.png";
 import { ThemeToggle } from "./ThemeToggle";
@@ -109,6 +110,10 @@ export const Header = () => {
                   <DropdownMenuItem onClick={() => navigate("/my-books")}>
                     <Library className="mr-2 h-4 w-4" />
                     <span>My Books</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate("/wishlist")}>
+                    <Heart className="mr-2 h-4 w-4" />
+                    <span>Wishlist</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => navigate("/settings")}>
                     <SettingsIcon className="mr-2 h-4 w-4" />
