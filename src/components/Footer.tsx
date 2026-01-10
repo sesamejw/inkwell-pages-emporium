@@ -1,11 +1,21 @@
 import { Mail } from "lucide-react";
 import { FaTwitter, FaTelegram } from "react-icons/fa";
+import { NewsletterForm } from "./NewsletterForm";
 
 export const Footer = () => {
   return (
     <footer className="bg-muted/30 border-t border-border">
       <div className="container mx-auto px-4 py-8">
         <div className="flex flex-col items-center gap-6">
+          {/* Newsletter Subscription */}
+          <div className="text-center space-y-2">
+            <h3 className="text-lg font-semibold">Stay Updated</h3>
+            <p className="text-sm text-muted-foreground">
+              Subscribe to get notified about new books and updates
+            </p>
+            <NewsletterForm />
+          </div>
+
           {/* Social Links */}
           <div className="flex items-center gap-6">
             <a
