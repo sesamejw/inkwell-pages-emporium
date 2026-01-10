@@ -10,7 +10,8 @@ import {
   DollarSign,
   Users,
   TrendingUp,
-  LogOut
+  LogOut,
+  Mail
 } from "lucide-react";
 import { ChronologyManager } from "@/components/ChronologyManager";
 import { BookManager } from "@/components/admin/BookManager";
@@ -18,6 +19,7 @@ import { AlmanacManager } from "@/components/admin/AlmanacManager";
 import { OrdersManager } from "@/components/admin/OrdersManager";
 import { CustomersManager } from "@/components/admin/CustomersManager";
 import { AnalyticsManager } from "@/components/admin/AnalyticsManager";
+import { NewsletterManager } from "@/components/admin/NewsletterManager";
 
 export const Admin = () => {
   const { books } = useBooks();
@@ -146,12 +148,13 @@ export const Admin = () => {
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
         <Tabs defaultValue="books" className="space-y-8">
-          <TabsList className="grid w-full grid-cols-6">
-            <TabsTrigger value="books">Book Management</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-7">
+            <TabsTrigger value="books">Books</TabsTrigger>
             <TabsTrigger value="chronology">Chronology</TabsTrigger>
             <TabsTrigger value="almanac">Almanac</TabsTrigger>
             <TabsTrigger value="orders">Orders</TabsTrigger>
             <TabsTrigger value="customers">Customers</TabsTrigger>
+            <TabsTrigger value="newsletter">Newsletter</TabsTrigger>
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
           </TabsList>
 
@@ -167,13 +170,16 @@ export const Admin = () => {
             <ChronologyManager />
           </TabsContent>
 
-
           <TabsContent value="orders" className="space-y-6">
             <OrdersManager />
           </TabsContent>
 
           <TabsContent value="customers" className="space-y-6">
             <CustomersManager />
+          </TabsContent>
+
+          <TabsContent value="newsletter" className="space-y-6">
+            <NewsletterManager />
           </TabsContent>
 
           <TabsContent value="analytics" className="space-y-6">
