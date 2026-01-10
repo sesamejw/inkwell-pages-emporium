@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Star, ShoppingCart } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { WishlistButton } from "@/components/WishlistButton";
 import bookCollection from "@/assets/book-collection.jpg";
 
 interface BookGalleryProps {
@@ -119,6 +120,10 @@ export const BookGallery = ({ onBookSelect, selectedBookId }: BookGalleryProps) 
                         alt={book.title}
                         className="w-full h-full object-cover"
                       />
+                    </div>
+                    {/* Wishlist Button */}
+                    <div className="absolute top-2 right-2 z-10">
+                      <WishlistButton bookId={book.id} />
                     </div>
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
                       <Button size="sm" variant="secondary" className="bg-background/90 backdrop-blur">
