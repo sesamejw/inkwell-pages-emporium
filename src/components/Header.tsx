@@ -31,12 +31,13 @@ import { ThemeToggle } from "./ThemeToggle";
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [cartCount, setCartCount] = useState(0);
+  const [searchQuery, setSearchQuery] = useState("");
   const location = useLocation();
   const navigate = useNavigate();
   const { user, profile, signOut } = useAuth();
 
   const navigation = [
-    { name: "Books", href: "/", icon: BookOpen },
+    { name: "Books", href: "/books", icon: BookOpen },
     { name: "Forum", href: "/forum", icon: MessageSquare },
   ];
 
@@ -47,6 +48,14 @@ export const Header = () => {
 
   const isActive = (path: string) => location.pathname === path;
 
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/books?search=${encodeURIComponent(searchQuery.trim())}`);
+      setSearchQuery("");
+      setIsMenuOpen(false);
+    }
+  };
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4">
@@ -76,16 +85,18 @@ export const Header = () => {
           </nav>
 
           {/* Search Bar */}
-          <div className="hidden md:flex flex-1 max-w-sm mx-8">
+          <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-sm mx-8">
             <div className="relative w-full">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 type="search"
                 placeholder="Search books..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-10 pr-4 h-10"
               />
             </div>
-          </div>
+          </form>
 
           {/* Right Side Actions */}
           <div className="flex items-center space-x-2">
@@ -162,14 +173,16 @@ export const Header = () => {
           <div className="md:hidden border-t bg-background py-4">
             <div className="flex flex-col space-y-4">
               {/* Mobile Search */}
-              <div className="relative">
+              <form onSubmit={handleSearch} className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   type="search"
                   placeholder="Search books..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full pl-10 pr-4 h-10"
                 />
-              </div>
+              </form>
 
               {/* Mobile Navigation Links */}
               <nav className="flex flex-col space-y-2">

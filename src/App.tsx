@@ -18,6 +18,7 @@ import { Settings } from "./pages/Settings";
 import EventDetail from "./pages/EventDetail";
 import AlmanacCategory from "./pages/AlmanacCategory";
 import Wishlist from "./pages/Wishlist";
+import Books from "./pages/Books";
 import { ChronologyTimeline } from "./components/ChronologyTimeline";
 import NotFound from "./pages/NotFound";
 
@@ -44,6 +45,7 @@ const App = () => (
                   <Route path="/checkout" element={<Checkout />} />
                   <Route path="/settings" element={<Settings />} />
                   <Route path="/wishlist" element={<Wishlist />} />
+                  <Route path="/books" element={<Books />} />
                   <Route path="/chronology" element={<ChronologyTimeline />} />
                   <Route path="/chronology/:eventId" element={<EventDetail />} />
                   <Route path="/almanac/:categoryId" element={<AlmanacCategory />} />
