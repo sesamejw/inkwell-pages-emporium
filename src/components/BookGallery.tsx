@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -14,6 +15,7 @@ interface BookGalleryProps {
 
 export const BookGallery = ({ onBookSelect, selectedBookId }: BookGalleryProps) => {
   const [activeBooks, setActiveBooks] = useState<any[]>([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchBooks();
@@ -177,7 +179,11 @@ export const BookGallery = ({ onBookSelect, selectedBookId }: BookGalleryProps) 
 
         {/* View All Button */}
         <div className="text-center mt-8">
-          <Button variant="outline" className="btn-outline-professional">
+          <Button 
+            variant="outline" 
+            className="btn-outline-professional"
+            onClick={() => navigate("/books")}
+          >
             View All Books
           </Button>
         </div>
