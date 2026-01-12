@@ -24,7 +24,6 @@ const categoryTableMap: Record<string, string> = {
   locations: "almanac_locations",
   magic: "almanac_magic",
   concepts: "almanac_concepts",
-  characters: "lore_characters",
 };
 
 const AlmanacCategory = () => {

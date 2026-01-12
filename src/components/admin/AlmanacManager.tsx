@@ -76,15 +76,6 @@ const categoryConfig = {
       { name: "concept_type", label: "Concept Type", type: "text" },
     ],
   },
-  characters: {
-    table: "lore_characters",
-    title: "Characters",
-    fields: [
-      { name: "era", label: "Era", type: "select", options: ["BGD", "GD", "AGD"] },
-      { name: "affiliation", label: "Affiliation", type: "text" },
-      { name: "role", label: "Role", type: "select", options: ["Hero", "Villain", "Deity", "Mortal", "Unknown"] },
-    ],
-  },
 };
 
 export const AlmanacManager = () => {
@@ -315,7 +306,7 @@ export const AlmanacManager = () => {
         setActiveCategory(v as keyof typeof categoryConfig);
         resetForm();
       }}>
-        <TabsList className="grid w-full grid-cols-8">
+        <TabsList className="grid w-full grid-cols-7">
           {Object.entries(categoryConfig).map(([key, config]) => (
             <TabsTrigger key={key} value={key}>{config.title}</TabsTrigger>
           ))}
