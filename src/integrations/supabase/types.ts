@@ -759,6 +759,51 @@ export type Database = {
           },
         ]
       }
+      lore_characters: {
+        Row: {
+          affiliation: string | null
+          article: string | null
+          created_at: string
+          description: string | null
+          era: string | null
+          id: string
+          image_url: string | null
+          name: string
+          order_index: number | null
+          role: string | null
+          slug: string | null
+          updated_at: string
+        }
+        Insert: {
+          affiliation?: string | null
+          article?: string | null
+          created_at?: string
+          description?: string | null
+          era?: string | null
+          id?: string
+          image_url?: string | null
+          name: string
+          order_index?: number | null
+          role?: string | null
+          slug?: string | null
+          updated_at?: string
+        }
+        Update: {
+          affiliation?: string | null
+          article?: string | null
+          created_at?: string
+          description?: string | null
+          era?: string | null
+          id?: string
+          image_url?: string | null
+          name?: string
+          order_index?: number | null
+          role?: string | null
+          slug?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       newsletter_subscribers: {
         Row: {
           email: string
