@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, Calendar, Clock } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { EventRelationshipMap } from "@/components/EventRelationshipMap";
 
 interface Event {
   id: string;
@@ -130,11 +131,15 @@ export const EventDetail = () => {
                 Historical Context
               </h3>
               <p className="text-sm" style={{ color: '#5a4a3a' }}>
-                This event occurred during the era known as {getEraName(event.era)}, 
-                a period that shaped the course of world history and left lasting impacts 
+                This event occurred during the era known as {getEraName(event.era)},
+                a period that shaped the course of world history and left lasting impacts
                 on civilization, magic, and the very fabric of reality itself.
               </p>
             </div>
+
+            <Separator style={{ backgroundColor: '#d4a574' }} />
+
+            <EventRelationshipMap eventId={eventId || ""} eventTitle={event.title} />
 
             <div className="flex justify-between items-center pt-4">
               <Button 
