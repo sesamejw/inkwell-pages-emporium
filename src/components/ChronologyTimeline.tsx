@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { Castle, Sparkles, Users, Crown, MapPin, Wand2, BookOpen } from "lucide-react";
+import { Castle, Sparkles, Users, Crown, MapPin, Wand2, BookOpen, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import worldMap from "@/assets/world-map.jpg";
 
@@ -16,7 +16,8 @@ const iconMap = {
   Crown,
   MapPin,
   Wand2,
-  BookOpen
+  BookOpen,
+  User
 };
 
 interface TimelineEvent {

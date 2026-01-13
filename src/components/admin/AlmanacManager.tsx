@@ -76,6 +76,18 @@ const categoryConfig = {
       { name: "concept_type", label: "Concept Type", type: "text" },
     ],
   },
+  characters: {
+    table: "almanac_characters",
+    title: "Characters",
+    fields: [
+      { name: "role", label: "Role", type: "text" },
+      { name: "affiliation", label: "Affiliation", type: "text" },
+      { name: "era", label: "Era", type: "select", options: ["BGD", "GD", "AGD", "Unknown"] },
+      { name: "species", label: "Species", type: "text" },
+      { name: "abilities", label: "Abilities", type: "textarea" },
+      { name: "relationships", label: "Relationships", type: "textarea" },
+    ],
+  },
 };
 
 export const AlmanacManager = () => {
@@ -306,7 +318,7 @@ export const AlmanacManager = () => {
         setActiveCategory(v as keyof typeof categoryConfig);
         resetForm();
       }}>
-        <TabsList className="grid w-full grid-cols-7">
+        <TabsList className="grid w-full grid-cols-8">
           {Object.entries(categoryConfig).map(([key, config]) => (
             <TabsTrigger key={key} value={key}>{config.title}</TabsTrigger>
           ))}
@@ -372,6 +384,13 @@ export const AlmanacManager = () => {
                             <option key={opt} value={opt}>{opt}</option>
                           ))}
                         </select>
+                      ) : field.type === "textarea" ? (
+                        <Textarea
+                          value={formData[field.name] || ""}
+                          onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value })}
+                          placeholder={field.label}
+                          rows={3}
+                        />
                       ) : (
                         <Input
                           value={formData[field.name] || ""}

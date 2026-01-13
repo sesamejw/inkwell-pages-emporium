@@ -12,6 +12,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/contexts/AuthContext";
+import { useCart } from "@/contexts/CartContext";
+import { CartSidebar } from "@/components/CartSidebar";
+import { StreakBadge } from "@/components/StreakBadge";
 import { 
   Search, 
   ShoppingCart, 
@@ -23,18 +26,19 @@ import {
   Settings as SettingsIcon,
   LogOut,
   Library,
-  Heart
+  Heart,
+  Trophy
 } from "lucide-react";
 import thouartLogo from "@/assets/thouart-logo.png";
 import { ThemeToggle } from "./ThemeToggle";
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [cartCount, setCartCount] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
   const location = useLocation();
   const navigate = useNavigate();
   const { user, profile, signOut } = useAuth();
+  const { totalItems, openCart, isOpen, closeCart, items, updateQuantity, removeFromCart } = useCart();
 
   const navigation = [
     { name: "Books", href: "/books", icon: BookOpen },
@@ -100,6 +104,9 @@ export const Header = () => {
 
           {/* Right Side Actions */}
           <div className="flex items-center space-x-2">
+            {/* Reading Streak Badge */}
+            <StreakBadge size="sm" />
+            
             {/* Theme Toggle */}
             <ThemeToggle />
             {/* User Account */}
@@ -130,6 +137,10 @@ export const Header = () => {
                     <SettingsIcon className="mr-2 h-4 w-4" />
                     <span>Settings</span>
                   </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate("/settings#achievements")}>
+                    <Trophy className="mr-2 h-4 w-4" />
+                    <span>Achievements</span>
+                  </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleSignOut}>
                     <LogOut className="mr-2 h-4 w-4" />
@@ -144,17 +155,26 @@ export const Header = () => {
             )}
 
             {/* Shopping Cart */}
-            <Button variant="ghost" size="icon" className="relative">
+            <Button variant="ghost" size="icon" className="relative" onClick={openCart}>
               <ShoppingCart className="h-5 w-5" />
-              {cartCount > 0 && (
+              {totalItems > 0 && (
                 <Badge 
                   variant="destructive" 
                   className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 text-xs flex items-center justify-center"
                 >
-                  {cartCount}
+                  {totalItems}
                 </Badge>
               )}
             </Button>
+
+            {/* Cart Sidebar */}
+            <CartSidebar
+              isOpen={isOpen}
+              onClose={closeCart}
+              items={items}
+              onUpdateQuantity={updateQuantity}
+              onRemoveItem={removeFromCart}
+            />
 
             {/* Mobile Menu Toggle */}
             <Button

@@ -16,6 +16,8 @@ import { WishlistButton } from "@/components/WishlistButton";
 import { BookSearchBar } from "@/components/BookSearchBar";
 import { BookFilters, ActiveFilters, FilterState } from "@/components/BookFilters";
 import { Footer } from "@/components/Footer";
+import { useCart } from "@/contexts/CartContext";
+import { useToast } from "@/hooks/use-toast";
 import bookCollection from "@/assets/book-collection.jpg";
 
 type SortOption = "newest" | "price-asc" | "price-desc" | "rating" | "title";
@@ -38,6 +40,8 @@ const defaultFilters: FilterState = {
 export const Books = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { addToCart } = useCart();
+  const { toast } = useToast();
   
   const [books, setBooks] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -197,8 +201,47 @@ export const Books = () => {
   };
 
   const handleBookClick = (book: any) => {
-    // Navigate to home with book selected (or could create a dedicated book detail page)
     navigate(`/?book=${book.id}`);
+  };
+
+  const handleQuickAdd = (book: any) => {
+    if (!book.book_versions || book.book_versions.length === 0) {
+      toast({
+        title: "Unavailable",
+        description: "This book has no available versions",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Get the cheapest available version
+    const availableVersions = book.book_versions.filter((v: any) => v.available);
+    if (availableVersions.length === 0) {
+      toast({
+        title: "Unavailable",
+        description: "This book is currently out of stock",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const cheapestVersion = availableVersions.reduce((min: any, v: any) =>
+      parseFloat(v.price) < parseFloat(min.price) ? v : min
+    );
+
+    addToCart({
+      id: book.id,
+      title: book.title,
+      author: book.author,
+      price: parseFloat(cheapestVersion.price),
+      version: cheapestVersion.version_type,
+      cover: book.cover_image_url,
+    });
+
+    toast({
+      title: "Added to cart",
+      description: `${book.title} (${cheapestVersion.version_type}) added to your cart`,
+    });
   };
 
   return (
@@ -242,15 +285,6 @@ export const Books = () => {
             {/* Toolbar */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
               <div className="flex items-center gap-4">
-                {/* Mobile filter trigger is inside BookFilters */}
-                <div className="lg:hidden">
-                  <BookFilters
-                    filters={filters}
-                    onFiltersChange={setFilters}
-                    onClearAll={handleClearFilters}
-                    activeFilterCount={activeFilterCount}
-                  />
-                </div>
                 <span className="text-sm text-muted-foreground">
                   {filteredBooks.length} book{filteredBooks.length !== 1 ? "s" : ""} found
                 </span>
@@ -339,7 +373,7 @@ export const Books = () => {
                             className="bg-background/90 backdrop-blur"
                             onClick={(e) => {
                               e.stopPropagation();
-                              // Add to cart logic would go here
+                              handleQuickAdd(book);
                             }}
                           >
                             <ShoppingCart className="h-4 w-4 mr-2" />

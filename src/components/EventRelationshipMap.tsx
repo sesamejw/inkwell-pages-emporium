@@ -93,8 +93,8 @@ export const EventRelationshipMap = ({
           target_event_id,
           relationship_type,
           description,
-          source_event:source_event_id(title, date),
-          target_event:target_event_id(title, date)
+          source_event:chronology_events!chronology_event_relationships_source_event_id_fkey(title, date),
+          target_event:chronology_events!chronology_event_relationships_target_event_id_fkey(title, date)
         `)
         .eq("source_event_id", eventId);
 
@@ -106,12 +106,15 @@ export const EventRelationshipMap = ({
           target_event_id,
           relationship_type,
           description,
-          source_event:source_event_id(title, date),
-          target_event:target_event_id(title, date)
+          source_event:chronology_events!chronology_event_relationships_source_event_id_fkey(title, date),
+          target_event:chronology_events!chronology_event_relationships_target_event_id_fkey(title, date)
         `)
         .eq("target_event_id", eventId);
 
-      const allRelationships = [...(outgoing || []), ...(incoming || [])];
+      const allRelationships = [...(outgoing || []), ...(incoming || [])].map((rel) => ({
+        ...rel,
+        relationship_type: rel.relationship_type as EventRelationship["relationship_type"],
+      }));
       setRelationships(allRelationships);
     } catch (error) {
       console.error("Failed to fetch relationships:", error);

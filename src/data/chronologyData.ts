@@ -207,5 +207,6 @@ export const almanacCategories = [
   { id: "titles", title: "Titles", icon: "Crown" },
   { id: "locations", title: "Locations", icon: "MapPin" },
   { id: "magic", title: "Magic", icon: "Wand2" },
-  { id: "concepts", title: "Concepts", icon: "BookOpen" }
+  { id: "concepts", title: "Concepts", icon: "BookOpen" },
+  { id: "characters", title: "Characters", icon: "User" }
 ];

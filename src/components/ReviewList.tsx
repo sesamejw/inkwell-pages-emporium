@@ -13,6 +13,10 @@ interface Review {
   title: string;
   comment: string;
   created_at: string;
+  profiles?: {
+    username: string | null;
+    avatar_url: string | null;
+  } | null;
 }
 
 interface ReviewListProps {
@@ -29,14 +33,29 @@ export const ReviewList = ({ bookId }: ReviewListProps) => {
 
   const fetchReviews = async () => {
     setLoading(true);
-    const { data, error } = await supabase
+    
+    // First fetch reviews
+    const { data: reviewsData, error: reviewsError } = await supabase
       .from("reviews")
       .select("*")
       .eq("book_id", bookId)
       .order("created_at", { ascending: false });
 
-    if (data) {
-      setReviews(data);
+    if (reviewsData) {
+      // Then fetch profiles for each review
+      const userIds = reviewsData.map((r) => r.user_id);
+      const { data: profilesData } = await supabase
+        .from("profiles")
+        .select("id, username, avatar_url")
+        .in("id", userIds);
+
+      // Merge profiles into reviews
+      const reviewsWithProfiles = reviewsData.map((review) => ({
+        ...review,
+        profiles: profilesData?.find((p) => p.id === review.user_id) || null,
+      }));
+
+      setReviews(reviewsWithProfiles);
     }
     setLoading(false);
   };
@@ -86,13 +105,13 @@ export const ReviewList = ({ bookId }: ReviewListProps) => {
           <div className="flex items-start space-x-4">
             <Avatar>
               <AvatarFallback>
-                {review.user_id.charAt(0).toUpperCase()}
+                {(review.profiles?.username || "U").charAt(0).toUpperCase()}
               </AvatarFallback>
             </Avatar>
             <div className="flex-1 space-y-2">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-semibold">Verified Buyer</p>
+                  <p className="font-semibold">{review.profiles?.username || "Anonymous"}</p>
                   <p className="text-sm text-muted-foreground">
                     {format(new Date(review.created_at), "MMM dd, yyyy")}
                   </p>
