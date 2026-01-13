@@ -326,6 +326,33 @@ export type Database = {
         }
         Relationships: []
       }
+      badge_types: {
+        Row: {
+          created_at: string
+          criteria: string
+          description: string
+          icon: string
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          criteria: string
+          description: string
+          icon: string
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          criteria?: string
+          description?: string
+          icon?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
       book_versions: {
         Row: {
           available: boolean | null
@@ -451,6 +478,48 @@ export type Database = {
         }
         Relationships: []
       }
+      chronology_event_relationships: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          relationship_type: string
+          source_event_id: string
+          target_event_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          relationship_type: string
+          source_event_id: string
+          target_event_id: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          relationship_type?: string
+          source_event_id?: string
+          target_event_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chronology_event_relationships_source_event_id_fkey"
+            columns: ["source_event_id"]
+            isOneToOne: false
+            referencedRelation: "chronology_events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "chronology_event_relationships_target_event_id_fkey"
+            columns: ["target_event_id"]
+            isOneToOne: false
+            referencedRelation: "chronology_events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       chronology_events: {
         Row: {
           article: string
@@ -558,6 +627,39 @@ export type Database = {
           },
         ]
       }
+      forum_post_tags: {
+        Row: {
+          id: string
+          post_id: string
+          tag_id: string
+        }
+        Insert: {
+          id?: string
+          post_id: string
+          tag_id: string
+        }
+        Update: {
+          id?: string
+          post_id?: string
+          tag_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "forum_post_tags_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "forum_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "forum_post_tags_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "post_tags"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       forum_posts: {
         Row: {
           author_id: string
@@ -567,6 +669,7 @@ export type Database = {
           id: string
           is_sticky: boolean
           likes_count: number
+          parent_post_id: string | null
           replies_count: number
           title: string
           updated_at: string
@@ -579,6 +682,7 @@ export type Database = {
           id?: string
           is_sticky?: boolean
           likes_count?: number
+          parent_post_id?: string | null
           replies_count?: number
           title: string
           updated_at?: string
@@ -591,6 +695,7 @@ export type Database = {
           id?: string
           is_sticky?: boolean
           likes_count?: number
+          parent_post_id?: string | null
           replies_count?: number
           title?: string
           updated_at?: string
@@ -603,6 +708,13 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "forum_posts_parent_post_id_fkey"
+            columns: ["parent_post_id"]
+            isOneToOne: false
+            referencedRelation: "forum_posts"
+            referencedColumns: ["id"]
+          },
         ]
       }
       forum_replies: {
@@ -611,6 +723,8 @@ export type Database = {
           content: string
           created_at: string
           id: string
+          likes_count: number
+          parent_reply_id: string | null
           post_id: string
           updated_at: string
         }
@@ -619,6 +733,8 @@ export type Database = {
           content: string
           created_at?: string
           id?: string
+          likes_count?: number
+          parent_reply_id?: string | null
           post_id: string
           updated_at?: string
         }
@@ -627,6 +743,8 @@ export type Database = {
           content?: string
           created_at?: string
           id?: string
+          likes_count?: number
+          parent_reply_id?: string | null
           post_id?: string
           updated_at?: string
         }
@@ -639,6 +757,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "forum_replies_parent_reply_id_fkey"
+            columns: ["parent_reply_id"]
+            isOneToOne: false
+            referencedRelation: "forum_replies"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "forum_replies_post_id_fkey"
             columns: ["post_id"]
             isOneToOne: false
@@ -646,6 +771,80 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      forum_reply_likes: {
+        Row: {
+          created_at: string
+          id: string
+          reply_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          reply_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          reply_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "forum_reply_likes_reply_id_fkey"
+            columns: ["reply_id"]
+            isOneToOne: false
+            referencedRelation: "forum_replies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lore_characters: {
+        Row: {
+          affiliation: string | null
+          article: string | null
+          created_at: string
+          description: string | null
+          era: string | null
+          id: string
+          image_url: string | null
+          name: string
+          order_index: number | null
+          role: string | null
+          slug: string | null
+          updated_at: string
+        }
+        Insert: {
+          affiliation?: string | null
+          article?: string | null
+          created_at?: string
+          description?: string | null
+          era?: string | null
+          id?: string
+          image_url?: string | null
+          name: string
+          order_index?: number | null
+          role?: string | null
+          slug?: string | null
+          updated_at?: string
+        }
+        Update: {
+          affiliation?: string | null
+          article?: string | null
+          created_at?: string
+          description?: string | null
+          era?: string | null
+          id?: string
+          image_url?: string | null
+          name?: string
+          order_index?: number | null
+          role?: string | null
+          slug?: string | null
+          updated_at?: string
+        }
+        Relationships: []
       }
       newsletter_subscribers: {
         Row: {
@@ -760,12 +959,42 @@ export type Database = {
           },
         ]
       }
+      post_tags: {
+        Row: {
+          color: string
+          created_at: string
+          id: string
+          name: string
+          slug: string
+          usage_count: number
+        }
+        Insert: {
+          color?: string
+          created_at?: string
+          id?: string
+          name: string
+          slug: string
+          usage_count?: number
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          id?: string
+          name?: string
+          slug?: string
+          usage_count?: number
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
           created_at: string
           full_name: string | null
           id: string
+          last_active: string | null
+          total_forum_posts: number
+          total_forum_replies: number
           updated_at: string
           username: string
         }
@@ -774,6 +1003,9 @@ export type Database = {
           created_at?: string
           full_name?: string | null
           id: string
+          last_active?: string | null
+          total_forum_posts?: number
+          total_forum_replies?: number
           updated_at?: string
           username: string
         }
@@ -782,6 +1014,9 @@ export type Database = {
           created_at?: string
           full_name?: string | null
           id?: string
+          last_active?: string | null
+          total_forum_posts?: number
+          total_forum_replies?: number
           updated_at?: string
           username?: string
         }
@@ -896,6 +1131,71 @@ export type Database = {
           id?: string
           rating?: number
           title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_badges: {
+        Row: {
+          badge_id: string
+          earned_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          badge_id: string
+          earned_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          badge_id?: string
+          earned_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_badges_badge_id_fkey"
+            columns: ["badge_id"]
+            isOneToOne: false
+            referencedRelation: "badge_types"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_reputation: {
+        Row: {
+          created_at: string
+          id: string
+          likes_received: number
+          posts_count: number
+          rank: string
+          replies_count: number
+          total_points: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          likes_received?: number
+          posts_count?: number
+          rank?: string
+          replies_count?: number
+          total_points?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          likes_received?: number
+          posts_count?: number
+          rank?: string
+          replies_count?: number
+          total_points?: number
           updated_at?: string
           user_id?: string
         }
