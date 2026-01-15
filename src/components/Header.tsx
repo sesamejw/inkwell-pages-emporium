@@ -27,7 +27,8 @@ import {
   LogOut,
   Library,
   Heart,
-  Trophy
+  Trophy,
+  UserCircle
 } from "lucide-react";
 import thouartLogo from "@/assets/thouart-logo.png";
 import { ThemeToggle } from "./ThemeToggle";
@@ -125,6 +126,10 @@ export const Header = () => {
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => navigate("/profile")}>
+                    <UserCircle className="mr-2 h-4 w-4" />
+                    <span>My Profile</span>
+                  </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => navigate("/my-books")}>
                     <Library className="mr-2 h-4 w-4" />
                     <span>My Books</span>

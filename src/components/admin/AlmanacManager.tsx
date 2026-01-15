@@ -5,9 +5,11 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Plus, Edit, Trash2, Save, X } from "lucide-react";
+import { Plus, Edit, Trash2, Save, X, Images } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { CharacterImageManager } from "./CharacterImageManager";
+import { Separator } from "@/components/ui/separator";
 
 interface AlmanacEntry {
   id: string;
@@ -96,6 +98,8 @@ export const AlmanacManager = () => {
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const [showGalleryFor, setShowGalleryFor] = useState<string | null>(null);
+  const [galleryImages, setGalleryImages] = useState<any[]>([]);
   const [formData, setFormData] = useState<Record<string, string>>({
     name: "",
     slug: "",
@@ -107,9 +111,17 @@ export const AlmanacManager = () => {
 
   useEffect(() => {
     fetchEntries();
+    setShowGalleryFor(null);
   }, [activeCategory]);
 
+  useEffect(() => {
+    if (showGalleryFor && activeCategory === "characters") {
+      fetchGalleryImages(showGalleryFor);
+    }
+  }, [showGalleryFor]);
+
   const config = categoryConfig[activeCategory];
+  const isCharacterCategory = activeCategory === "characters";
 
   const fetchEntries = async () => {
     const { data, error } = await supabase
@@ -127,6 +139,18 @@ export const AlmanacManager = () => {
     }
 
     setEntries((data as any) || []);
+  };
+
+  const fetchGalleryImages = async (characterId: string) => {
+    const { data, error } = await supabase
+      .from("almanac_character_images" as any)
+      .select("*")
+      .eq("character_id", characterId)
+      .order("order_index", { ascending: true });
+
+    if (!error && data) {
+      setGalleryImages(data as any[]);
+    }
   };
 
   const generateSlug = (name: string) => {
@@ -472,6 +496,16 @@ export const AlmanacManager = () => {
                             <Button variant="ghost" size="icon" onClick={() => handleEdit(entry)}>
                               <Edit className="h-4 w-4" />
                             </Button>
+                            {isCharacterCategory && (
+                              <Button 
+                                variant="ghost" 
+                                size="icon" 
+                                onClick={() => setShowGalleryFor(showGalleryFor === entry.id ? null : entry.id)}
+                                className={showGalleryFor === entry.id ? "bg-muted" : ""}
+                              >
+                                <Images className="h-4 w-4" />
+                              </Button>
+                            )}
                             <Button
                               variant="ghost"
                               size="icon"
@@ -495,6 +529,26 @@ export const AlmanacManager = () => {
                 </table>
               </div>
             </Card>
+
+            {/* Character Gallery Manager */}
+            {isCharacterCategory && showGalleryFor && (
+              <Card className="p-6 mt-4">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold">
+                    Gallery Images for: {entries.find(e => e.id === showGalleryFor)?.name}
+                  </h3>
+                  <Button variant="ghost" size="sm" onClick={() => setShowGalleryFor(null)}>
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+                <Separator className="mb-4" />
+                <CharacterImageManager
+                  characterId={showGalleryFor}
+                  images={galleryImages}
+                  onImagesChange={() => fetchGalleryImages(showGalleryFor)}
+                />
+              </Card>
+            )}
           </TabsContent>
         ))}
       </Tabs>

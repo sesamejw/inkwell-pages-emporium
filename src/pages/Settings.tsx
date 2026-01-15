@@ -6,9 +6,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { StreakCard } from "@/components/StreakCard";
 import { AchievementsDisplay } from "@/components/AchievementsDisplay";
+import { ActivityFeed } from "@/components/ActivityFeed";
+import { SuggestedUsers } from "@/components/SuggestedUsers";
+import { AvatarUpload } from "@/components/AvatarUpload";
 
 export const Settings = () => {
   const { user, profile, loading, updateProfile } = useAuth();
@@ -24,6 +28,7 @@ export const Settings = () => {
   const getInitialTab = () => {
     const hash = location.hash.replace('#', '');
     if (hash === 'achievements') return 'achievements';
+    if (hash === 'social') return 'social';
     return 'profile';
   };
 
@@ -40,6 +45,8 @@ export const Settings = () => {
     const hash = location.hash.replace('#', '');
     if (hash === 'achievements') {
       setActiveTab('achievements');
+    } else if (hash === 'social') {
+      setActiveTab('social');
     }
   }, [location.hash]);
 
@@ -88,12 +95,23 @@ export const Settings = () => {
       <div className="container mx-auto px-4">
         <div className="max-w-4xl mx-auto">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-            <TabsList className="grid w-full grid-cols-2">
+            <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="profile">Profile</TabsTrigger>
               <TabsTrigger value="achievements">Achievements</TabsTrigger>
+              <TabsTrigger value="social">Social</TabsTrigger>
             </TabsList>
 
             <TabsContent value="profile" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-2xl font-heading">Profile Picture</CardTitle>
+                  <CardDescription>Upload a photo to personalize your profile</CardDescription>
+                </CardHeader>
+                <CardContent className="flex justify-center">
+                  <AvatarUpload />
+                </CardContent>
+              </Card>
+
               <Card>
                 <CardHeader>
                   <CardTitle className="text-2xl font-heading">Account Settings</CardTitle>
@@ -156,6 +174,13 @@ export const Settings = () => {
                 </Card>
               </div>
               <AchievementsDisplay showLocked />
+            </TabsContent>
+
+            <TabsContent value="social" className="space-y-6">
+              <div className="grid gap-6 lg:grid-cols-2">
+                <SuggestedUsers />
+                <ActivityFeed />
+              </div>
             </TabsContent>
           </Tabs>
         </div>

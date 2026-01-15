@@ -2,18 +2,16 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { BookDisplay } from "@/components/BookDisplay";
 import { BookGallery } from "@/components/BookGallery";
-import { CartSidebar, CartItem } from "@/components/CartSidebar";
 import { Button } from "@/components/ui/button";
-import { ShoppingCart } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import bookCollection from "@/assets/book-collection.jpg";
 import { Footer } from "@/components/Footer";
+import { useCart } from "@/contexts/CartContext";
 
 const Index = () => {
   const navigate = useNavigate();
   const [selectedBook, setSelectedBook] = useState<any>(undefined);
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  const [isCartOpen, setIsCartOpen] = useState(false);
+  const { addToCart } = useCart();
 
   useEffect(() => {
     fetchMostRecentBook();
@@ -68,38 +66,8 @@ const Index = () => {
     }
   };
 
-  const handleAddToCart = (item: CartItem) => {
-    setCartItems(prev => {
-      const existingItemIndex = prev.findIndex(
-        cartItem => cartItem.id === item.id && cartItem.version === item.version
-      );
-      
-      if (existingItemIndex >= 0) {
-        const updated = [...prev];
-        updated[existingItemIndex].quantity += item.quantity;
-        return updated;
-      } else {
-        return [...prev, { ...item, id: `${item.id}-${item.version}` }];
-      }
-    });
-    setIsCartOpen(true);
-  };
-
-  const handleUpdateQuantity = (id: string, quantity: number) => {
-    if (quantity <= 0) {
-      handleRemoveItem(id);
-      return;
-    }
-    
-    setCartItems(prev => 
-      prev.map(item => 
-        item.id === id ? { ...item, quantity } : item
-      )
-    );
-  };
-
-  const handleRemoveItem = (id: string) => {
-    setCartItems(prev => prev.filter(item => item.id !== id));
+  const handleAddToCart = (item: { id: string; title: string; author: string; price: number; version: "ebook" | "paperback" | "hardcover"; cover?: string }) => {
+    addToCart(item);
   };
 
   return (
@@ -116,23 +84,6 @@ const Index = () => {
         </Button>
       </div>
 
-      {/* Header with Cart Button */}
-      <div className="fixed top-20 md:top-4 right-2 md:right-4 z-50">
-        <Button 
-          variant="outline" 
-          size="icon"
-          className="bg-background/80 backdrop-blur h-9 w-9 md:h-10 md:w-10"
-          onClick={() => setIsCartOpen(true)}
-        >
-          <ShoppingCart className="h-4 w-4 md:h-5 md:w-5" />
-          {cartItems.length > 0 && (
-            <span className="absolute -top-2 -right-2 bg-accent text-accent-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center">
-              {cartItems.reduce((sum, item) => sum + item.quantity, 0)}
-            </span>
-          )}
-        </Button>
-      </div>
-
       {/* Featured Book Section */}
       <section className="py-6 md:py-12 px-4 md:px-0">
         <div className="container mx-auto">
@@ -145,15 +96,6 @@ const Index = () => {
 
       {/* Footer */}
       <Footer />
-
-      {/* Cart Sidebar */}
-      <CartSidebar 
-        isOpen={isCartOpen}
-        onClose={() => setIsCartOpen(false)}
-        items={cartItems}
-        onUpdateQuantity={handleUpdateQuantity}
-        onRemoveItem={handleRemoveItem}
-      />
     </div>
   );
 };

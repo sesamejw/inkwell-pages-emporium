@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { ImageGallery } from "@/components/ImageGallery";
 
 interface AlmanacEntry {
   id: string;
@@ -14,6 +15,19 @@ interface AlmanacEntry {
   description: string;
   article: string;
   image_url: string | null;
+  // Character-specific fields
+  role?: string;
+  affiliation?: string;
+  era?: string;
+  species?: string;
+  abilities?: string;
+  relationships?: string;
+}
+
+interface GalleryImage {
+  id: string;
+  image_url: string;
+  caption?: string;
 }
 
 const categoryTableMap: Record<string, string> = {
@@ -32,16 +46,26 @@ const AlmanacCategory = () => {
   const navigate = useNavigate();
   const [entries, setEntries] = useState<AlmanacEntry[]>([]);
   const [selectedEntry, setSelectedEntry] = useState<AlmanacEntry | null>(null);
+  const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([]);
   const [loading, setLoading] = useState(true);
 
   const category = almanacCategories.find((c) => c.id === categoryId);
   const tableName = categoryId ? categoryTableMap[categoryId] : null;
+  const isCharacterCategory = categoryId === "characters";
 
   useEffect(() => {
     if (tableName) {
       fetchEntries();
     }
   }, [tableName]);
+
+  useEffect(() => {
+    if (selectedEntry && isCharacterCategory) {
+      fetchGalleryImages(selectedEntry.id);
+    } else {
+      setGalleryImages([]);
+    }
+  }, [selectedEntry, isCharacterCategory]);
 
   const fetchEntries = async () => {
     if (!tableName) return;
@@ -55,6 +79,18 @@ const AlmanacCategory = () => {
       setEntries(data as any);
     }
     setLoading(false);
+  };
+
+  const fetchGalleryImages = async (characterId: string) => {
+    const { data, error } = await supabase
+      .from("almanac_character_images" as any)
+      .select("id, image_url, caption")
+      .eq("character_id", characterId)
+      .order("order_index", { ascending: true });
+
+    if (!error && data) {
+      setGalleryImages(data as unknown as GalleryImage[]);
+    }
   };
 
   if (!category || !tableName) {
@@ -102,10 +138,43 @@ const AlmanacCategory = () => {
               <CardDescription style={{ color: '#8a7a6a' }}>
                 {selectedEntry.description}
               </CardDescription>
+              
+              {/* Character-specific metadata */}
+              {isCharacterCategory && (
+                <div className="flex flex-wrap gap-2 mt-4">
+                  {selectedEntry.role && (
+                    <span className="px-3 py-1 rounded-full text-sm" style={{ backgroundColor: '#d4a574', color: '#2c1810' }}>
+                      {selectedEntry.role}
+                    </span>
+                  )}
+                  {selectedEntry.affiliation && (
+                    <span className="px-3 py-1 rounded-full text-sm" style={{ backgroundColor: '#e8dcc8', color: '#2c1810' }}>
+                      {selectedEntry.affiliation}
+                    </span>
+                  )}
+                  {selectedEntry.era && (
+                    <span className="px-3 py-1 rounded-full text-sm" style={{ backgroundColor: '#c9a57a', color: '#fff' }}>
+                      {selectedEntry.era}
+                    </span>
+                  )}
+                  {selectedEntry.species && (
+                    <span className="px-3 py-1 rounded-full text-sm" style={{ backgroundColor: '#8a7a6a', color: '#fff' }}>
+                      {selectedEntry.species}
+                    </span>
+                  )}
+                </div>
+              )}
             </CardHeader>
 
             <CardContent className="space-y-6">
-              {selectedEntry.image_url && (
+              {/* Image Gallery for Characters, Single Image for Others */}
+              {isCharacterCategory ? (
+                <ImageGallery 
+                  images={galleryImages} 
+                  mainImage={selectedEntry.image_url}
+                  altText={selectedEntry.name}
+                />
+              ) : selectedEntry.image_url ? (
                 <div className="w-full">
                   <img
                     src={selectedEntry.image_url}
@@ -113,7 +182,7 @@ const AlmanacCategory = () => {
                     className="w-full h-96 object-cover rounded-lg shadow-lg"
                   />
                 </div>
-              )}
+              ) : null}
 
               <Separator style={{ backgroundColor: '#d4a574' }} />
 
@@ -122,6 +191,39 @@ const AlmanacCategory = () => {
                   {selectedEntry.article}
                 </p>
               </div>
+
+              {/* Character-specific sections */}
+              {isCharacterCategory && (
+                <>
+                  {selectedEntry.abilities && (
+                    <>
+                      <Separator style={{ backgroundColor: '#d4a574' }} />
+                      <div>
+                        <h3 className="text-xl font-heading font-semibold mb-3" style={{ color: '#2c1810' }}>
+                          Abilities
+                        </h3>
+                        <p className="whitespace-pre-line" style={{ color: '#5a4a3a' }}>
+                          {selectedEntry.abilities}
+                        </p>
+                      </div>
+                    </>
+                  )}
+
+                  {selectedEntry.relationships && (
+                    <>
+                      <Separator style={{ backgroundColor: '#d4a574' }} />
+                      <div>
+                        <h3 className="text-xl font-heading font-semibold mb-3" style={{ color: '#2c1810' }}>
+                          Relationships
+                        </h3>
+                        <p className="whitespace-pre-line" style={{ color: '#5a4a3a' }}>
+                          {selectedEntry.relationships}
+                        </p>
+                      </div>
+                    </>
+                  )}
+                </>
+              )}
             </CardContent>
           </Card>
         </div>
@@ -196,6 +298,21 @@ const AlmanacCategory = () => {
                   <CardDescription className="line-clamp-3" style={{ color: '#5a4a3a' }}>
                     {entry.description}
                   </CardDescription>
+                  {/* Show character role/era badges in list */}
+                  {isCharacterCategory && (entry.role || entry.era) && (
+                    <div className="flex flex-wrap gap-1 mt-2">
+                      {entry.role && (
+                        <span className="px-2 py-0.5 rounded text-xs" style={{ backgroundColor: '#d4a574', color: '#2c1810' }}>
+                          {entry.role}
+                        </span>
+                      )}
+                      {entry.era && (
+                        <span className="px-2 py-0.5 rounded text-xs" style={{ backgroundColor: '#c9a57a', color: '#fff' }}>
+                          {entry.era}
+                        </span>
+                      )}
+                    </div>
+                  )}
                 </CardHeader>
               </Card>
             ))}
