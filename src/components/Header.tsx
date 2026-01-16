@@ -15,6 +15,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useCart } from "@/contexts/CartContext";
 import { CartSidebar } from "@/components/CartSidebar";
 import { StreakBadge } from "@/components/StreakBadge";
+import { NotificationBell } from "@/components/NotificationBell";
 import { 
   Search, 
   ShoppingCart, 
@@ -107,6 +108,9 @@ export const Header = () => {
           <div className="flex items-center space-x-2">
             {/* Reading Streak Badge */}
             <StreakBadge size="sm" />
+            
+            {/* Notifications */}
+            {user && <NotificationBell />}
             
             {/* Theme Toggle */}
             <ThemeToggle />

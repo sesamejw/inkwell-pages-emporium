@@ -21,6 +21,7 @@ import EventDetail from "./pages/EventDetail";
 import AlmanacCategory from "./pages/AlmanacCategory";
 import Wishlist from "./pages/Wishlist";
 import Books from "./pages/Books";
+import RelationshipsMap from "./pages/RelationshipsMap";
 import { ChronologyTimeline } from "./components/ChronologyTimeline";
 import NotFound from "./pages/NotFound";
 
@@ -54,6 +55,7 @@ const App = () => (
                   <Route path="/chronology" element={<ChronologyTimeline />} />
                   <Route path="/chronology/:eventId" element={<EventDetail />} />
                   <Route path="/almanac/:categoryId" element={<AlmanacCategory />} />
+                  <Route path="/relationships" element={<RelationshipsMap />} />
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                   <Route path="*" element={<NotFound />} />
                 </Routes>

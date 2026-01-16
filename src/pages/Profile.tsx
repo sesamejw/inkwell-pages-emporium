@@ -5,7 +5,7 @@ import { useAchievements } from "@/hooks/useAchievements";
 import { useStreaks } from "@/hooks/useStreaks";
 import { useWishlist } from "@/hooks/useWishlist";
 import { useBooks } from "@/contexts/BooksContext";
-import { Header } from "@/components/Header";
+
 import { Footer } from "@/components/Footer";
 import { FollowButton } from "@/components/FollowButton";
 import { AchievementsDisplay } from "@/components/AchievementsDisplay";
@@ -51,7 +51,6 @@ const ProfilePage = () => {
   if (!targetUserId && !loading) {
     return (
       <div className="min-h-screen bg-background">
-        <Header />
         <div className="container mx-auto px-4 py-16 text-center">
           <h1 className="text-2xl font-bold mb-4">Please sign in to view your profile</h1>
           <Button onClick={() => navigate("/auth")}>Sign In</Button>
@@ -101,7 +100,6 @@ const ProfilePage = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
       
       <main className="container mx-auto px-4 py-8">
         {loading ? (
