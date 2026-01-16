@@ -58,9 +58,9 @@ interface CharacterEventLink {
 }
 
 const RELATIONSHIP_TYPES = [
+  // General relationships
   "ally",
   "enemy",
-  "family",
   "mentor",
   "student",
   "rival",
@@ -68,7 +68,42 @@ const RELATIONSHIP_TYPES = [
   "lover",
   "servant",
   "master",
+  // Family relationships
+  "parent",
+  "child",
+  "spouse",
+  "sibling",
+  "grandparent",
+  "grandchild",
+  "uncle_aunt",
+  "nephew_niece",
+  "cousin",
+  "ancestor",
+  "descendant",
 ];
+
+const RELATIONSHIP_LABELS: Record<string, string> = {
+  ally: "Ally",
+  enemy: "Enemy",
+  mentor: "Mentor",
+  student: "Student",
+  rival: "Rival",
+  friend: "Friend",
+  lover: "Lover",
+  servant: "Servant",
+  master: "Master",
+  parent: "Parent",
+  child: "Child",
+  spouse: "Spouse",
+  sibling: "Sibling",
+  grandparent: "Grandparent",
+  grandchild: "Grandchild",
+  uncle_aunt: "Uncle/Aunt",
+  nephew_niece: "Nephew/Niece",
+  cousin: "Cousin",
+  ancestor: "Ancestor",
+  descendant: "Descendant",
+};
 
 export const CharacterRelationshipManager = () => {
   const [activeTab, setActiveTab] = useState("relationships");
@@ -400,9 +435,9 @@ export const CharacterRelationshipManager = () => {
 
   const getRelationshipColor = (type: string) => {
     const colors: Record<string, string> = {
+      // General relationships
       ally: "bg-green-500/20 text-green-700 dark:text-green-400",
       enemy: "bg-red-500/20 text-red-700 dark:text-red-400",
-      family: "bg-blue-500/20 text-blue-700 dark:text-blue-400",
       mentor: "bg-purple-500/20 text-purple-700 dark:text-purple-400",
       student: "bg-indigo-500/20 text-indigo-700 dark:text-indigo-400",
       rival: "bg-orange-500/20 text-orange-700 dark:text-orange-400",
@@ -410,6 +445,18 @@ export const CharacterRelationshipManager = () => {
       lover: "bg-pink-500/20 text-pink-700 dark:text-pink-400",
       servant: "bg-gray-500/20 text-gray-700 dark:text-gray-400",
       master: "bg-amber-500/20 text-amber-700 dark:text-amber-400",
+      // Family relationships
+      parent: "bg-violet-500/20 text-violet-700 dark:text-violet-400",
+      child: "bg-fuchsia-500/20 text-fuchsia-700 dark:text-fuchsia-400",
+      spouse: "bg-rose-500/20 text-rose-700 dark:text-rose-400",
+      sibling: "bg-sky-500/20 text-sky-700 dark:text-sky-400",
+      grandparent: "bg-yellow-500/20 text-yellow-700 dark:text-yellow-400",
+      grandchild: "bg-lime-500/20 text-lime-700 dark:text-lime-400",
+      uncle_aunt: "bg-emerald-500/20 text-emerald-700 dark:text-emerald-400",
+      nephew_niece: "bg-cyan-500/20 text-cyan-700 dark:text-cyan-400",
+      cousin: "bg-blue-500/20 text-blue-700 dark:text-blue-400",
+      ancestor: "bg-indigo-600/20 text-indigo-700 dark:text-indigo-400",
+      descendant: "bg-purple-600/20 text-purple-700 dark:text-purple-400",
     };
     return colors[type] || "bg-muted text-muted-foreground";
   };
@@ -469,7 +516,7 @@ export const CharacterRelationshipManager = () => {
                       <SelectTrigger>
                         <SelectValue placeholder="Select character" />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="z-50 bg-background border border-border shadow-lg max-h-[300px] overflow-y-auto">
                         {characters.map((c) => (
                           <SelectItem key={c.id} value={c.id}>
                             {c.name}
@@ -488,10 +535,10 @@ export const CharacterRelationshipManager = () => {
                       <SelectTrigger>
                         <SelectValue placeholder="Select type" />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="z-50 bg-background border border-border shadow-lg max-h-[300px] overflow-y-auto">
                         {RELATIONSHIP_TYPES.map((type) => (
                           <SelectItem key={type} value={type}>
-                            {type.charAt(0).toUpperCase() + type.slice(1)}
+                            {RELATIONSHIP_LABELS[type] || type}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -507,7 +554,7 @@ export const CharacterRelationshipManager = () => {
                       <SelectTrigger>
                         <SelectValue placeholder="Select character" />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="z-50 bg-background border border-border shadow-lg max-h-[300px] overflow-y-auto">
                         {characters
                           .filter((c) => c.id !== relFormData.character_id)
                           .map((c) => (
@@ -635,7 +682,7 @@ export const CharacterRelationshipManager = () => {
                       <SelectTrigger>
                         <SelectValue placeholder="Select character" />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="z-50 bg-background border border-border shadow-lg max-h-[300px] overflow-y-auto">
                         {characters.map((c) => (
                           <SelectItem key={c.id} value={c.id}>
                             {c.name}
@@ -654,7 +701,7 @@ export const CharacterRelationshipManager = () => {
                       <SelectTrigger>
                         <SelectValue placeholder="Select event" />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="z-50 bg-background border border-border shadow-lg max-h-[300px] overflow-y-auto">
                         {events.map((e) => (
                           <SelectItem key={e.id} value={e.id}>
                             {e.title} ({e.year} {e.era})

@@ -1,7 +1,8 @@
 import { CharacterRelationshipMap } from "@/components/CharacterRelationshipMap";
 import { AllEventsRelationshipMap } from "@/components/AllEventsRelationshipMap";
+import { FamilyTreeMap } from "@/components/FamilyTreeMap";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Users, Calendar } from "lucide-react";
+import { Users, Calendar, GitBranch } from "lucide-react";
 
 const RelationshipsMap = () => {
   return (
@@ -26,6 +27,13 @@ const RelationshipsMap = () => {
               Character Relationships
             </TabsTrigger>
             <TabsTrigger 
+              value="family"
+              className="data-[state=active]:bg-[hsl(var(--parchment-gold))] data-[state=active]:text-[hsl(var(--parchment-brown))]"
+            >
+              <GitBranch className="h-4 w-4 mr-2" />
+              Family Tree
+            </TabsTrigger>
+            <TabsTrigger 
               value="events"
               className="data-[state=active]:bg-[hsl(var(--parchment-gold))] data-[state=active]:text-[hsl(var(--parchment-brown))]"
             >
@@ -36,6 +44,10 @@ const RelationshipsMap = () => {
 
           <TabsContent value="characters">
             <CharacterRelationshipMap />
+          </TabsContent>
+
+          <TabsContent value="family">
+            <FamilyTreeMap />
           </TabsContent>
 
           <TabsContent value="events">

@@ -17,8 +17,8 @@ interface Character {
 
 interface Relationship {
   id: string;
-  source_character_id: string;
-  target_character_id: string;
+  character_id: string;
+  related_character_id: string;
   relationship_type: string;
   description?: string;
 }
@@ -29,13 +29,28 @@ interface NodePosition {
 }
 
 const relationshipColors: Record<string, string> = {
+  // General relationships
   ally: "hsl(142, 76%, 36%)",
   enemy: "hsl(0, 84%, 60%)",
-  family: "hsl(262, 83%, 58%)",
   mentor: "hsl(45, 93%, 47%)",
   student: "hsl(199, 89%, 48%)",
   rival: "hsl(25, 95%, 53%)",
   friend: "hsl(173, 80%, 40%)",
+  lover: "hsl(340, 82%, 52%)",
+  servant: "hsl(220, 14%, 46%)",
+  master: "hsl(35, 92%, 50%)",
+  // Family relationships
+  parent: "hsl(262, 83%, 58%)",
+  child: "hsl(280, 70%, 50%)",
+  spouse: "hsl(340, 82%, 52%)",
+  sibling: "hsl(199, 89%, 48%)",
+  grandparent: "hsl(45, 93%, 47%)",
+  grandchild: "hsl(25, 95%, 53%)",
+  uncle_aunt: "hsl(173, 80%, 40%)",
+  nephew_niece: "hsl(160, 70%, 45%)",
+  cousin: "hsl(142, 76%, 36%)",
+  ancestor: "hsl(220, 70%, 50%)",
+  descendant: "hsl(200, 80%, 55%)",
   default: "hsl(var(--muted-foreground))",
 };
 
@@ -98,7 +113,7 @@ export const CharacterRelationshipMap = () => {
   const filteredRelationships = useMemo(() => {
     if (!selectedCharacter) return relationships;
     return relationships.filter(
-      (r) => r.source_character_id === selectedCharacter || r.target_character_id === selectedCharacter
+      (r) => r.character_id === selectedCharacter || r.related_character_id === selectedCharacter
     );
   }, [relationships, selectedCharacter]);
 
@@ -107,8 +122,8 @@ export const CharacterRelationshipMap = () => {
     if (!selectedCharacter) return new Set(characters.map((c) => c.id));
     const connected = new Set<string>([selectedCharacter]);
     filteredRelationships.forEach((r) => {
-      connected.add(r.source_character_id);
-      connected.add(r.target_character_id);
+      connected.add(r.character_id);
+      connected.add(r.related_character_id);
     });
     return connected;
   }, [filteredRelationships, selectedCharacter, characters]);
@@ -215,8 +230,8 @@ export const CharacterRelationshipMap = () => {
           >
             {/* Relationship lines */}
             {filteredRelationships.map((rel) => {
-              const source = nodePositions[rel.source_character_id];
-              const target = nodePositions[rel.target_character_id];
+              const source = nodePositions[rel.character_id];
+              const target = nodePositions[rel.related_character_id];
               if (!source || !target) return null;
 
               return (
@@ -331,7 +346,7 @@ export const CharacterRelationshipMap = () => {
               const char = characters.find((c) => c.id === selectedCharacter);
               if (!char) return null;
               const charRelationships = relationships.filter(
-                (r) => r.source_character_id === char.id || r.target_character_id === char.id
+                (r) => r.character_id === char.id || r.related_character_id === char.id
               );
               return (
                 <div>
