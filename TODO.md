@@ -12,7 +12,8 @@
 ### Community Features
 - [x] **@Mentions in Replies** - Tag users in forum and submission replies
 - [x] **Reply Editing/Deleting** - Edit and delete your own replies
-- [ ] **Direct Messaging** - Private messaging between users
+- [x] **Direct Messaging** - Private messaging between users
+- [x] **Discussion Replies** - Fixed book club discussion replies functionality
 - [ ] **User Badges Display** - Show earned badges on user profiles and submissions
 - [ ] **Community Challenges** - Weekly/monthly reading or art challenges
 - [ ] **Submission Collections** - Allow users to create curated collections of submissions
