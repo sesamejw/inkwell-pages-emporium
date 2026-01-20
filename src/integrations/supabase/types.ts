@@ -82,6 +82,7 @@ export type Database = {
           image_url: string | null
           name: string
           order_index: number | null
+          origin_location_id: string | null
           relationships: string | null
           role: string | null
           slug: string
@@ -99,6 +100,7 @@ export type Database = {
           image_url?: string | null
           name: string
           order_index?: number | null
+          origin_location_id?: string | null
           relationships?: string | null
           role?: string | null
           slug: string
@@ -116,13 +118,22 @@ export type Database = {
           image_url?: string | null
           name?: string
           order_index?: number | null
+          origin_location_id?: string | null
           relationships?: string | null
           role?: string | null
           slug?: string
           species?: string | null
           updated_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "almanac_characters_origin_location_id_fkey"
+            columns: ["origin_location_id"]
+            isOneToOne: false
+            referencedRelation: "world_locations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       almanac_concepts: {
         Row: {
@@ -821,6 +832,53 @@ export type Database = {
           target_character_id?: string | null
         }
         Relationships: []
+      }
+      character_stats: {
+        Row: {
+          agility: number | null
+          character_id: string
+          charisma: number | null
+          created_at: string
+          endurance: number | null
+          id: string
+          intelligence: number | null
+          magic: number | null
+          strength: number | null
+          updated_at: string
+        }
+        Insert: {
+          agility?: number | null
+          character_id: string
+          charisma?: number | null
+          created_at?: string
+          endurance?: number | null
+          id?: string
+          intelligence?: number | null
+          magic?: number | null
+          strength?: number | null
+          updated_at?: string
+        }
+        Update: {
+          agility?: number | null
+          character_id?: string
+          charisma?: number | null
+          created_at?: string
+          endurance?: number | null
+          id?: string
+          intelligence?: number | null
+          magic?: number | null
+          strength?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "character_stats_character_id_fkey"
+            columns: ["character_id"]
+            isOneToOne: true
+            referencedRelation: "almanac_characters"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       chronology_event_relationships: {
         Row: {
@@ -2251,6 +2309,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      world_locations: {
+        Row: {
+          color: string | null
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          type: string
+          updated_at: string
+          x_position: number
+          y_position: number
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          type?: string
+          updated_at?: string
+          x_position?: number
+          y_position?: number
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          type?: string
+          updated_at?: string
+          x_position?: number
+          y_position?: number
+        }
+        Relationships: []
       }
     }
     Views: {

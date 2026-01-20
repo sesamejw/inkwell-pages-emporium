@@ -33,16 +33,6 @@ interface Node {
   character: Character;
 }
 
-interface Particle {
-  x: number;
-  y: number;
-  vx: number;
-  vy: number;
-  life: number;
-  maxLife: number;
-  size: number;
-  color: string;
-}
 
 const relationshipColors: Record<string, string> = {
   ally: "#22c55e",
@@ -74,7 +64,6 @@ export const DynamicRelationshipMap = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const animationRef = useRef<number>();
   const nodesRef = useRef<Node[]>([]);
-  const particlesRef = useRef<Particle[]>([]);
   const draggedNodeRef = useRef<Node | null>(null);
   
   const [characters, setCharacters] = useState<Character[]>([]);
@@ -82,7 +71,6 @@ export const DynamicRelationshipMap = () => {
   const [loading, setLoading] = useState(true);
   const [selectedCharacter, setSelectedCharacter] = useState<string | null>(null);
   const [isSimulating, setIsSimulating] = useState(true);
-  const [showParticles, setShowParticles] = useState(true);
   const [zoom, setZoom] = useState(1);
   const [hoveredNode, setHoveredNode] = useState<Character | null>(null);
   const [dimensions, setDimensions] = useState({ width: 800, height: 600 });
@@ -132,23 +120,6 @@ export const DynamicRelationshipMap = () => {
     };
   }, []);
 
-  // Initialize ambient particles when dimensions change
-  useEffect(() => {
-    const { width, height } = dimensions;
-    const colors = isDarkMode 
-      ? ["#fbbf24", "#a78bfa", "#60a5fa", "#4ade80", "#fb923c"]
-      : ["#d4af37", "#8b5cf6", "#3b82f6", "#22c55e", "#f97316"];
-    particlesRef.current = Array.from({ length: 50 }, () => ({
-      x: Math.random() * width,
-      y: Math.random() * height,
-      vx: (Math.random() - 0.5) * 0.5,
-      vy: (Math.random() - 0.5) * 0.5,
-      life: Math.random() * 100,
-      maxLife: 100 + Math.random() * 100,
-      size: 1 + Math.random() * 2,
-      color: colors[Math.floor(Math.random() * colors.length)],
-    }));
-  }, [dimensions, isDarkMode]);
 
   useEffect(() => {
     fetchData();
@@ -270,56 +241,11 @@ export const DynamicRelationshipMap = () => {
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, width, height);
 
-    // Update and draw particles
-    if (showParticles) {
-      particlesRef.current.forEach((particle) => {
-        // Update particle
-        particle.x += particle.vx;
-        particle.y += particle.vy;
-        particle.life += 1;
-
-        // Wrap around edges
-        if (particle.x < 0) particle.x = width;
-        if (particle.x > width) particle.x = 0;
-        if (particle.y < 0) particle.y = height;
-        if (particle.y > height) particle.y = 0;
-
-        // Reset if life exceeded
-        if (particle.life > particle.maxLife) {
-          particle.life = 0;
-          particle.x = Math.random() * width;
-          particle.y = Math.random() * height;
-        }
-
-        // Calculate alpha based on life cycle (fade in/out)
-        const lifeRatio = particle.life / particle.maxLife;
-        const alpha = lifeRatio < 0.2 
-          ? lifeRatio * 5 
-          : lifeRatio > 0.8 
-            ? (1 - lifeRatio) * 5 
-            : 1;
-
-        // Draw particle with glow
-        ctx.beginPath();
-        ctx.arc(particle.x, particle.y, particle.size * 2, 0, Math.PI * 2);
-        const glowGradient = ctx.createRadialGradient(
-          particle.x, particle.y, 0,
-          particle.x, particle.y, particle.size * 3
-        );
-        glowGradient.addColorStop(0, particle.color);
-        glowGradient.addColorStop(1, "transparent");
-        ctx.fillStyle = glowGradient;
-        ctx.globalAlpha = alpha * 0.3;
-        ctx.fill();
-
-        ctx.beginPath();
-        ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
-        ctx.fillStyle = particle.color;
-        ctx.globalAlpha = alpha * 0.6;
-        ctx.fill();
-        ctx.globalAlpha = 1;
-      });
-    }
+    // Apply zoom transform for nodes and edges only
+    ctx.save();
+    ctx.translate(width / 2, height / 2);
+    ctx.scale(zoom, zoom);
+    ctx.translate(-width / 2, -height / 2);
 
     const nodes = nodesRef.current;
     const filteredRels = selectedCharacter
@@ -411,7 +337,9 @@ export const DynamicRelationshipMap = () => {
 
       ctx.globalAlpha = 1;
     });
-  }, [relationships, selectedCharacter, hoveredNode, showParticles, dimensions, isDarkMode]);
+
+    ctx.restore();
+  }, [relationships, selectedCharacter, hoveredNode, dimensions, isDarkMode, zoom]);
 
   // Animation loop
   useEffect(() => {
@@ -551,14 +479,27 @@ export const DynamicRelationshipMap = () => {
           Character Relationships
         </CardTitle>
         <div className="flex items-center gap-2">
-          <Button 
-            variant={showParticles ? "secondary" : "outline"}
-            size="sm"
-            onClick={() => setShowParticles(!showParticles)}
-            className="transition-all hover:scale-105 text-xs"
-          >
-            ✨ Particles
-          </Button>
+          <div className="flex items-center gap-1 border rounded-md p-0.5">
+            <Button 
+              variant="ghost" 
+              size="icon"
+              className="h-7 w-7"
+              onClick={() => setZoom(z => Math.max(0.5, z - 0.25))}
+              disabled={zoom <= 0.5}
+            >
+              <ZoomOut className="h-4 w-4" />
+            </Button>
+            <span className="text-xs font-medium w-12 text-center">{Math.round(zoom * 100)}%</span>
+            <Button 
+              variant="ghost" 
+              size="icon"
+              className="h-7 w-7"
+              onClick={() => setZoom(z => Math.min(2, z + 0.25))}
+              disabled={zoom >= 2}
+            >
+              <ZoomIn className="h-4 w-4" />
+            </Button>
+          </div>
           <Button 
             variant="outline" 
             size="icon" 
@@ -620,7 +561,7 @@ export const DynamicRelationshipMap = () => {
             style={{ 
               width: '100%', 
               height: '100%', 
-              cursor: hoveredNode ? "pointer" : "grab" 
+              cursor: hoveredNode ? "pointer" : "grab",
             }}
             onMouseMove={handleMouseMove}
             onMouseDown={handleMouseDown}

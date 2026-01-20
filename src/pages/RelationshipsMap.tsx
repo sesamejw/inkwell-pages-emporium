@@ -1,8 +1,10 @@
 import { DynamicRelationshipMap } from "@/components/DynamicRelationshipMap";
 import { AllEventsRelationshipMap } from "@/components/AllEventsRelationshipMap";
 import { FamilyTreeMap } from "@/components/FamilyTreeMap";
+import { InteractiveWorldMap } from "@/components/InteractiveWorldMap";
+import { CharacterComparison } from "@/components/CharacterComparison";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Users, Calendar, GitBranch } from "lucide-react";
+import { Users, Calendar, GitBranch, MapPin, Scale } from "lucide-react";
 
 const RelationshipsMap = () => {
   return (
@@ -18,7 +20,7 @@ const RelationshipsMap = () => {
         </div>
 
         <Tabs defaultValue="characters" className="w-full">
-          <TabsList className="mb-6 bg-[hsl(var(--parchment-card))] border border-[hsl(var(--parchment-border))]">
+          <TabsList className="mb-6 bg-[hsl(var(--parchment-card))] border border-[hsl(var(--parchment-border))] flex-wrap h-auto">
             <TabsTrigger 
               value="characters" 
               className="data-[state=active]:bg-[hsl(var(--parchment-gold))] data-[state=active]:text-[hsl(var(--parchment-brown))]"
@@ -40,6 +42,20 @@ const RelationshipsMap = () => {
               <Calendar className="h-4 w-4 mr-2" />
               Event Connections
             </TabsTrigger>
+            <TabsTrigger 
+              value="world"
+              className="data-[state=active]:bg-[hsl(var(--parchment-gold))] data-[state=active]:text-[hsl(var(--parchment-brown))]"
+            >
+              <MapPin className="h-4 w-4 mr-2" />
+              World Map
+            </TabsTrigger>
+            <TabsTrigger 
+              value="compare"
+              className="data-[state=active]:bg-[hsl(var(--parchment-gold))] data-[state=active]:text-[hsl(var(--parchment-brown))]"
+            >
+              <Scale className="h-4 w-4 mr-2" />
+              Compare Characters
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="characters">
@@ -52,6 +68,14 @@ const RelationshipsMap = () => {
 
           <TabsContent value="events">
             <AllEventsRelationshipMap />
+          </TabsContent>
+
+          <TabsContent value="world">
+            <InteractiveWorldMap />
+          </TabsContent>
+
+          <TabsContent value="compare">
+            <CharacterComparison />
           </TabsContent>
         </Tabs>
       </div>

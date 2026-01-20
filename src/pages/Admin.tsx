@@ -18,6 +18,8 @@ import {
   Calendar,
   Shield,
   BarChart3,
+  MapPin,
+  Scale,
 } from "lucide-react";
 import { ChronologyManager } from "@/components/ChronologyManager";
 import { BookManager } from "@/components/admin/BookManager";
@@ -31,6 +33,8 @@ import { CharactersManager } from "@/components/admin/CharactersManager";
 import { SubmissionsManager } from "@/components/admin/SubmissionsManager";
 import { ContentScheduler } from "@/components/admin/ContentScheduler";
 import { ModerationQueue } from "@/components/admin/ModerationQueue";
+import { LocationsManager } from "@/components/admin/LocationsManager";
+import { CharacterStatsManager } from "@/components/admin/CharacterStatsManager";
 
 export const Admin = () => {
   const { books } = useBooks();
@@ -167,6 +171,14 @@ export const Admin = () => {
               <User className="h-4 w-4 mr-1" />
               Characters
             </TabsTrigger>
+            <TabsTrigger value="stats">
+              <Scale className="h-4 w-4 mr-1" />
+              Stats
+            </TabsTrigger>
+            <TabsTrigger value="locations">
+              <MapPin className="h-4 w-4 mr-1" />
+              Locations
+            </TabsTrigger>
             <TabsTrigger value="relationships">
               <Network className="h-4 w-4 mr-1" />
               Links
@@ -206,6 +218,14 @@ export const Admin = () => {
 
           <TabsContent value="characters" className="space-y-6">
             <CharactersManager />
+          </TabsContent>
+
+          <TabsContent value="stats" className="space-y-6">
+            <CharacterStatsManager />
+          </TabsContent>
+
+          <TabsContent value="locations" className="space-y-6">
+            <LocationsManager />
           </TabsContent>
 
           <TabsContent value="relationships" className="space-y-6">
