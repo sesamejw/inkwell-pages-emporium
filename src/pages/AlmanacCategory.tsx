@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { almanacCategories } from "@/data/chronologyData";
@@ -10,6 +10,9 @@ import { Separator } from "@/components/ui/separator";
 import { ImageGallery } from "@/components/ImageGallery";
 import { Footer } from "@/components/Footer";
 import { BookSearchBar } from "@/components/BookSearchBar";
+import { AlmanacReferenceParser } from "@/components/AlmanacReferenceParser";
+import { OptimizedImage } from "@/components/OptimizedImage";
+import { useAlmanacEntries } from "@/hooks/useAlmanacEntries";
 import {
   Pagination,
   PaginationContent,
@@ -57,6 +60,7 @@ const ITEMS_PER_PAGE = 9;
 
 const AlmanacCategory = () => {
   const { categoryId } = useParams();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [entries, setEntries] = useState<AlmanacEntry[]>([]);
   const [selectedEntry, setSelectedEntry] = useState<AlmanacEntry | null>(null);
@@ -64,6 +68,9 @@ const AlmanacCategory = () => {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+
+  // Get all almanac entries for cross-referencing
+  const { entries: allAlmanacEntries } = useAlmanacEntries();
 
   const category = almanacCategories.find((c) => c.id === categoryId);
   const tableName = categoryId ? categoryTableMap[categoryId] : null;
@@ -133,6 +140,19 @@ const AlmanacCategory = () => {
   useEffect(() => {
     setCurrentPage(1);
   }, [searchQuery]);
+
+  // Handle URL query param for direct entry linking (from cross-references)
+  useEffect(() => {
+    const entrySlug = searchParams.get("entry");
+    if (entrySlug && entries.length > 0) {
+      const matchedEntry = entries.find(
+        (e) => e.slug === entrySlug || e.name.toLowerCase() === entrySlug.toLowerCase()
+      );
+      if (matchedEntry) {
+        setSelectedEntry(matchedEntry);
+      }
+    }
+  }, [searchParams, entries]);
 
   const renderPagination = () => {
     if (totalPages <= 1) return null;
@@ -269,11 +289,13 @@ const AlmanacCategory = () => {
                   altText={selectedEntry.name}
                 />
               ) : selectedEntry.image_url ? (
-                <div className="w-full">
-                  <img
+                <div className="w-full h-96 overflow-hidden rounded-2xl shadow-lg">
+                  <OptimizedImage
                     src={selectedEntry.image_url}
                     alt={selectedEntry.name}
-                    className="w-full h-96 object-cover rounded-2xl shadow-lg"
+                    className="w-full h-full object-cover"
+                    containerClassName="w-full h-full"
+                    priority
                   />
                 </div>
               ) : null}
@@ -281,8 +303,12 @@ const AlmanacCategory = () => {
               <Separator className="bg-[hsl(var(--parchment-border))]" />
 
               <div className="prose max-w-none">
-                <p className="leading-relaxed whitespace-pre-line text-[hsl(var(--parchment-brown))]">
-                  {selectedEntry.article}
+                <p className="leading-relaxed text-[hsl(var(--parchment-brown))]">
+                  <AlmanacReferenceParser
+                    content={selectedEntry.article}
+                    allEntries={allAlmanacEntries}
+                    currentEntryId={selectedEntry.id}
+                  />
                 </p>
               </div>
 
@@ -296,8 +322,12 @@ const AlmanacCategory = () => {
                         <h3 className="text-xl font-heading font-semibold mb-3 text-[hsl(var(--parchment-brown))]">
                           Abilities
                         </h3>
-                        <p className="whitespace-pre-line text-[hsl(var(--parchment-muted))]">
-                          {selectedEntry.abilities}
+                        <p className="text-[hsl(var(--parchment-muted))]">
+                          <AlmanacReferenceParser
+                            content={selectedEntry.abilities}
+                            allEntries={allAlmanacEntries}
+                            currentEntryId={selectedEntry.id}
+                          />
                         </p>
                       </div>
                     </>
@@ -310,8 +340,12 @@ const AlmanacCategory = () => {
                         <h3 className="text-xl font-heading font-semibold mb-3 text-[hsl(var(--parchment-brown))]">
                           Relationships
                         </h3>
-                        <p className="whitespace-pre-line text-[hsl(var(--parchment-muted))]">
-                          {selectedEntry.relationships}
+                        <p className="text-[hsl(var(--parchment-muted))]">
+                          <AlmanacReferenceParser
+                            content={selectedEntry.relationships}
+                            allEntries={allAlmanacEntries}
+                            currentEntryId={selectedEntry.id}
+                          />
                         </p>
                       </div>
                     </>
@@ -410,10 +444,11 @@ const AlmanacCategory = () => {
                 >
                   {entry.image_url && (
                     <div className="w-full h-80 overflow-hidden rounded-t-2xl">
-                      <img
+                      <OptimizedImage
                         src={entry.image_url}
                         alt={entry.name}
                         className="w-full h-full object-cover"
+                        containerClassName="w-full h-full"
                       />
                     </div>
                   )}

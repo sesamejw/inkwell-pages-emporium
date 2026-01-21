@@ -10,6 +10,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { CartProvider } from "@/contexts/CartContext";
 import { Header } from "./components/Header";
 import { PageTransition } from "./components/PageTransition";
+import { ScrollToTop } from "./components/ScrollToTop";
 import Index from "./pages/Index";
 import { Admin } from "./pages/Admin";
 import { AdminAuth } from "./pages/AdminAuth";
@@ -73,6 +74,7 @@ const App = () => (
               <Toaster />
               <Sonner />
               <BrowserRouter>
+                <ScrollToTop />
                 <div className="min-h-screen bg-background transition-colors duration-300">
                   <Header />
                   <AnimatedRoutes />

@@ -354,6 +354,15 @@ export const DynamicRelationshipMap = () => {
     };
   }, [simulate, render]);
 
+  // Transform screen coordinates to world coordinates (accounting for zoom)
+  const screenToWorld = useCallback((screenX: number, screenY: number) => {
+    const { width, height } = dimensions;
+    // Reverse the zoom transform: translate to center, scale, translate back
+    const worldX = (screenX - width / 2) / zoom + width / 2;
+    const worldY = (screenY - height / 2) / zoom + height / 2;
+    return { x: worldX, y: worldY };
+  }, [dimensions, zoom]);
+
   // Mouse interaction
   const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
@@ -361,8 +370,11 @@ export const DynamicRelationshipMap = () => {
     
     const { width, height } = dimensions;
     const rect = canvas.getBoundingClientRect();
-    const x = (e.clientX - rect.left) * (width / rect.width);
-    const y = (e.clientY - rect.top) * (height / rect.height);
+    const screenX = (e.clientX - rect.left) * (width / rect.width);
+    const screenY = (e.clientY - rect.top) * (height / rect.height);
+    
+    // Convert to world coordinates
+    const { x, y } = screenToWorld(screenX, screenY);
 
     if (draggedNodeRef.current) {
       draggedNodeRef.current.x = x;
@@ -372,11 +384,12 @@ export const DynamicRelationshipMap = () => {
       return;
     }
 
-    // Check hover
+    // Check hover with zoom-adjusted hit radius
+    const hitRadius = 30 / zoom; // Adjust hit radius based on zoom
     const hovered = nodesRef.current.find((node) => {
       const dx = node.x - x;
       const dy = node.y - y;
-      return Math.sqrt(dx * dx + dy * dy) < 30;
+      return Math.sqrt(dx * dx + dy * dy) < hitRadius;
     });
     setHoveredNode(hovered?.character || null);
   };
@@ -387,13 +400,18 @@ export const DynamicRelationshipMap = () => {
     
     const { width, height } = dimensions;
     const rect = canvas.getBoundingClientRect();
-    const x = (e.clientX - rect.left) * (width / rect.width);
-    const y = (e.clientY - rect.top) * (height / rect.height);
+    const screenX = (e.clientX - rect.left) * (width / rect.width);
+    const screenY = (e.clientY - rect.top) * (height / rect.height);
+    
+    // Convert to world coordinates
+    const { x, y } = screenToWorld(screenX, screenY);
 
+    // Adjust hit radius based on zoom level
+    const hitRadius = 30 / zoom;
     const clicked = nodesRef.current.find((node) => {
       const dx = node.x - x;
       const dy = node.y - y;
-      return Math.sqrt(dx * dx + dy * dy) < 30;
+      return Math.sqrt(dx * dx + dy * dy) < hitRadius;
     });
 
     if (clicked) {

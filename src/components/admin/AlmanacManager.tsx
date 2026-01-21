@@ -437,10 +437,14 @@ export const AlmanacManager = () => {
 
                   <div>
                     <label className="block text-sm font-medium mb-2">Full Article *</label>
+                    <p className="text-xs text-muted-foreground mb-2">
+                      💡 Tip: Use [[Name]] to create cross-references to other entries. 
+                      Example: "He fought [[Petronai]] in battle" will link to Petronai's entry.
+                    </p>
                     <Textarea
                       value={formData.article}
                       onChange={(e) => setFormData({ ...formData, article: e.target.value })}
-                      placeholder="Full article content with detailed information"
+                      placeholder="Full article content with detailed information. Use [[Name]] to reference other entries."
                       rows={10}
                     />
                   </div>
