@@ -80,9 +80,14 @@ export type Database = {
           era: string | null
           id: string
           image_url: string | null
+          is_disabled: boolean | null
           name: string
           order_index: number | null
           origin_location_id: string | null
+          promo_book_id: string | null
+          promo_enabled: boolean | null
+          promo_link: string | null
+          promo_text: string | null
           relationships: string | null
           role: string | null
           slug: string
@@ -98,9 +103,14 @@ export type Database = {
           era?: string | null
           id?: string
           image_url?: string | null
+          is_disabled?: boolean | null
           name: string
           order_index?: number | null
           origin_location_id?: string | null
+          promo_book_id?: string | null
+          promo_enabled?: boolean | null
+          promo_link?: string | null
+          promo_text?: string | null
           relationships?: string | null
           role?: string | null
           slug: string
@@ -116,9 +126,14 @@ export type Database = {
           era?: string | null
           id?: string
           image_url?: string | null
+          is_disabled?: boolean | null
           name?: string
           order_index?: number | null
           origin_location_id?: string | null
+          promo_book_id?: string | null
+          promo_enabled?: boolean | null
+          promo_link?: string | null
+          promo_text?: string | null
           relationships?: string | null
           role?: string | null
           slug?: string
@@ -133,6 +148,13 @@ export type Database = {
             referencedRelation: "world_locations"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "almanac_characters_promo_book_id_fkey"
+            columns: ["promo_book_id"]
+            isOneToOne: false
+            referencedRelation: "books"
+            referencedColumns: ["id"]
+          },
         ]
       }
       almanac_concepts: {
@@ -143,8 +165,13 @@ export type Database = {
           description: string
           id: string
           image_url: string | null
+          is_disabled: boolean | null
           name: string
           order_index: number | null
+          promo_book_id: string | null
+          promo_enabled: boolean | null
+          promo_link: string | null
+          promo_text: string | null
           slug: string
           updated_at: string | null
         }
@@ -155,8 +182,13 @@ export type Database = {
           description: string
           id?: string
           image_url?: string | null
+          is_disabled?: boolean | null
           name: string
           order_index?: number | null
+          promo_book_id?: string | null
+          promo_enabled?: boolean | null
+          promo_link?: string | null
+          promo_text?: string | null
           slug: string
           updated_at?: string | null
         }
@@ -167,12 +199,25 @@ export type Database = {
           description?: string
           id?: string
           image_url?: string | null
+          is_disabled?: boolean | null
           name?: string
           order_index?: number | null
+          promo_book_id?: string | null
+          promo_enabled?: boolean | null
+          promo_link?: string | null
+          promo_text?: string | null
           slug?: string
           updated_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "almanac_concepts_promo_book_id_fkey"
+            columns: ["promo_book_id"]
+            isOneToOne: false
+            referencedRelation: "books"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       almanac_kingdoms: {
         Row: {
@@ -182,8 +227,13 @@ export type Database = {
           founded_date: string | null
           id: string
           image_url: string | null
+          is_disabled: boolean | null
           name: string
           order_index: number | null
+          promo_book_id: string | null
+          promo_enabled: boolean | null
+          promo_link: string | null
+          promo_text: string | null
           slug: string
           status: string | null
           updated_at: string | null
@@ -195,8 +245,13 @@ export type Database = {
           founded_date?: string | null
           id?: string
           image_url?: string | null
+          is_disabled?: boolean | null
           name: string
           order_index?: number | null
+          promo_book_id?: string | null
+          promo_enabled?: boolean | null
+          promo_link?: string | null
+          promo_text?: string | null
           slug: string
           status?: string | null
           updated_at?: string | null
@@ -208,13 +263,26 @@ export type Database = {
           founded_date?: string | null
           id?: string
           image_url?: string | null
+          is_disabled?: boolean | null
           name?: string
           order_index?: number | null
+          promo_book_id?: string | null
+          promo_enabled?: boolean | null
+          promo_link?: string | null
+          promo_text?: string | null
           slug?: string
           status?: string | null
           updated_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "almanac_kingdoms_promo_book_id_fkey"
+            columns: ["promo_book_id"]
+            isOneToOne: false
+            referencedRelation: "books"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       almanac_locations: {
         Row: {
@@ -223,10 +291,15 @@ export type Database = {
           description: string
           id: string
           image_url: string | null
+          is_disabled: boolean | null
           kingdom: string | null
           location_type: string | null
           name: string
           order_index: number | null
+          promo_book_id: string | null
+          promo_enabled: boolean | null
+          promo_link: string | null
+          promo_text: string | null
           slug: string
           updated_at: string | null
         }
@@ -236,10 +309,15 @@ export type Database = {
           description: string
           id?: string
           image_url?: string | null
+          is_disabled?: boolean | null
           kingdom?: string | null
           location_type?: string | null
           name: string
           order_index?: number | null
+          promo_book_id?: string | null
+          promo_enabled?: boolean | null
+          promo_link?: string | null
+          promo_text?: string | null
           slug: string
           updated_at?: string | null
         }
@@ -249,14 +327,27 @@ export type Database = {
           description?: string
           id?: string
           image_url?: string | null
+          is_disabled?: boolean | null
           kingdom?: string | null
           location_type?: string | null
           name?: string
           order_index?: number | null
+          promo_book_id?: string | null
+          promo_enabled?: boolean | null
+          promo_link?: string | null
+          promo_text?: string | null
           slug?: string
           updated_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "almanac_locations_promo_book_id_fkey"
+            columns: ["promo_book_id"]
+            isOneToOne: false
+            referencedRelation: "books"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       almanac_magic: {
         Row: {
@@ -266,9 +357,14 @@ export type Database = {
           difficulty: string | null
           id: string
           image_url: string | null
+          is_disabled: boolean | null
           magic_type: string | null
           name: string
           order_index: number | null
+          promo_book_id: string | null
+          promo_enabled: boolean | null
+          promo_link: string | null
+          promo_text: string | null
           slug: string
           updated_at: string | null
         }
@@ -279,9 +375,14 @@ export type Database = {
           difficulty?: string | null
           id?: string
           image_url?: string | null
+          is_disabled?: boolean | null
           magic_type?: string | null
           name: string
           order_index?: number | null
+          promo_book_id?: string | null
+          promo_enabled?: boolean | null
+          promo_link?: string | null
+          promo_text?: string | null
           slug: string
           updated_at?: string | null
         }
@@ -292,13 +393,26 @@ export type Database = {
           difficulty?: string | null
           id?: string
           image_url?: string | null
+          is_disabled?: boolean | null
           magic_type?: string | null
           name?: string
           order_index?: number | null
+          promo_book_id?: string | null
+          promo_enabled?: boolean | null
+          promo_link?: string | null
+          promo_text?: string | null
           slug?: string
           updated_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "almanac_magic_promo_book_id_fkey"
+            columns: ["promo_book_id"]
+            isOneToOne: false
+            referencedRelation: "books"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       almanac_races: {
         Row: {
@@ -308,9 +422,14 @@ export type Database = {
           homeland: string | null
           id: string
           image_url: string | null
+          is_disabled: boolean | null
           name: string
           order_index: number | null
           population: string | null
+          promo_book_id: string | null
+          promo_enabled: boolean | null
+          promo_link: string | null
+          promo_text: string | null
           slug: string
           updated_at: string | null
         }
@@ -321,9 +440,14 @@ export type Database = {
           homeland?: string | null
           id?: string
           image_url?: string | null
+          is_disabled?: boolean | null
           name: string
           order_index?: number | null
           population?: string | null
+          promo_book_id?: string | null
+          promo_enabled?: boolean | null
+          promo_link?: string | null
+          promo_text?: string | null
           slug: string
           updated_at?: string | null
         }
@@ -334,13 +458,26 @@ export type Database = {
           homeland?: string | null
           id?: string
           image_url?: string | null
+          is_disabled?: boolean | null
           name?: string
           order_index?: number | null
           population?: string | null
+          promo_book_id?: string | null
+          promo_enabled?: boolean | null
+          promo_link?: string | null
+          promo_text?: string | null
           slug?: string
           updated_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "almanac_races_promo_book_id_fkey"
+            columns: ["promo_book_id"]
+            isOneToOne: false
+            referencedRelation: "books"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       almanac_relics: {
         Row: {
@@ -349,9 +486,14 @@ export type Database = {
           description: string
           id: string
           image_url: string | null
+          is_disabled: boolean | null
           name: string
           order_index: number | null
           power_level: string | null
+          promo_book_id: string | null
+          promo_enabled: boolean | null
+          promo_link: string | null
+          promo_text: string | null
           slug: string
           type: string | null
           updated_at: string | null
@@ -362,9 +504,14 @@ export type Database = {
           description: string
           id?: string
           image_url?: string | null
+          is_disabled?: boolean | null
           name: string
           order_index?: number | null
           power_level?: string | null
+          promo_book_id?: string | null
+          promo_enabled?: boolean | null
+          promo_link?: string | null
+          promo_text?: string | null
           slug: string
           type?: string | null
           updated_at?: string | null
@@ -375,14 +522,27 @@ export type Database = {
           description?: string
           id?: string
           image_url?: string | null
+          is_disabled?: boolean | null
           name?: string
           order_index?: number | null
           power_level?: string | null
+          promo_book_id?: string | null
+          promo_enabled?: boolean | null
+          promo_link?: string | null
+          promo_text?: string | null
           slug?: string
           type?: string | null
           updated_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "almanac_relics_promo_book_id_fkey"
+            columns: ["promo_book_id"]
+            isOneToOne: false
+            referencedRelation: "books"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       almanac_titles: {
         Row: {
@@ -392,8 +552,13 @@ export type Database = {
           description: string
           id: string
           image_url: string | null
+          is_disabled: boolean | null
           name: string
           order_index: number | null
+          promo_book_id: string | null
+          promo_enabled: boolean | null
+          promo_link: string | null
+          promo_text: string | null
           rank: string | null
           slug: string
           updated_at: string | null
@@ -405,8 +570,13 @@ export type Database = {
           description: string
           id?: string
           image_url?: string | null
+          is_disabled?: boolean | null
           name: string
           order_index?: number | null
+          promo_book_id?: string | null
+          promo_enabled?: boolean | null
+          promo_link?: string | null
+          promo_text?: string | null
           rank?: string | null
           slug: string
           updated_at?: string | null
@@ -418,13 +588,26 @@ export type Database = {
           description?: string
           id?: string
           image_url?: string | null
+          is_disabled?: boolean | null
           name?: string
           order_index?: number | null
+          promo_book_id?: string | null
+          promo_enabled?: boolean | null
+          promo_link?: string | null
+          promo_text?: string | null
           rank?: string | null
           slug?: string
           updated_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "almanac_titles_promo_book_id_fkey"
+            columns: ["promo_book_id"]
+            isOneToOne: false
+            referencedRelation: "books"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       badge_types: {
         Row: {

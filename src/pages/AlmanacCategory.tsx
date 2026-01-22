@@ -1,10 +1,10 @@
 import { useState, useEffect, useMemo } from "react";
-import { useParams, useNavigate, useSearchParams } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { almanacCategories } from "@/data/chronologyData";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Network } from "lucide-react";
+import { ArrowLeft, Network, Loader2, BookOpen, ExternalLink } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { ImageGallery } from "@/components/ImageGallery";
@@ -13,6 +13,8 @@ import { BookSearchBar } from "@/components/BookSearchBar";
 import { AlmanacReferenceParser } from "@/components/AlmanacReferenceParser";
 import { OptimizedImage } from "@/components/OptimizedImage";
 import { useAlmanacEntries } from "@/hooks/useAlmanacEntries";
+import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
+import { useUserPreferences } from "@/hooks/useUserPreferences";
 import {
   Pagination,
   PaginationContent,
@@ -23,6 +25,13 @@ import {
   PaginationEllipsis,
 } from "@/components/ui/pagination";
 
+interface PromoBook {
+  id: string;
+  title: string;
+  author: string;
+  cover_image_url: string | null;
+}
+
 interface AlmanacEntry {
   id: string;
   name: string;
@@ -30,6 +39,11 @@ interface AlmanacEntry {
   description: string;
   article: string;
   image_url: string | null;
+  is_disabled?: boolean;
+  promo_enabled?: boolean;
+  promo_text?: string | null;
+  promo_link?: string | null;
+  promo_book_id?: string | null;
   // Character-specific fields
   role?: string;
   affiliation?: string;
@@ -65,9 +79,13 @@ const AlmanacCategory = () => {
   const [entries, setEntries] = useState<AlmanacEntry[]>([]);
   const [selectedEntry, setSelectedEntry] = useState<AlmanacEntry | null>(null);
   const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([]);
+  const [promoBook, setPromoBook] = useState<PromoBook | null>(null);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  
+  // Get user preference for infinite scroll
+  const { infiniteScrollEnabled } = useUserPreferences();
 
   // Get all almanac entries for cross-referencing
   const { entries: allAlmanacEntries } = useAlmanacEntries();
@@ -88,6 +106,13 @@ const AlmanacCategory = () => {
     } else {
       setGalleryImages([]);
     }
+
+    // Fetch promo book if entry has one
+    if (selectedEntry?.promo_enabled && selectedEntry?.promo_book_id) {
+      fetchPromoBook(selectedEntry.promo_book_id);
+    } else {
+      setPromoBook(null);
+    }
   }, [selectedEntry, isCharacterCategory]);
 
   const fetchEntries = async () => {
@@ -96,6 +121,7 @@ const AlmanacCategory = () => {
     const { data, error } = await supabase
       .from(tableName as any)
       .select("*")
+      .eq("is_disabled", false)
       .order("order_index", { ascending: true });
 
     if (!error && data) {
@@ -116,6 +142,18 @@ const AlmanacCategory = () => {
     }
   };
 
+  const fetchPromoBook = async (bookId: string) => {
+    const { data, error } = await supabase
+      .from("books")
+      .select("id, title, author, cover_image_url")
+      .eq("id", bookId)
+      .single();
+
+    if (!error && data) {
+      setPromoBook(data as PromoBook);
+    }
+  };
+
   // Filter entries by search query
   const filteredEntries = useMemo(() => {
     if (!searchQuery.trim()) return entries;
@@ -129,12 +167,26 @@ const AlmanacCategory = () => {
     );
   }, [entries, searchQuery]);
 
-  // Pagination logic
+  // Infinite scroll hook
+  const {
+    displayedItems: infiniteScrollItems,
+    hasMore: infiniteScrollHasMore,
+    loadMoreRef,
+  } = useInfiniteScroll({
+    items: filteredEntries,
+    itemsPerPage: ITEMS_PER_PAGE,
+    enabled: infiniteScrollEnabled,
+  });
+
+  // Pagination logic (used when infinite scroll is disabled)
   const totalPages = Math.ceil(filteredEntries.length / ITEMS_PER_PAGE);
   const paginatedEntries = useMemo(() => {
     const start = (currentPage - 1) * ITEMS_PER_PAGE;
     return filteredEntries.slice(start, start + ITEMS_PER_PAGE);
   }, [filteredEntries, currentPage]);
+
+  // Get the entries to display based on scroll mode
+  const displayedEntries = infiniteScrollEnabled ? infiniteScrollItems : paginatedEntries;
 
   // Reset to page 1 when search changes
   useEffect(() => {
@@ -155,7 +207,8 @@ const AlmanacCategory = () => {
   }, [searchParams, entries]);
 
   const renderPagination = () => {
-    if (totalPages <= 1) return null;
+    // Don't show pagination if infinite scroll is enabled
+    if (infiniteScrollEnabled || totalPages <= 1) return null;
 
     const pages: (number | "ellipsis")[] = [];
     if (totalPages <= 5) {
@@ -204,6 +257,21 @@ const AlmanacCategory = () => {
           </PaginationItem>
         </PaginationContent>
       </Pagination>
+    );
+  };
+
+  const renderInfiniteScrollLoader = () => {
+    if (!infiniteScrollEnabled) return null;
+    
+    return (
+      <div ref={loadMoreRef} className="flex justify-center py-8">
+        {infiniteScrollHasMore && (
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <Loader2 className="h-5 w-5 animate-spin" />
+            <span>Loading more...</span>
+          </div>
+        )}
+      </div>
     );
   };
 
@@ -352,6 +420,51 @@ const AlmanacCategory = () => {
                   )}
                 </>
               )}
+
+              {/* Promo Banner */}
+              {selectedEntry.promo_enabled && (selectedEntry.promo_book_id || selectedEntry.promo_link) && (
+                <>
+                  <Separator className="bg-[hsl(var(--parchment-border))]" />
+                  <div className="bg-gradient-to-r from-[hsl(var(--parchment-gold))/10] to-[hsl(var(--parchment-border))/30] rounded-xl p-6 border border-[hsl(var(--parchment-gold))/30]">
+                    <div className="flex flex-col md:flex-row items-center gap-4">
+                      {promoBook?.cover_image_url && (
+                        <div className="w-20 h-28 flex-shrink-0 rounded-lg overflow-hidden shadow-lg">
+                          <img
+                            src={promoBook.cover_image_url}
+                            alt={promoBook.title}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      )}
+                      <div className="flex-1 text-center md:text-left">
+                        <p className="text-lg font-heading font-semibold text-[hsl(var(--parchment-brown))] mb-2">
+                          {selectedEntry.promo_text || `Find out more about ${selectedEntry.name}!`}
+                        </p>
+                        {promoBook && (
+                          <p className="text-sm text-[hsl(var(--parchment-muted))] mb-3">
+                            {promoBook.title} by {promoBook.author}
+                          </p>
+                        )}
+                      </div>
+                      {selectedEntry.promo_book_id && promoBook ? (
+                        <Link to={`/books?book=${promoBook.id}`}>
+                          <Button className="bg-[hsl(var(--parchment-gold))] hover:bg-[hsl(var(--parchment-gold))]/90 text-white">
+                            <BookOpen className="h-4 w-4 mr-2" />
+                            View Book
+                          </Button>
+                        </Link>
+                      ) : selectedEntry.promo_link ? (
+                        <a href={selectedEntry.promo_link} target="_blank" rel="noopener noreferrer">
+                          <Button className="bg-[hsl(var(--parchment-gold))] hover:bg-[hsl(var(--parchment-gold))]/90 text-white">
+                            <ExternalLink className="h-4 w-4 mr-2" />
+                            Learn More
+                          </Button>
+                        </a>
+                      ) : null}
+                    </div>
+                  </div>
+                </>
+              )}
             </CardContent>
           </Card>
         </div>
@@ -429,7 +542,7 @@ const AlmanacCategory = () => {
               },
             }}
           >
-            {paginatedEntries.map((entry) => (
+            {displayedEntries.map((entry) => (
               <motion.div
                 key={entry.id}
                 variants={{
@@ -480,6 +593,7 @@ const AlmanacCategory = () => {
             ))}
           </motion.div>
           {renderPagination()}
+          {renderInfiniteScrollLoader()}
           </>
         )}
       </div>
