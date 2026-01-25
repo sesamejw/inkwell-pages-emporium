@@ -12,6 +12,7 @@ import { Footer } from "@/components/Footer";
 import { BookSearchBar } from "@/components/BookSearchBar";
 import { AlmanacReferenceParser } from "@/components/AlmanacReferenceParser";
 import { OptimizedImage } from "@/components/OptimizedImage";
+import SocialButton from "@/components/ui/social-button";
 import { useAlmanacEntries } from "@/hooks/useAlmanacEntries";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { useUserPreferences } from "@/hooks/useUserPreferences";
@@ -74,7 +75,7 @@ const ITEMS_PER_PAGE = 9;
 
 const AlmanacCategory = () => {
   const { categoryId } = useParams();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const [entries, setEntries] = useState<AlmanacEntry[]>([]);
   const [selectedEntry, setSelectedEntry] = useState<AlmanacEntry | null>(null);
@@ -99,6 +100,17 @@ const AlmanacCategory = () => {
       fetchEntries();
     }
   }, [tableName]);
+
+  // Handle entry URL parameter for deep linking
+  useEffect(() => {
+    const entrySlug = searchParams.get("entry");
+    if (entrySlug && entries.length > 0 && !selectedEntry) {
+      const entry = entries.find((e) => e.slug === entrySlug);
+      if (entry) {
+        setSelectedEntry(entry);
+      }
+    }
+  }, [searchParams, entries]);
 
   useEffect(() => {
     if (selectedEntry && isCharacterCategory) {
@@ -205,6 +217,15 @@ const AlmanacCategory = () => {
       }
     }
   }, [searchParams, entries]);
+
+  // Scroll to top when selected entry changes
+  useEffect(() => {
+    if (selectedEntry) {
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    }
+  }, [selectedEntry]);
 
   const renderPagination = () => {
     // Don't show pagination if infinite scroll is enabled
@@ -314,12 +335,21 @@ const AlmanacCategory = () => {
 
           <Card className="shadow-xl bg-[hsl(var(--parchment-card))] border-[hsl(var(--parchment-border))]">
             <CardHeader>
-              <CardTitle className="text-4xl font-heading text-[hsl(var(--parchment-brown))]">
-                {selectedEntry.name}
-              </CardTitle>
-              <CardDescription className="text-[hsl(var(--parchment-light-muted))]">
-                {selectedEntry.description}
-              </CardDescription>
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex-1">
+                  <CardTitle className="text-4xl font-heading text-[hsl(var(--parchment-brown))]">
+                    {selectedEntry.name}
+                  </CardTitle>
+                  <CardDescription className="text-[hsl(var(--parchment-light-muted))] mt-2">
+                    {selectedEntry.description}
+                  </CardDescription>
+                </div>
+                <SocialButton 
+                  shareUrl={`${window.location.origin}/almanac/${categoryId}?entry=${selectedEntry.slug}`}
+                  shareTitle={`${selectedEntry.name} - ThouArt Almanac`}
+                  shareDescription={selectedEntry.description}
+                />
+              </div>
               
               {/* Character-specific metadata */}
               {isCharacterCategory && (
@@ -446,21 +476,24 @@ const AlmanacCategory = () => {
                           </p>
                         )}
                       </div>
-                      {selectedEntry.promo_book_id && promoBook ? (
-                        <Link to={`/books?book=${promoBook.id}`}>
-                          <Button className="bg-[hsl(var(--parchment-gold))] hover:bg-[hsl(var(--parchment-gold))]/90 text-white">
-                            <BookOpen className="h-4 w-4 mr-2" />
-                            View Book
-                          </Button>
-                        </Link>
-                      ) : selectedEntry.promo_link ? (
-                        <a href={selectedEntry.promo_link} target="_blank" rel="noopener noreferrer">
-                          <Button className="bg-[hsl(var(--parchment-gold))] hover:bg-[hsl(var(--parchment-gold))]/90 text-white">
-                            <ExternalLink className="h-4 w-4 mr-2" />
-                            Learn More
-                          </Button>
-                        </a>
-                      ) : null}
+                      <div className="flex flex-wrap gap-2">
+                        {selectedEntry.promo_book_id && promoBook && (
+                          <Link to={`/books?book=${promoBook.id}`}>
+                            <Button className="bg-[hsl(var(--parchment-gold))] hover:bg-[hsl(var(--parchment-gold))]/90 text-white">
+                              <BookOpen className="h-4 w-4 mr-2" />
+                              View Book
+                            </Button>
+                          </Link>
+                        )}
+                        {selectedEntry.promo_link && (
+                          <a href={selectedEntry.promo_link} target="_blank" rel="noopener noreferrer">
+                            <Button variant="outline" className="border-[hsl(var(--parchment-gold))] text-[hsl(var(--parchment-brown))] hover:bg-[hsl(var(--parchment-gold))]/10">
+                              <ExternalLink className="h-4 w-4 mr-2" />
+                              Learn More
+                            </Button>
+                          </a>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </>

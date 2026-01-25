@@ -72,6 +72,9 @@ export const DynamicRelationshipMap = () => {
   const [selectedCharacter, setSelectedCharacter] = useState<string | null>(null);
   const [isSimulating, setIsSimulating] = useState(true);
   const [zoom, setZoom] = useState(1);
+  const [pan, setPan] = useState({ x: 0, y: 0 });
+  const [isPanning, setIsPanning] = useState(false);
+  const lastPanPos = useRef({ x: 0, y: 0 });
   const [hoveredNode, setHoveredNode] = useState<Character | null>(null);
   const [dimensions, setDimensions] = useState({ width: 800, height: 600 });
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -201,7 +204,7 @@ export const DynamicRelationshipMap = () => {
       target.vy -= (dy / dist) * force;
     });
 
-    // Update positions with damping
+    // Update positions with damping - NO boundary constraints (infinite canvas)
     nodes.forEach((node) => {
       if (draggedNodeRef.current?.id === node.id) return;
       
@@ -209,11 +212,7 @@ export const DynamicRelationshipMap = () => {
       node.vy *= 0.9;
       node.x += node.vx;
       node.y += node.vy;
-
-      // Boundary constraints
-      const padding = 50;
-      node.x = Math.max(padding, Math.min(width - padding, node.x));
-      node.y = Math.max(padding, Math.min(height - padding, node.y));
+      // Nodes can now extend infinitely in any direction
     });
   }, [relationships, isSimulating, dimensions]);
 
@@ -241,9 +240,9 @@ export const DynamicRelationshipMap = () => {
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, width, height);
 
-    // Apply zoom transform for nodes and edges only
+    // Apply zoom and pan transform for nodes and edges
     ctx.save();
-    ctx.translate(width / 2, height / 2);
+    ctx.translate(width / 2 + pan.x, height / 2 + pan.y);
     ctx.scale(zoom, zoom);
     ctx.translate(-width / 2, -height / 2);
 
@@ -339,7 +338,7 @@ export const DynamicRelationshipMap = () => {
     });
 
     ctx.restore();
-  }, [relationships, selectedCharacter, hoveredNode, dimensions, isDarkMode, zoom]);
+  }, [relationships, selectedCharacter, hoveredNode, dimensions, isDarkMode, zoom, pan]);
 
   // Animation loop
   useEffect(() => {
@@ -354,14 +353,14 @@ export const DynamicRelationshipMap = () => {
     };
   }, [simulate, render]);
 
-  // Transform screen coordinates to world coordinates (accounting for zoom)
+  // Transform screen coordinates to world coordinates (accounting for zoom and pan)
   const screenToWorld = useCallback((screenX: number, screenY: number) => {
     const { width, height } = dimensions;
-    // Reverse the zoom transform: translate to center, scale, translate back
-    const worldX = (screenX - width / 2) / zoom + width / 2;
-    const worldY = (screenY - height / 2) / zoom + height / 2;
+    // Reverse the zoom and pan transform
+    const worldX = (screenX - width / 2 - pan.x) / zoom + width / 2;
+    const worldY = (screenY - height / 2 - pan.y) / zoom + height / 2;
     return { x: worldX, y: worldY };
-  }, [dimensions, zoom]);
+  }, [dimensions, zoom, pan]);
 
   // Mouse interaction
   const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
@@ -372,6 +371,15 @@ export const DynamicRelationshipMap = () => {
     const rect = canvas.getBoundingClientRect();
     const screenX = (e.clientX - rect.left) * (width / rect.width);
     const screenY = (e.clientY - rect.top) * (height / rect.height);
+
+    // Handle panning
+    if (isPanning) {
+      const deltaX = e.clientX - lastPanPos.current.x;
+      const deltaY = e.clientY - lastPanPos.current.y;
+      setPan(prev => ({ x: prev.x + deltaX, y: prev.y + deltaY }));
+      lastPanPos.current = { x: e.clientX, y: e.clientY };
+      return;
+    }
     
     // Convert to world coordinates
     const { x, y } = screenToWorld(screenX, screenY);
@@ -416,6 +424,10 @@ export const DynamicRelationshipMap = () => {
 
     if (clicked) {
       draggedNodeRef.current = clicked;
+    } else {
+      // Start panning if no node clicked
+      setIsPanning(true);
+      lastPanPos.current = { x: e.clientX, y: e.clientY };
     }
   };
 
@@ -427,11 +439,20 @@ export const DynamicRelationshipMap = () => {
       );
     }
     draggedNodeRef.current = null;
+    setIsPanning(false);
+  };
+
+  // Handle mouse wheel for zooming
+  const handleWheel = (e: React.WheelEvent<HTMLCanvasElement>) => {
+    e.preventDefault();
+    const delta = e.deltaY > 0 ? -0.1 : 0.1;
+    setZoom(z => Math.max(0.1, Math.min(3, z + delta)));
   };
 
   const handleReset = () => {
     setSelectedCharacter(null);
     setZoom(1);
+    setPan({ x: 0, y: 0 });
     const { width, height } = dimensions;
     // Randomize positions
     nodesRef.current.forEach((node) => {
@@ -439,6 +460,36 @@ export const DynamicRelationshipMap = () => {
       node.y = height / 2 + (Math.random() - 0.5) * Math.min(300, height * 0.4);
       node.vx = 0;
       node.vy = 0;
+    });
+  };
+
+  // Fit all nodes in view
+  const handleFitView = () => {
+    const nodes = nodesRef.current;
+    if (nodes.length === 0) return;
+
+    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+    nodes.forEach(node => {
+      minX = Math.min(minX, node.x);
+      maxX = Math.max(maxX, node.x);
+      minY = Math.min(minY, node.y);
+      maxY = Math.max(maxY, node.y);
+    });
+
+    const graphWidth = maxX - minX + 100;
+    const graphHeight = maxY - minY + 100;
+    const centerX = (minX + maxX) / 2;
+    const centerY = (minY + maxY) / 2;
+
+    const { width, height } = dimensions;
+    const scaleX = width / graphWidth;
+    const scaleY = height / graphHeight;
+    const newZoom = Math.min(scaleX, scaleY, 1) * 0.9;
+
+    setZoom(newZoom);
+    setPan({
+      x: (width / 2 - centerX) * newZoom,
+      y: (height / 2 - centerY) * newZoom,
     });
   };
 
@@ -502,8 +553,8 @@ export const DynamicRelationshipMap = () => {
               variant="ghost" 
               size="icon"
               className="h-7 w-7"
-              onClick={() => setZoom(z => Math.max(0.5, z - 0.25))}
-              disabled={zoom <= 0.5}
+              onClick={() => setZoom(z => Math.max(0.1, z - 0.25))}
+              disabled={zoom <= 0.1}
             >
               <ZoomOut className="h-4 w-4" />
             </Button>
@@ -512,12 +563,20 @@ export const DynamicRelationshipMap = () => {
               variant="ghost" 
               size="icon"
               className="h-7 w-7"
-              onClick={() => setZoom(z => Math.min(2, z + 0.25))}
-              disabled={zoom >= 2}
+              onClick={() => setZoom(z => Math.min(3, z + 0.25))}
+              disabled={zoom >= 3}
             >
               <ZoomIn className="h-4 w-4" />
             </Button>
           </div>
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={handleFitView}
+            className="transition-all hover:scale-105 text-xs px-2"
+          >
+            Fit All
+          </Button>
           <Button 
             variant="outline" 
             size="icon" 
@@ -579,14 +638,16 @@ export const DynamicRelationshipMap = () => {
             style={{ 
               width: '100%', 
               height: '100%', 
-              cursor: hoveredNode ? "pointer" : "grab",
+              cursor: isPanning ? "grabbing" : (hoveredNode ? "pointer" : "grab"),
             }}
             onMouseMove={handleMouseMove}
             onMouseDown={handleMouseDown}
             onMouseUp={handleMouseUp}
+            onWheel={handleWheel}
             onMouseLeave={() => {
               draggedNodeRef.current = null;
               setHoveredNode(null);
+              setIsPanning(false);
             }}
           />
           

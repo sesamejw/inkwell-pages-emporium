@@ -719,8 +719,7 @@ export const AlmanacManager = () => {
                             value={formData.promo_book_id || ""}
                             onValueChange={(value) => setFormData({ 
                               ...formData, 
-                              promo_book_id: value === "none" ? "" : value,
-                              promo_link: value && value !== "none" ? "" : formData.promo_link 
+                              promo_book_id: value === "none" ? "" : value
                             })}
                           >
                             <SelectTrigger>
@@ -737,19 +736,17 @@ export const AlmanacManager = () => {
                           </Select>
                         </div>
                         <div>
-                          <Label>Or External Link</Label>
+                          <Label>External Link (optional)</Label>
                           <Input
                             value={formData.promo_link}
                             onChange={(e) => setFormData({ 
                               ...formData, 
-                              promo_link: e.target.value,
-                              promo_book_id: e.target.value ? "" : formData.promo_book_id 
+                              promo_link: e.target.value
                             })}
                             placeholder="https://example.com"
-                            disabled={!!formData.promo_book_id}
                           />
                           <p className="text-xs text-muted-foreground mt-1">
-                            Choose either a book or external link, not both.
+                            You can use both a book link and an external link together.
                           </p>
                         </div>
                       </div>

@@ -70,14 +70,16 @@ export const OptimizedImage = ({
       )}
       style={{ backgroundColor: placeholderColor }}
     >
-      {/* Blur placeholder skeleton */}
+      {/* Shimmer placeholder skeleton */}
       <div
         className={cn(
-          "absolute inset-0 animate-pulse transition-opacity duration-500",
+          "absolute inset-0 transition-opacity duration-500",
           isLoaded ? "opacity-0" : "opacity-100"
         )}
         style={{ backgroundColor: placeholderColor }}
-      />
+      >
+        <div className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-muted-foreground/10 to-transparent" />
+      </div>
 
       {/* Actual image - only render when in view */}
       {isInView && !hasError && (
