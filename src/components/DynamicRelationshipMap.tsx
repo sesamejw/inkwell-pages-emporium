@@ -542,12 +542,12 @@ export const DynamicRelationshipMap = () => {
 
   return (
     <Card className="bg-[hsl(var(--parchment-card))] border-[hsl(var(--parchment-border))]">
-      <CardHeader className="flex flex-row items-center justify-between">
+      <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <CardTitle className="flex items-center gap-2 text-[hsl(var(--parchment-brown))]">
           <Users className="h-5 w-5" />
           Character Relationships
         </CardTitle>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <div className="flex items-center gap-1 border rounded-md p-0.5">
             <Button 
               variant="ghost" 

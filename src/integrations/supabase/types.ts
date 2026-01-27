@@ -748,6 +748,47 @@ export type Database = {
         }
         Relationships: []
       }
+      book_external_links: {
+        Row: {
+          book_id: string
+          created_at: string
+          format_type: string
+          id: string
+          order_index: number | null
+          store_name: string
+          updated_at: string
+          url: string
+        }
+        Insert: {
+          book_id: string
+          created_at?: string
+          format_type: string
+          id?: string
+          order_index?: number | null
+          store_name: string
+          updated_at?: string
+          url: string
+        }
+        Update: {
+          book_id?: string
+          created_at?: string
+          format_type?: string
+          id?: string
+          order_index?: number | null
+          store_name?: string
+          updated_at?: string
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "book_external_links_book_id_fkey"
+            columns: ["book_id"]
+            isOneToOne: false
+            referencedRelation: "books"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       book_highlights: {
         Row: {
           book_id: string

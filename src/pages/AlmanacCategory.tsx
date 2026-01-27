@@ -101,14 +101,17 @@ const AlmanacCategory = () => {
     }
   }, [tableName]);
 
-  // Handle entry URL parameter for deep linking
+  // Handle entry URL parameter for deep linking and browser back/forward
   useEffect(() => {
     const entrySlug = searchParams.get("entry");
-    if (entrySlug && entries.length > 0 && !selectedEntry) {
+    if (entrySlug && entries.length > 0) {
       const entry = entries.find((e) => e.slug === entrySlug);
       if (entry) {
         setSelectedEntry(entry);
       }
+    } else if (!entrySlug && selectedEntry) {
+      // Browser back button was pressed, clear selection
+      setSelectedEntry(null);
     }
   }, [searchParams, entries]);
 
@@ -320,13 +323,19 @@ const AlmanacCategory = () => {
     );
   }
 
+  // Handle back button to clear entry selection
+  const handleBackToCategory = () => {
+    setSelectedEntry(null);
+    setSearchParams({});
+  };
+
   if (selectedEntry) {
     return (
       <div className="min-h-screen flex flex-col bg-[hsl(var(--parchment-bg))]">
         <div className="flex-1 container mx-auto px-4 py-8 max-w-4xl">
           <Button
             variant="ghost"
-            onClick={() => setSelectedEntry(null)}
+            onClick={handleBackToCategory}
             className="mb-6 text-[hsl(var(--parchment-brown))] hover:bg-[hsl(var(--parchment-card))]"
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
@@ -509,11 +518,11 @@ const AlmanacCategory = () => {
   return (
     <div className="min-h-screen flex flex-col bg-[hsl(var(--parchment-bg))]">
       <div className="flex-1 container mx-auto px-4 py-8 max-w-6xl">
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
           <Button
             variant="ghost"
             onClick={() => navigate("/chronology")}
-            className="text-[hsl(var(--parchment-brown))] hover:bg-[hsl(var(--parchment-card))]"
+            className="text-[hsl(var(--parchment-brown))] hover:bg-[hsl(var(--parchment-card))] w-fit"
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Chronology
@@ -523,7 +532,7 @@ const AlmanacCategory = () => {
             <Button
               variant="outline"
               onClick={() => navigate("/relationships")}
-              className="border-[hsl(var(--parchment-gold))] text-[hsl(var(--parchment-brown))] hover:bg-[hsl(var(--parchment-gold))/10]"
+              className="border-[hsl(var(--parchment-gold))] text-[hsl(var(--parchment-brown))] hover:bg-[hsl(var(--parchment-gold))/10] w-fit"
             >
               <Network className="mr-2 h-4 w-4" />
               View Relationships Map
@@ -586,7 +595,10 @@ const AlmanacCategory = () => {
               >
                 <Card
                   className="cursor-pointer transition-all duration-200 hover:shadow-xl hover:-translate-y-1 bg-[hsl(var(--parchment-card))] border-[hsl(var(--parchment-border))]"
-                  onClick={() => setSelectedEntry(entry)}
+                  onClick={() => {
+                    setSelectedEntry(entry);
+                    setSearchParams({ entry: entry.slug });
+                  }}
                 >
                   {entry.image_url && (
                     <div className="w-full h-80 overflow-hidden rounded-t-2xl">
