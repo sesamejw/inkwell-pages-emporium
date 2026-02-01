@@ -2,7 +2,7 @@ import * as React from "react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { Settings, LogOut, User, Library, Heart, Trophy, ChevronRight, Mail } from "lucide-react";
+import { Settings, LogOut, User, Library, Heart, Trophy, ChevronRight, Mail, LayoutDashboard } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -39,6 +39,11 @@ export default function ProfileDropdown({
   if (!user) return null;
 
   const menuItems: MenuItem[] = [
+    {
+      label: "Dashboard",
+      href: "/dashboard",
+      icon: <LayoutDashboard className="w-4 h-4" />,
+    },
     {
       label: "My Profile",
       href: "/profile",

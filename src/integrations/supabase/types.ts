@@ -219,6 +219,36 @@ export type Database = {
           },
         ]
       }
+      almanac_entry_images: {
+        Row: {
+          caption: string | null
+          category: string
+          created_at: string | null
+          entry_id: string
+          id: string
+          image_url: string
+          order_index: number | null
+        }
+        Insert: {
+          caption?: string | null
+          category: string
+          created_at?: string | null
+          entry_id: string
+          id?: string
+          image_url: string
+          order_index?: number | null
+        }
+        Update: {
+          caption?: string | null
+          category?: string
+          created_at?: string | null
+          entry_id?: string
+          id?: string
+          image_url?: string
+          order_index?: number | null
+        }
+        Relationships: []
+      }
       almanac_kingdoms: {
         Row: {
           article: string

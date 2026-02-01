@@ -12,8 +12,11 @@ import { Footer } from "@/components/Footer";
 import { BookSearchBar } from "@/components/BookSearchBar";
 import { AlmanacReferenceParser } from "@/components/AlmanacReferenceParser";
 import { OptimizedImage } from "@/components/OptimizedImage";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { EmptyState } from "@/components/EmptyState";
 import SocialButton from "@/components/ui/social-button";
 import { useAlmanacEntries } from "@/hooks/useAlmanacEntries";
+import { CategoryMetadataBadges } from "@/components/almanac/CategoryMetadataBadges";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { useUserPreferences } from "@/hooks/useUserPreferences";
 import {
@@ -52,6 +55,26 @@ interface AlmanacEntry {
   species?: string;
   abilities?: string;
   relationships?: string;
+  // Kingdom-specific fields
+  founded_date?: string;
+  status?: string;
+  // Location-specific fields
+  location_type?: string;
+  kingdom?: string;
+  // Magic-specific fields
+  magic_type?: string;
+  difficulty?: string;
+  // Relic-specific fields
+  type?: string;
+  power_level?: string;
+  // Race-specific fields
+  population?: string;
+  homeland?: string;
+  // Concept-specific fields
+  concept_type?: string;
+  // Title-specific fields
+  rank?: string;
+  authority?: string;
 }
 
 interface GalleryImage {
@@ -116,8 +139,13 @@ const AlmanacCategory = () => {
   }, [searchParams, entries]);
 
   useEffect(() => {
-    if (selectedEntry && isCharacterCategory) {
-      fetchGalleryImages(selectedEntry.id);
+    if (selectedEntry) {
+      // Fetch gallery images - characters use their own table, others use the generic table
+      if (isCharacterCategory) {
+        fetchCharacterGalleryImages(selectedEntry.id);
+      } else if (categoryId) {
+        fetchGenericGalleryImages(selectedEntry.id, categoryId);
+      }
     } else {
       setGalleryImages([]);
     }
@@ -128,7 +156,7 @@ const AlmanacCategory = () => {
     } else {
       setPromoBook(null);
     }
-  }, [selectedEntry, isCharacterCategory]);
+  }, [selectedEntry, isCharacterCategory, categoryId]);
 
   const fetchEntries = async () => {
     if (!tableName) return;
@@ -145,11 +173,24 @@ const AlmanacCategory = () => {
     setLoading(false);
   };
 
-  const fetchGalleryImages = async (characterId: string) => {
+  const fetchCharacterGalleryImages = async (characterId: string) => {
     const { data, error } = await supabase
       .from("almanac_character_images" as any)
       .select("id, image_url, caption")
       .eq("character_id", characterId)
+      .order("order_index", { ascending: true });
+
+    if (!error && data) {
+      setGalleryImages(data as unknown as GalleryImage[]);
+    }
+  };
+
+  const fetchGenericGalleryImages = async (entryId: string, category: string) => {
+    const { data, error } = await supabase
+      .from("almanac_entry_images" as any)
+      .select("id, image_url, caption")
+      .eq("entry_id", entryId)
+      .eq("category", category)
       .order("order_index", { ascending: true });
 
     if (!error && data) {
@@ -333,6 +374,15 @@ const AlmanacCategory = () => {
     return (
       <div className="min-h-screen flex flex-col bg-[hsl(var(--parchment-bg))]">
         <div className="flex-1 container mx-auto px-4 py-8 max-w-4xl">
+          <Breadcrumbs 
+            items={[
+              { label: "Chronology", href: "/chronology" },
+              { label: category.title, href: `/almanac/${categoryId}` },
+              { label: selectedEntry.name }
+            ]}
+            className="mb-4"
+          />
+          
           <Button
             variant="ghost"
             onClick={handleBackToCategory}
@@ -360,51 +410,21 @@ const AlmanacCategory = () => {
                 />
               </div>
               
-              {/* Character-specific metadata */}
-              {isCharacterCategory && (
-                <div className="flex flex-wrap gap-2 mt-4">
-                  {selectedEntry.role && (
-                    <span className="px-3 py-1 rounded-full text-sm bg-[hsl(var(--parchment-border))] text-[hsl(var(--parchment-brown))]">
-                      {selectedEntry.role}
-                    </span>
-                  )}
-                  {selectedEntry.affiliation && (
-                    <span className="px-3 py-1 rounded-full text-sm bg-[hsl(var(--parchment-bg))] text-[hsl(var(--parchment-brown))]">
-                      {selectedEntry.affiliation}
-                    </span>
-                  )}
-                  {selectedEntry.era && (
-                    <span className="px-3 py-1 rounded-full text-sm bg-[hsl(var(--parchment-gold))] text-white">
-                      {selectedEntry.era}
-                    </span>
-                  )}
-                  {selectedEntry.species && (
-                    <span className="px-3 py-1 rounded-full text-sm bg-[hsl(var(--parchment-muted))] text-white">
-                      {selectedEntry.species}
-                    </span>
-                  )}
-                </div>
-              )}
+              {/* Category-specific metadata badges */}
+              <CategoryMetadataBadges 
+                categoryId={categoryId || ""} 
+                entry={selectedEntry} 
+              />
             </CardHeader>
 
             <CardContent className="space-y-6">
-              {/* Image Gallery for Characters, Single Image for Others */}
-              {isCharacterCategory ? (
+              {/* Image Gallery for all categories */}
+              {(galleryImages.length > 0 || selectedEntry.image_url) ? (
                 <ImageGallery 
                   images={galleryImages} 
                   mainImage={selectedEntry.image_url}
                   altText={selectedEntry.name}
                 />
-              ) : selectedEntry.image_url ? (
-                <div className="w-full h-96 overflow-hidden rounded-2xl shadow-lg">
-                  <OptimizedImage
-                    src={selectedEntry.image_url}
-                    alt={selectedEntry.name}
-                    className="w-full h-full object-cover"
-                    containerClassName="w-full h-full"
-                    priority
-                  />
-                </div>
               ) : null}
 
               <Separator className="bg-[hsl(var(--parchment-border))]" />
@@ -518,6 +538,14 @@ const AlmanacCategory = () => {
   return (
     <div className="min-h-screen flex flex-col bg-[hsl(var(--parchment-bg))]">
       <div className="flex-1 container mx-auto px-4 py-8 max-w-6xl">
+        <Breadcrumbs 
+          items={[
+            { label: "Chronology", href: "/chronology" },
+            { label: category.title }
+          ]}
+          className="mb-4"
+        />
+        
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
           <Button
             variant="ghost"
@@ -563,13 +591,11 @@ const AlmanacCategory = () => {
             <p className="text-[hsl(var(--parchment-muted))]">Loading entries...</p>
           </div>
         ) : filteredEntries.length === 0 ? (
-          <Card className="bg-[hsl(var(--parchment-card))] border-[hsl(var(--parchment-border))]">
-            <CardContent className="p-12 text-center">
-              <p className="text-[hsl(var(--parchment-muted))]">
-                {searchQuery ? `No entries matching "${searchQuery}"` : `No entries yet for ${category.title}. Check back later!`}
-              </p>
-            </CardContent>
-          </Card>
+          <EmptyState
+            type="search"
+            title={searchQuery ? `No results for "${searchQuery}"` : `No ${category.title.toLowerCase()} yet`}
+            description={searchQuery ? "Try adjusting your search terms" : "Check back later for new entries!"}
+          />
         ) : (
           <>
           <motion.div 
@@ -617,21 +643,12 @@ const AlmanacCategory = () => {
                     <CardDescription className="line-clamp-3 text-[hsl(var(--parchment-muted))]">
                       {entry.description}
                     </CardDescription>
-                    {/* Show character role/era badges in list */}
-                    {isCharacterCategory && (entry.role || entry.era) && (
-                      <div className="flex flex-wrap gap-1 mt-2">
-                        {entry.role && (
-                          <span className="px-2 py-0.5 rounded text-xs bg-[hsl(var(--parchment-border))] text-[hsl(var(--parchment-brown))]">
-                            {entry.role}
-                          </span>
-                        )}
-                        {entry.era && (
-                          <span className="px-2 py-0.5 rounded text-xs bg-[hsl(var(--parchment-gold))] text-white">
-                            {entry.era}
-                          </span>
-                        )}
-                      </div>
-                    )}
+                    {/* Show category-specific badges in list */}
+                    <CategoryMetadataBadges 
+                      categoryId={categoryId || ""} 
+                      entry={entry} 
+                      variant="compact"
+                    />
                   </CardHeader>
                 </Card>
               </motion.div>

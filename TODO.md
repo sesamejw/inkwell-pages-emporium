@@ -3,7 +3,7 @@
 ## 🚀 Suggested Feature Additions
 
 ### High Priority
-- [ ] **User Dashboard** - Personal dashboard showing reading progress, achievements, and activity summary
+- [x] **User Dashboard** - Personal dashboard showing reading progress, achievements, and activity summary
 - [ ] **Book Reading Tracker** - Track pages read per session with time-based analytics
 - [x] **Push Notifications** - Real-time browser push notifications via Service Worker (PWA)
 - [x] **Advanced Search** - Full-text search across books, almanac entries, and community content
@@ -110,6 +110,11 @@
 
 ## ✅ Recently Completed
 
+- [x] Breadcrumb navigation component for detail pages
+- [x] Navigation progress bar during route transitions
+- [x] Empty state component with illustrations
+- [x] IconButton component with tooltip support
+- [x] Gallery image manager for all almanac categories
 - [x] Push notifications with Service Worker support
 - [x] PWA configuration with offline caching
 - [x] @Mentions in forum replies with user search
@@ -162,13 +167,13 @@
 - ⚠ Character links in events would be nice
 
 ### Suggested UX Improvements
-- [ ] Add breadcrumb navigation on detail pages
+- [x] Add breadcrumb navigation on detail pages
 - [ ] Add "Back to top" button on long pages
-- [ ] Add loading indicators on navigation
-- [ ] Add empty state illustrations (not just text)
+- [x] Add loading indicators on navigation
+- [x] Add empty state illustrations (not just text)
 - [ ] Add keyboard shortcuts for power users
 - [ ] Add confirmation modals before destructive actions
-- [ ] Add tooltips on icon-only buttons
+- [x] Add tooltips on icon-only buttons
 
 ---
 

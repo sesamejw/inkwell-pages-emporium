@@ -14,6 +14,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CharacterImageManager } from "./CharacterImageManager";
+import { AlmanacGalleryManager } from "./AlmanacGalleryManager";
 import { Separator } from "@/components/ui/separator";
 import {
   Select,
@@ -855,16 +856,15 @@ export const AlmanacManager = () => {
                             <Button variant="ghost" size="icon" onClick={() => handleEdit(entry)}>
                               <Edit className="h-4 w-4" />
                             </Button>
-                            {isCharacterCategory && (
-                              <Button 
-                                variant="ghost" 
-                                size="icon" 
-                                onClick={() => setShowGalleryFor(showGalleryFor === entry.id ? null : entry.id)}
-                                className={showGalleryFor === entry.id ? "bg-muted" : ""}
-                              >
-                                <Images className="h-4 w-4" />
-                              </Button>
-                            )}
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              onClick={() => setShowGalleryFor(showGalleryFor === entry.id ? null : entry.id)}
+                              className={showGalleryFor === entry.id ? "bg-muted" : ""}
+                              title="Manage gallery images"
+                            >
+                              <Images className="h-4 w-4" />
+                            </Button>
                             <Button
                               variant="ghost"
                               size="icon"
@@ -889,8 +889,8 @@ export const AlmanacManager = () => {
               </div>
             </Card>
 
-            {/* Character Gallery Manager */}
-            {isCharacterCategory && showGalleryFor && (
+            {/* Gallery Manager */}
+            {showGalleryFor && (
               <Card className="p-6 mt-4">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-semibold">
@@ -901,11 +901,18 @@ export const AlmanacManager = () => {
                   </Button>
                 </div>
                 <Separator className="mb-4" />
-                <CharacterImageManager
-                  characterId={showGalleryFor}
-                  images={galleryImages}
-                  onImagesChange={() => fetchGalleryImages(showGalleryFor)}
-                />
+                {isCharacterCategory ? (
+                  <CharacterImageManager
+                    characterId={showGalleryFor}
+                    images={galleryImages}
+                    onImagesChange={() => fetchGalleryImages(showGalleryFor)}
+                  />
+                ) : (
+                  <AlmanacGalleryManager
+                    entryId={showGalleryFor}
+                    category={activeCategory}
+                  />
+                )}
               </Card>
             )}
           </TabsContent>

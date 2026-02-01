@@ -11,7 +11,9 @@ import { CartProvider } from "@/contexts/CartContext";
 import { Header } from "./components/Header";
 import { PageTransition } from "./components/PageTransition";
 import { ScrollToTop } from "./components/ScrollToTop";
+import { NavigationProgress } from "./components/NavigationProgress";
 import Index from "./pages/Index";
+import Dashboard from "./pages/Dashboard";
 import { Admin } from "./pages/Admin";
 import { AdminAuth } from "./pages/AdminAuth";
 import { Auth } from "./pages/Auth";
@@ -39,6 +41,7 @@ const AnimatedRoutes = () => {
     <AnimatePresence mode="wait" onExitComplete={() => window.scrollTo(0, 0)}>
       <Routes location={location} key={location.pathname}>
         <Route path="/" element={<PageTransition><Index /></PageTransition>} />
+        <Route path="/dashboard" element={<PageTransition><Dashboard /></PageTransition>} />
         <Route path="/profile" element={<PageTransition><ProfilePage /></PageTransition>} />
         <Route path="/profile/:userId" element={<PageTransition><ProfilePage /></PageTransition>} />
         <Route path="/forum" element={<Navigate to="/community" replace />} />
@@ -75,6 +78,7 @@ const App = () => (
               <Sonner />
               <BrowserRouter>
                 <ScrollToTop />
+                <NavigationProgress />
                 <div className="min-h-screen bg-background transition-colors duration-300">
                   <Header />
                   <AnimatedRoutes />
