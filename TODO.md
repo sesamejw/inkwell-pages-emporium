@@ -1,5 +1,83 @@
 # ThouArt - Feature Roadmap & Bug Fixes
 
+## 🎮 Lore Chronicles — Interactive Roleplay System
+
+A choose-your-adventure roleplay experience where users create characters and embark on branching story adventures within the ThouArt universe. Stories can intertwine, and users can expand the lore under Loremaster oversight.
+
+### Core Systems
+
+#### 1. Character Creation
+- [ ] **Race Selection** — Pick from almanac races (links to `almanac_races`)
+- [ ] **Stat Allocation** — Distribute points across Strength, Magic, Charisma, etc.
+- [ ] **Character Profile** — Name, backstory, portrait upload
+- [ ] **Progression System** — Abilities & faction affiliation earned through story choices
+- [ ] **Character Sheet View** — D&D-style character sheet display
+
+#### 2. Story Campaigns
+- [ ] **Campaign Creator** — Authors create branching narratives
+- [ ] **Story Nodes** — Choice points with multiple paths
+- [ ] **Outcome System** — Choices affect stats, unlock abilities, change story
+- [ ] **Campaign Browser** — Discover and join campaigns by genre/difficulty
+- [ ] **Featured Campaigns** — Loremaster-approved spotlight campaigns
+
+#### 3. Chronicle Threads (Sessions)
+- [ ] **Async Mode** — Turn-based, players act when online
+- [ ] **Real-Time Mode** — Scheduled sessions with live participants
+- [ ] **Group Sessions** — Multiple players in same campaign
+- [ ] **Solo Play** — Single-player story experiences
+- [ ] **Story Intertwining** — Characters can cross into other campaigns via "crossover events"
+
+#### 4. Lore Expansion System
+- [ ] **Lore Proposals** — Users submit new races, locations, items, factions
+- [ ] **Proposal Review Queue** — Loremasters approve/reject submissions
+- [ ] **Universe Rules Enforcement** — Guidelines for lore-compliant content
+- [ ] **Approved Lore Integration** — Accepted elements become available for all campaigns
+- [ ] **Lore Contribution Credits** — Recognition for accepted contributions
+
+#### 5. Loremaster Role
+- [ ] **Loremaster Permissions** — Special role for trusted users/admins
+- [ ] **Moderation Dashboard** — Review proposals, flag content, feature campaigns
+- [ ] **Universe Consistency Tools** — Check new lore against existing almanac
+- [ ] **Loremaster Applications** — Users can apply for the role
+
+### Database Tables Required
+
+| Table | Purpose |
+|-------|---------|
+| `rp_characters` | Player characters with stats, race, backstory, current campaign |
+| `rp_campaigns` | User-created story adventures with metadata |
+| `rp_story_nodes` | Branching choice points within campaigns |
+| `rp_node_choices` | Available choices at each node with outcomes |
+| `rp_sessions` | Active playthroughs (solo or group) |
+| `rp_session_participants` | Players in each session |
+| `rp_character_progress` | Current node, unlocked abilities, story flags |
+| `rp_lore_proposals` | User-submitted new lore for approval |
+| `rp_loremasters` | Users with oversight permissions |
+
+### Implementation Phases
+
+**Phase 1: Foundation**
+- [ ] Create database schema for characters and campaigns
+- [ ] Build character creation UI with race/stat selection
+- [ ] Implement character sheet display
+
+**Phase 2: Campaigns**
+- [ ] Campaign creator with node-based story builder
+- [ ] Story player UI with choice presentation
+- [ ] Session management (start, save, resume)
+
+**Phase 3: Multiplayer**
+- [ ] Group session support
+- [ ] Real-time synchronization via Supabase subscriptions
+- [ ] Crossover event system
+
+**Phase 4: Lore Governance**
+- [ ] Lore proposal submission form
+- [ ] Loremaster dashboard
+- [ ] Approval workflow with notifications
+
+---
+
 ## 🚀 Suggested Feature Additions
 
 ### High Priority
@@ -63,14 +141,14 @@
 - [ ] **Email Templates** - Customizable email templates for notifications
 
 ### Technical Improvements
-- [ ] **Image Optimization** - Implement lazy loading and WebP conversion
+- [x] **Image Optimization** - Lazy loading with intersection observer and WebP fallback support
 - [x] **Caching Strategy** - Service worker caching via PWA for faster loads
 - [ ] **SEO Enhancements** - Dynamic meta tags and structured data
 - [ ] **Performance Monitoring** - Add analytics for Core Web Vitals
 - [ ] **Accessibility Audit** - Full WCAG 2.1 compliance review
 - [ ] **Rate Limiting** - Prevent spam and abuse on forms
 - [ ] **Error Boundary Components** - Graceful error handling throughout app
-- [ ] **Skeleton Loaders Everywhere** - Consistent loading states on all pages
+- [x] **Skeleton Loaders Everywhere** - Consistent staggered loading states on all pages
 
 ---
 
@@ -83,14 +161,14 @@
 
 ### UI/UX
 - [ ] Dropdown menus occasionally transparent on certain pages
-- [ ] Mobile navigation menu doesn't close on route change
+- [x] Mobile navigation menu doesn't close on route change
 - [ ] Image aspect ratios inconsistent in submission cards
-- [ ] Dark mode color contrast issues on some badges
+- [x] Dark mode color contrast issues on some badges
 - [ ] Community page hero section has rendering issues (faded cards visible)
 - [ ] Some submission card titles show placeholder text ("d", "eeeee", "cectctc")
 - [ ] Book details page shows empty ISBN field
 - [ ] Price display shows $22.00 but format options all say "Unavailable"
-- [ ] Missing "Forum" link in main navigation (only Books & Community visible)
+- [x] Missing "Forum" link in main navigation (only Books & Community visible)
 
 ### Functionality
 - [ ] Forum reply notifications not always triggering
@@ -149,7 +227,7 @@
 - ✓ Price range slider functional
 - ✓ Category checkboxes work
 - ✓ Sort dropdown works
-- ⚠ Could use "View as Grid/List" toggle
+- ✓ Grid/List view toggle added
 
 ### Community Page
 - ✓ Gallery/Discussions/Book Clubs tabs work
@@ -168,11 +246,11 @@
 
 ### Suggested UX Improvements
 - [x] Add breadcrumb navigation on detail pages
-- [ ] Add "Back to top" button on long pages
+- [x] Add "Back to top" button on long pages
 - [x] Add loading indicators on navigation
 - [x] Add empty state illustrations (not just text)
-- [ ] Add keyboard shortcuts for power users
-- [ ] Add confirmation modals before destructive actions
+- [x] Add keyboard shortcuts for power users
+- [x] Add confirmation modals before destructive actions
 - [x] Add tooltips on icon-only buttons
 
 ---

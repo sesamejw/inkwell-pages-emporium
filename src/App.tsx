@@ -12,6 +12,8 @@ import { Header } from "./components/Header";
 import { PageTransition } from "./components/PageTransition";
 import { ScrollToTop } from "./components/ScrollToTop";
 import { NavigationProgress } from "./components/NavigationProgress";
+import { BackToTop } from "./components/BackToTop";
+import { KeyboardShortcutsProvider } from "./components/KeyboardShortcutsProvider";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import { Admin } from "./pages/Admin";
@@ -79,10 +81,13 @@ const App = () => (
               <BrowserRouter>
                 <ScrollToTop />
                 <NavigationProgress />
-                <div className="min-h-screen bg-background transition-colors duration-300">
-                  <Header />
-                  <AnimatedRoutes />
-                </div>
+                <KeyboardShortcutsProvider>
+                  <div className="min-h-screen bg-background transition-colors duration-300">
+                    <Header />
+                    <AnimatedRoutes />
+                    <BackToTop />
+                  </div>
+                </KeyboardShortcutsProvider>
               </BrowserRouter>
             </BooksProvider>
           </CartProvider>

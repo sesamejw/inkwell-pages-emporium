@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -27,6 +27,11 @@ export const Header = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { totalItems, openCart, isOpen, closeCart, items, updateQuantity, removeFromCart } = useCart();
+
+  // Close mobile menu on route change
+  useEffect(() => {
+    setIsMenuOpen(false);
+  }, [location.pathname]);
 
   const navigation = [
     { name: "Books", href: "/books", icon: BookOpen },
