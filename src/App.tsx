@@ -8,6 +8,7 @@ import { AnimatePresence } from "framer-motion";
 import { BooksProvider } from "@/contexts/BooksContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { CartProvider } from "@/contexts/CartContext";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { Header } from "./components/Header";
 import { PageTransition } from "./components/PageTransition";
 import { ScrollToTop } from "./components/ScrollToTop";
@@ -33,6 +34,7 @@ import Community from "./pages/Community";
 import SubmissionDetail from "./pages/SubmissionDetail";
 import BookClubDetail from "./pages/BookClubDetail";
 import NotFound from "./pages/NotFound";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 
 const queryClient = new QueryClient();
 
@@ -62,6 +64,7 @@ const AnimatedRoutes = () => {
         <Route path="/community" element={<PageTransition><Community /></PageTransition>} />
         <Route path="/community/submission/:id" element={<PageTransition><SubmissionDetail /></PageTransition>} />
         <Route path="/community/club/:clubId" element={<PageTransition><BookClubDetail /></PageTransition>} />
+        <Route path="/privacy" element={<PageTransition><PrivacyPolicy /></PageTransition>} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
       </Routes>
@@ -73,25 +76,29 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange={false}>
       <TooltipProvider>
-        <AuthProvider>
-          <CartProvider>
-            <BooksProvider>
-              <Toaster />
-              <Sonner />
-              <BrowserRouter>
-                <ScrollToTop />
-                <NavigationProgress />
-                <KeyboardShortcutsProvider>
-                  <div className="min-h-screen bg-background transition-colors duration-300">
-                    <Header />
-                    <AnimatedRoutes />
-                    <BackToTop />
-                  </div>
-                </KeyboardShortcutsProvider>
-              </BrowserRouter>
-            </BooksProvider>
-          </CartProvider>
-        </AuthProvider>
+        <ErrorBoundary>
+          <AuthProvider>
+            <CartProvider>
+              <BooksProvider>
+                <Toaster />
+                <Sonner />
+                <BrowserRouter>
+                  <ScrollToTop />
+                  <NavigationProgress />
+                  <KeyboardShortcutsProvider>
+                    <div className="min-h-screen bg-background transition-colors duration-300">
+                      <Header />
+                      <ErrorBoundary>
+                        <AnimatedRoutes />
+                      </ErrorBoundary>
+                      <BackToTop />
+                    </div>
+                  </KeyboardShortcutsProvider>
+                </BrowserRouter>
+              </BooksProvider>
+            </CartProvider>
+          </AuthProvider>
+        </ErrorBoundary>
       </TooltipProvider>
     </ThemeProvider>
   </QueryClientProvider>
