@@ -4,7 +4,7 @@
  import { 
    ArrowLeft, Plus, Save, Play, Trash2, Link2, 
    BookOpen, MessageSquare, GitBranch, CheckCircle,
-   Settings, Eye, EyeOff
+   Settings, Eye, EyeOff, Flag, Zap
  } from "lucide-react";
  import { Button } from "@/components/ui/button";
  import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -15,10 +15,13 @@
  import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
  import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
  import { Switch } from "@/components/ui/switch";
+ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
  import { supabase } from "@/integrations/supabase/client";
  import { useAuth } from "@/contexts/AuthContext";
  import { toast } from "@/hooks/use-toast";
  import { RpCampaign, RpStoryNode, RpNodeChoice } from "@/hooks/useLoreChronicles";
+ import { KeyPointsEditor } from "@/components/lore-chronicles/KeyPointsEditor";
+ import { EventTriggersEditor } from "@/components/lore-chronicles/EventTriggersEditor";
  
  interface NodeWithChoices extends RpStoryNode {
    choices: RpNodeChoice[];
@@ -299,93 +302,123 @@
  
        {/* Main Content */}
        <main className="container mx-auto px-4 py-8">
-         {/* Add Node Buttons */}
-         <div className="flex flex-wrap gap-2 mb-8">
-           <span className="text-sm text-muted-foreground self-center mr-2">Add Node:</span>
-           {Object.entries(nodeTypeLabels).map(([type, { label, icon, color }]) => (
-             <Button
-               key={type}
-               variant="outline"
-               size="sm"
-               onClick={() => createNode(type)}
-               className="gap-2"
-             >
-               <span className={`w-2 h-2 rounded-full ${color}`} />
-               {icon}
-               {label}
-             </Button>
-           ))}
-         </div>
- 
-         {/* Nodes Grid */}
-         {nodes.length === 0 ? (
-           <Card className="text-center py-12">
-             <CardContent>
-               <GitBranch className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-               <h3 className="text-xl font-semibold mb-2">No Nodes Yet</h3>
-               <p className="text-muted-foreground mb-4">
-                 Start building your story by adding a narrative node
-               </p>
-               <Button onClick={() => createNode("narrative")}>
-                 <Plus className="h-4 w-4 mr-2" />
-                 Add First Node
-               </Button>
-             </CardContent>
-           </Card>
-         ) : (
-           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-             {nodes.map((node, index) => {
-               const typeInfo = nodeTypeLabels[node.node_type] || nodeTypeLabels.narrative;
-               const isStart = campaign.start_node_id === node.id;
- 
-               return (
-                 <motion.div
-                   key={node.id}
-                   initial={{ opacity: 0, y: 20 }}
-                   animate={{ opacity: 1, y: 0 }}
-                   transition={{ delay: index * 0.05 }}
+         <Tabs defaultValue="nodes" className="w-full">
+           <TabsList className="mb-6">
+             <TabsTrigger value="nodes" className="gap-2">
+               <GitBranch className="h-4 w-4" />
+               Story Nodes
+             </TabsTrigger>
+             <TabsTrigger value="key-points" className="gap-2">
+               <Flag className="h-4 w-4" />
+               Key Points
+             </TabsTrigger>
+             <TabsTrigger value="triggers" className="gap-2">
+               <Zap className="h-4 w-4" />
+               Event Triggers
+             </TabsTrigger>
+           </TabsList>
+
+           <TabsContent value="nodes">
+             {/* Add Node Buttons */}
+             <div className="flex flex-wrap gap-2 mb-8">
+               <span className="text-sm text-muted-foreground self-center mr-2">Add Node:</span>
+               {Object.entries(nodeTypeLabels).map(([type, { label, icon, color }]) => (
+                 <Button
+                   key={type}
+                   variant="outline"
+                   size="sm"
+                   onClick={() => createNode(type)}
+                   className="gap-2"
                  >
-                   <Card 
-                     className={`cursor-pointer hover:border-primary/40 transition-colors ${
-                       isStart ? "ring-2 ring-primary" : ""
-                     }`}
-                     onClick={() => {
-                       setEditingNode(node);
-                       setShowNodeDialog(true);
-                     }}
-                   >
-                     <CardHeader className="pb-2">
-                       <div className="flex items-start justify-between">
-                         <div className="flex items-center gap-2">
-                           <span className={`w-3 h-3 rounded-full ${typeInfo.color}`} />
-                           <Badge variant="outline" className="text-xs">
-                             {typeInfo.label}
-                           </Badge>
-                         </div>
-                         {isStart && (
-                           <Badge className="bg-primary">Start</Badge>
-                         )}
-                       </div>
-                       <CardTitle className="text-base mt-2">
-                         {node.title || "Untitled Node"}
-                       </CardTitle>
-                     </CardHeader>
-                     <CardContent>
-                       <p className="text-sm text-muted-foreground line-clamp-2">
-                         {node.content.text || "No content"}
-                       </p>
-                       <div className="flex items-center gap-2 mt-3 text-xs text-muted-foreground">
-                         <GitBranch className="h-3 w-3" />
-                         {node.choices.length} choice{node.choices.length !== 1 ? "s" : ""}
-                         <span className="ml-auto">+{node.xp_reward} XP</span>
-                       </div>
-                     </CardContent>
-                   </Card>
-                 </motion.div>
-               );
-             })}
-           </div>
-         )}
+                   <span className={`w-2 h-2 rounded-full ${color}`} />
+                   {icon}
+                   {label}
+                 </Button>
+               ))}
+             </div>
+
+             {/* Nodes Grid */}
+             {nodes.length === 0 ? (
+               <Card className="text-center py-12">
+                 <CardContent>
+                   <GitBranch className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+                   <h3 className="text-xl font-semibold mb-2">No Nodes Yet</h3>
+                   <p className="text-muted-foreground mb-4">
+                     Start building your story by adding a narrative node
+                   </p>
+                   <Button onClick={() => createNode("narrative")}>
+                     <Plus className="h-4 w-4 mr-2" />
+                     Add First Node
+                   </Button>
+                 </CardContent>
+               </Card>
+             ) : (
+               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                 {nodes.map((node, index) => {
+                   const typeInfo = nodeTypeLabels[node.node_type] || nodeTypeLabels.narrative;
+                   const isStart = campaign.start_node_id === node.id;
+
+                   return (
+                     <motion.div
+                       key={node.id}
+                       initial={{ opacity: 0, y: 20 }}
+                       animate={{ opacity: 1, y: 0 }}
+                       transition={{ delay: index * 0.05 }}
+                     >
+                       <Card 
+                         className={`cursor-pointer hover:border-primary/40 transition-colors ${
+                           isStart ? "ring-2 ring-primary" : ""
+                         }`}
+                         onClick={() => {
+                           setEditingNode(node);
+                           setShowNodeDialog(true);
+                         }}
+                       >
+                         <CardHeader className="pb-2">
+                           <div className="flex items-start justify-between">
+                             <div className="flex items-center gap-2">
+                               <span className={`w-3 h-3 rounded-full ${typeInfo.color}`} />
+                               <Badge variant="outline" className="text-xs">
+                                 {typeInfo.label}
+                               </Badge>
+                             </div>
+                             {isStart && (
+                               <Badge className="bg-primary">Start</Badge>
+                             )}
+                           </div>
+                           <CardTitle className="text-base mt-2">
+                             {node.title || "Untitled Node"}
+                           </CardTitle>
+                         </CardHeader>
+                         <CardContent>
+                           <p className="text-sm text-muted-foreground line-clamp-2">
+                             {node.content.text || "No content"}
+                           </p>
+                           <div className="flex items-center gap-2 mt-3 text-xs text-muted-foreground">
+                             <GitBranch className="h-3 w-3" />
+                             {node.choices.length} choice{node.choices.length !== 1 ? "s" : ""}
+                             <span className="ml-auto">+{node.xp_reward} XP</span>
+                           </div>
+                         </CardContent>
+                       </Card>
+                     </motion.div>
+                   );
+                 })}
+               </div>
+             )}
+           </TabsContent>
+
+           <TabsContent value="key-points">
+             <KeyPointsEditor 
+               campaignId={campaignId!} 
+               storyNodes={nodes.map(n => ({ id: n.id, title: n.title }))} 
+             />
+           </TabsContent>
+
+           <TabsContent value="triggers">
+             <EventTriggersEditor campaignId={campaignId!} />
+           </TabsContent>
+         </Tabs>
        </main>
  
        {/* Node Editor Dialog */}
