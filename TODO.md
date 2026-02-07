@@ -16,11 +16,11 @@ A choose-your-adventure roleplay experience where users create characters and em
 ### Core Systems
 
 #### 1. Character Creation
-- [ ] **Race Selection** — Pick from almanac races (links to `almanac_races`)
-- [ ] **Stat Allocation** — Distribute points across Strength, Magic, Charisma, etc.
-- [ ] **Character Profile** — Name, backstory, portrait upload (reuse `AvatarUpload` with crop)
-- [ ] **Progression System** — Abilities & faction affiliation earned through story choices
-- [ ] **Character Sheet View** — D&D-style character sheet display
+- [x] **Race Selection** — Pick from almanac races (links to `almanac_races`)
+- [x] **Stat Allocation** — Distribute points across Strength, Magic, Charisma, etc.
+- [x] **Character Profile** — Name, backstory, portrait upload (reuse `AvatarUpload` with crop)
+- [x] **Progression System** — Abilities & faction affiliation earned through story choices
+- [x] **Character Sheet View** — D&D-style character sheet display
 
 **UI Flow:**
 1. Step 1: Select race → show race lore from almanac
@@ -29,11 +29,11 @@ A choose-your-adventure roleplay experience where users create characters and em
 4. Step 4: Review & create
 
 #### 2. Story Campaigns
-- [ ] **Campaign Creator** — Authors create branching narratives
-- [ ] **Story Nodes** — Choice points with multiple paths
-- [ ] **Outcome System** — Choices affect stats, unlock abilities, change story
-- [ ] **Campaign Browser** — Discover and join campaigns by genre/difficulty
-- [ ] **Featured Campaigns** — Loremaster-approved spotlight campaigns
+- [x] **Campaign Creator** — Authors create branching narratives
+- [x] **Story Nodes** — Choice points with multiple paths
+- [x] **Outcome System** — Choices affect stats, unlock abilities, change story
+- [x] **Campaign Browser** — Discover and join campaigns by genre/difficulty
+- [x] **Featured Campaigns** — Loremaster-approved spotlight campaigns
 
 **Node Types:**
 - `narrative` — Story text with "Continue" button
@@ -43,24 +43,27 @@ A choose-your-adventure roleplay experience where users create characters and em
 - `ending` — Campaign conclusion with outcome summary
 
 #### 3. Chronicle Threads (Sessions)
-- [ ] **Async Mode** — Turn-based, players act when online
-- [ ] **Real-Time Mode** — Scheduled sessions with live participants
-- [ ] **Group Sessions** — Multiple players in same campaign
-- [ ] **Solo Play** — Single-player story experiences
-- [ ] **Story Intertwining** — Characters can cross into other campaigns via "crossover events"
+- [x] **Async Mode** — Turn-based, players act when online
+- [x] **Real-Time Mode** — Scheduled sessions with live participants
+- [x] **Group Sessions** — Multiple players in same campaign
+- [x] **Solo Play** — Single-player story experiences
+- [x] **Story Intertwining** — Characters can cross into other campaigns via "crossover events"
 
 #### 4. Lore Expansion System
-- [ ] **Lore Proposals** — Users submit new races, locations, items, factions
-- [ ] **Proposal Review Queue** — Loremasters approve/reject submissions
-- [ ] **Universe Rules Enforcement** — Guidelines for lore-compliant content
-- [ ] **Approved Lore Integration** — Accepted elements become available for all campaigns
-- [ ] **Lore Contribution Credits** — Recognition for accepted contributions
+- [x] **Lore Proposals** — Users submit new races, locations, items, factions
+- [x] **Proposal Review Queue** — Loremasters approve/reject submissions
+- [x] **Universe Rules Enforcement** — Guidelines for lore-compliant content
+- [x] **Community Lore Almanac** — Dedicated almanac for approved community lore (separate from official Witness Almanac)
+- [x] **Community Lore Browser** — Browse/search approved community entries by category
+- [x] **Lore Contribution Credits** — Recognition for accepted contributions (badges, profile display)
+- [x] **Contributor Badges** — "Lore Contributor" badge on profiles with accepted proposals
 
 #### 5. Loremaster Role
-- [ ] **Loremaster Permissions** — Special role for trusted users/admins
-- [ ] **Moderation Dashboard** — Review proposals, flag content, feature campaigns
+- [x] **Loremaster Permissions** — Special role for trusted users/admins
+- [x] **Moderation Dashboard** — Review proposals, flag content, feature campaigns
 - [ ] **Universe Consistency Tools** — Check new lore against existing almanac
-- [ ] **Loremaster Applications** — Users can apply for the role
+- [x] **Loremaster Applications** — Users can apply for the role
+- [ ] **Loremaster Leaderboard** — Track reviews completed by each Loremaster
 
 ---
 
@@ -179,28 +182,506 @@ A choose-your-adventure roleplay experience where users create characters and em
 ### Implementation Phases (Revised)
 
 **Phase 1: Foundation (MVP)**
-- [ ] Create database schema (core tables with RLS)
-- [ ] Build character creation wizard UI
-- [ ] Implement character sheet display
-- [ ] Seed sample race data from `almanac_races`
+- [x] Create database schema (core tables with RLS)
+- [x] Build character creation wizard UI
+- [x] Implement character sheet display
+- [x] Seed sample race data from `almanac_races`
 
 **Phase 2: Solo Campaigns**
-- [ ] Campaign creator with visual node editor
-- [ ] Story player UI with choice presentation
-- [ ] Session management (start, save, resume)
-- [ ] Create 1-2 sample campaigns for testing
+- [x] Campaign creator with visual node editor
+- [x] Story player UI with choice presentation
+- [x] Session management (start, save, resume)
+- [x] Create 1-2 sample campaigns for testing
 
 **Phase 3: Multiplayer & Social**
-- [ ] Group session support with turn-based flow
-- [ ] Real-time synchronization via Supabase Realtime
-- [ ] Crossover event system between campaigns
-- [ ] Leaderboards / achievement integration
+- [x] Group session support with turn-based flow
+- [x] Real-time synchronization via Supabase Realtime
+- [x] Crossover event system between campaigns
+- [x] Leaderboards / achievement integration
+- [x] Campaign reviews and ratings
+- [x] Character showcase (public profiles)
 
 **Phase 4: Lore Governance**
-- [ ] Lore proposal submission form
-- [ ] Loremaster dashboard with approval workflow
+- [x] Lore proposal submission form
+- [x] Loremaster dashboard with approval workflow
+- [x] Community Lore Almanac (separate from official Witness Almanac)
 - [ ] Automated lore conflict detection
-- [ ] Loremaster application system
+- [x] Loremaster application system
+- [x] Contributor recognition system
+
+---
+
+### Advanced Campaign Systems
+
+#### 6. Key Points & Dynamic Pathways
+Campaign creators define **Key Points** (major story milestones) — what happens *between* them is driven by the player.
+
+- [ ] **Key Point Nodes** — Special high-priority milestone nodes that anchor the narrative arc
+- [ ] **Dynamic Path Generation** — Between key points, players navigate via:
+  - Pre-built response selections (creator-authored choices)
+  - Activity-based interactions (mini-challenges, puzzles, trades)
+  - Free-text player input (open-ended responses interpreted by game logic)
+- [ ] **Key Point Branching** — Which key points even occur depends on prior player actions
+- [ ] **Key Point Editor UI** — Visual editor showing key points as anchors with flexible paths between
+- [ ] **Path Weighting** — Creator assigns probability/conditions for which paths appear
+
+**Key Point Structure:**
+```
+[Start] ──→ {dynamic path} ──→ [Key Point A] ──→ {dynamic path} ──→ [Key Point C]
+                                      │
+                                      └── (if betrayed faction) ──→ [Key Point B] ──→ ...
+```
+
+**Database Addition:**
+| Table | Purpose | Key Columns |
+|-------|---------|-------------|
+| `rp_key_points` | Major story milestones | `campaign_id`, `title`, `description`, `order_index`, `is_required`, `conditions` (JSONB), `image_url` |
+| `rp_key_point_paths` | Connections between key points | `source_key_point_id`, `target_key_point_id`, `path_type` (linear/conditional/random), `conditions` (JSONB) |
+
+#### 7. Event Trigger System
+Events require specific **triggers** set by the creator — player actions, stat thresholds, item possession, or time-based conditions.
+
+- [ ] **Trigger Definitions** — Creators define triggers on nodes (stat check, item held, flag set, relationship threshold)
+- [ ] **Trigger Chains** — Multiple triggers can be combined (AND/OR logic)
+- [ ] **Triggered Events** — When conditions are met, fire events (unlock path, spawn encounter, modify stats)
+- [ ] **Conditional Visibility** — Choices/paths only appear when triggers are satisfied
+- [ ] **Trigger Editor UI** — Visual builder for creating trigger conditions in the campaign editor
+- [ ] **Trigger Log** — Players can see which triggers they've activated (optional transparency)
+
+**Trigger Types:**
+| Trigger | Example |
+|---------|---------|
+| `stat_threshold` | Strength ≥ 7 |
+| `item_possessed` | Has "Ancient Key" |
+| `flag_set` | `met_elder = true` |
+| `relationship_score` | NPC "Kael" ≥ 50 |
+| `faction_reputation` | "Shadow Guild" ≥ 30 |
+| `choice_made` | Selected "spare the wolf" at node X |
+| `player_count` | ≥ 3 players in session (multiplayer) |
+| `random_chance` | 30% probability per visit |
+
+**Database Addition:**
+| Table | Purpose | Key Columns |
+|-------|---------|-------------|
+| `rp_event_triggers` | Trigger definitions | `campaign_id`, `name`, `trigger_type`, `conditions` (JSONB), `target_event_id` |
+| `rp_triggered_events` | Events fired by triggers | `campaign_id`, `name`, `event_type` (unlock_path/spawn_node/modify_stat/grant_item), `payload` (JSONB) |
+| `rp_session_trigger_log` | Per-session trigger history | `session_id`, `trigger_id`, `character_id`, `fired_at`, `context` (JSONB) |
+
+#### 8. Interaction Point System
+Character-to-character (and character-to-NPC) interactions that trigger **different progressions** for each participant.
+
+- [ ] **Interaction Nodes** — Special node type where two+ characters/NPCs interact
+- [ ] **Dual Outcomes** — Each interaction produces separate outcomes per participant (one gains, other loses — or both benefit/suffer)
+- [ ] **Interaction Types** — Dialogue, trade, combat, persuasion, alliance proposal, betrayal
+- [ ] **Interaction History** — Track all interactions per character pair
+- [ ] **Creator Outcome Designer** — UI for creators to design good/bad outcomes per interaction
+- [ ] **Stat-Influenced Interactions** — Interaction results modified by participant stats
+- [ ] **Cascading Effects** — One interaction's outcome affects future available interactions
+
+**Outcome Matrix Example:**
+```
+Character A (Charisma 7) meets NPC "Kael" (Persuasion check):
+  ├─ Pass: A gains trust (+20 relationship), Kael reveals secret → unlocks Path X
+  └─ Fail: A loses trust (-10 relationship), Kael becomes suspicious → triggers guard encounter
+
+Creator designs BOTH branches with full consequences.
+```
+
+**Database Addition:**
+| Table | Purpose | Key Columns |
+|-------|---------|-------------|
+| `rp_interaction_points` | Interaction definitions | `campaign_id`, `node_id`, `interaction_type`, `participants` (JSONB), `outcomes` (JSONB) |
+| `rp_interaction_outcomes` | Outcome templates | `interaction_id`, `participant_role`, `result_type` (good/bad/neutral), `stat_effects` (JSONB), `flag_effects` (JSONB), `narrative_text` |
+| `rp_interaction_log` | Session interaction history | `session_id`, `interaction_id`, `participants` (JSONB), `outcome_chosen`, `timestamp` |
+
+#### 9. Random Events System
+Creator-defined events that fire when **certain conditions are met** — adding unpredictability and replayability.
+
+- [ ] **Random Event Pool** — Creators add events to a pool with activation conditions
+- [ ] **Condition-Based Triggering** — Events fire based on player state, location, turn count, etc.
+- [ ] **Probability Weighting** — Each event has a % chance when conditions are met
+- [ ] **One-Time vs Recurring** — Events can fire once or repeat
+- [ ] **Random Event Categories** — Encounter, weather, fortune, misfortune, discovery, ambush
+- [ ] **Random Event Editor** — Drag-and-drop event creation with condition builder
+- [ ] **Event Cooldowns** — Prevent same random event firing too frequently
+
+**Database Addition:**
+| Table | Purpose | Key Columns |
+|-------|---------|-------------|
+| `rp_random_events` | Random event definitions | `campaign_id`, `name`, `description`, `category`, `probability`, `conditions` (JSONB), `effects` (JSONB), `is_recurring`, `cooldown_turns` |
+| `rp_random_event_log` | When events fired | `session_id`, `event_id`, `character_id`, `fired_at`, `outcome` (JSONB) |
+
+#### 10. Multiplayer Convergence System
+Each player starts from a **different campaign beginning** which later merges — resulting in allies or enemies based on prior choices.
+
+- [ ] **Multiple Entry Points** — Campaign has 2-4+ distinct starting branches (one per player/faction)
+- [ ] **Convergence Nodes** — Special nodes where player paths merge
+- [ ] **Convergence Conditions** — Creators define when/how paths collide (after X key points, specific triggers, etc.)
+- [ ] **Prior Choice Impact** — Players' decisions before convergence determine their relationship at meeting
+- [ ] **Alliance/Enemy Resolution** — Automatic determination: allies, enemies, or neutral based on faction, flags, and choices
+- [ ] **Post-Convergence Branching** — Story continues differently for allied vs enemy player groups
+- [ ] **Convergence Reveal UI** — Dramatic reveal moment when players discover each other's histories
+- [ ] **Split & Reconverge** — Paths can split and merge multiple times
+
+**Convergence Flow:**
+```
+Player 1: [Start A] → [Key Point A1] → [Key Point A2] ──────┐
+                                                              ├──→ [Convergence] → [Allied Path] or [Enemy Path]
+Player 2: [Start B] → [Key Point B1] → [Key Point B2] ──────┘
+
+Convergence checks:
+  - Did Player 1 help the rebels? Did Player 2 join the crown?
+  - If opposing factions → Enemy encounter
+  - If same faction → Alliance formed
+  - If neutral → Negotiation interaction point
+```
+
+**Database Addition:**
+| Table | Purpose | Key Columns |
+|-------|---------|-------------|
+| `rp_campaign_entry_points` | Multiple starting branches | `campaign_id`, `entry_label`, `start_node_id`, `faction_id`, `description`, `max_players` |
+| `rp_convergence_nodes` | Where paths merge | `campaign_id`, `node_id`, `required_entry_points` (JSONB), `convergence_type` (merge/clash/negotiate) |
+| `rp_convergence_rules` | How alliances/enemies are decided | `convergence_id`, `condition_type`, `conditions` (JSONB), `result` (ally/enemy/neutral), `target_node_id` |
+
+#### 11. Faction System (Campaign-Level)
+Factions within campaigns that players can join, betray, or destroy — affecting the entire story arc.
+
+- [ ] **Campaign Factions** — Creators define factions per campaign with lore, goals, and values
+- [ ] **Faction Joining** — Players join factions through story choices or interaction points
+- [ ] **Faction Reputation** — Per-player reputation with each faction (-100 to +100)
+- [ ] **Faction Conflicts** — Factions can be allied, neutral, or at war — affecting player interactions
+- [ ] **Faction Perks** — High reputation unlocks faction-specific choices, items, abilities
+- [ ] **Faction Betrayal** — Leaving/betraying a faction has severe consequences
+- [ ] **Multiplayer Faction Wars** — In convergence, faction alignment determines ally/enemy status
+- [ ] **Faction Leaderboard** — Track which factions are most popular across all sessions
+
+**Database Addition:**
+| Table | Purpose | Key Columns |
+|-------|---------|-------------|
+| `rp_campaign_factions` | Faction definitions per campaign | `campaign_id`, `name`, `description`, `image_url`, `values` (JSONB), `perks` (JSONB) |
+| `rp_faction_relations` | Inter-faction relationships | `campaign_id`, `faction_a_id`, `faction_b_id`, `relation_type` (allied/neutral/hostile) |
+| `rp_character_faction_standing` | Player's faction reputation | `session_id`, `character_id`, `faction_id`, `reputation_score`, `joined_at`, `betrayed_at` |
+
+---
+
+### Implementation Phases (Advanced Systems)
+
+**Phase 5: Dynamic Campaigns**
+- [ ] Key Points system with conditional branching
+- [ ] Event Trigger system with visual editor
+- [ ] Random Events pool with condition builder
+- [ ] Free-text input handling for player responses
+
+**Phase 6: Interaction & Consequences**
+- [ ] Interaction Point system with dual outcomes
+- [ ] Creator Outcome Designer UI
+- [ ] Cascading effects engine
+- [ ] Interaction history tracking
+
+**Phase 7: Multiplayer Convergence**
+- [ ] Multiple entry points per campaign
+- [ ] Convergence node system
+- [ ] Alliance/Enemy resolution engine
+- [ ] Convergence reveal UI
+- [ ] Faction system with reputation tracking
+- [ ] Faction conflicts affecting multiplayer dynamics
+
+#### 12. Player-to-Player Physical Interaction System
+Real-time physical and social interactions between players when they meet in multiplayer campaigns — proximity-based, skill-gated, and inventory-dependent.
+
+##### Proximity Mechanics
+- [ ] **Proximity Tracking** — Track relative distance between players in a scene (close/mid/far)
+- [ ] **Movement Actions** — Players can: stop, walk, run, approach a specific player, retreat, circle around
+- [ ] **Proximity Zones** — Actions unlock based on distance:
+  - **Far** (10+ paces): Shout, signal, observe
+  - **Mid** (3-9 paces): Speak normally, gesture, throw item
+  - **Close** (1-2 paces): Whisper, hand item, grab, shove
+  - **Adjacent** (touching): Stab, pickpocket, embrace, restrain
+
+##### Physical Actions (Proximity + Inventory + Skill Gated)
+- [ ] **Melee Actions** — Stab, slash, punch, shove (requires: adjacent + weapon in inventory + combat skill)
+- [ ] **Stealth Actions** — Stab from behind, pickpocket, plant item (requires: adjacent + stealth skill + concealed item)
+- [ ] **Social Actions** — Whisper, lie, persuade, intimidate, bargain (requires: close/adjacent + charisma/wisdom checks)
+- [ ] **Ranged Actions** — Throw item, shoot bow, cast spell (requires: mid+ range + item/ability)
+- [ ] **Movement Actions** — Walk closer, run away, block path, follow silently
+
+**Action Availability Logic:**
+```
+Can player A "stab" player B?
+  ├─ Is A adjacent to B? ✗ → Action hidden
+  ├─ Does A have a bladed weapon in inventory? ✗ → Action hidden
+  ├─ Has A prepared the weapon (unsheathed/unhidden)? ✗ → Action hidden
+  ├─ Does A have sufficient combat/stealth stat? ✗ → Action visible but grayed out
+  └─ All pass → Action available (with stat check roll on execution)
+```
+
+##### Pre-Planning & Preparation
+- [ ] **Action Preparation** — Players must prepare actions in advance (hidden from others):
+  - "Hide knife in cloak" → Conceals weapon, enables surprise attacks later
+  - "Ready bow" → Enables ranged attack next turn but visible to perceptive players
+  - "Prepare lie" → Pre-write a deceptive statement for upcoming conversation
+  - "Signal ally" → Set up a secret signal with another player
+- [ ] **Preparation Slots** — Limited number of preparations based on level/wisdom
+- [ ] **Preparation Reveal** — Preparations only revealed when used or detected by perception
+- [ ] **Preparation Cooldowns** — Can't re-prepare immediately after use
+
+##### Awareness & Perception System
+- [ ] **Passive Perception** — Auto-calculated from wisdom + agility + level
+- [ ] **Perception Checks** — Automatic rolls when nearby players prepare/execute hidden actions
+- [ ] **Awareness Levels:**
+  - **Oblivious** (low perception): No warnings, easily surprised
+  - **Alert** (mid perception): "You sense something is off" hints
+  - **Vigilant** (high perception): "Player X reached into their cloak" — partial reveal
+  - **Hawkeye** (max perception): Full action detection — "Player X concealed a dagger"
+- [ ] **Perception Modifiers** — Environment (dark = harder), fatigue, distraction, magic
+- [ ] **Detection Notifications** — Private alerts to perceptive players about suspicious actions
+- [ ] **Counter-Actions** — If you detect a threat, unlock reactive options (dodge, block, call out, counter-attack)
+
+##### Action Resolution
+- [ ] **Stat Check Rolls** — Actions resolved via stat checks (attacker stat vs defender stat)
+- [ ] **Surprise Bonus** — Undetected actions get +3 to stat check
+- [ ] **Consequence Engine** — Each action has success/fail outcomes defined by campaign creator
+- [ ] **Witness System** — Other nearby players may witness actions and gain knowledge/flags
+- [ ] **Reputation Impact** — Aggressive actions affect faction standing and NPC relationships
+- [ ] **Death/Injury from PvP** — Stab can wound or kill based on damage system (creator-configured lethality)
+
+**Database Addition:**
+| Table | Purpose | Key Columns |
+|-------|---------|-------------|
+| `rp_player_positions` | Player proximity in scene | `session_id`, `character_id`, `zone` (far/mid/close/adjacent), `relative_to_character_id`, `updated_at` |
+| `rp_prepared_actions` | Pre-planned hidden actions | `session_id`, `character_id`, `action_type`, `target_character_id`, `item_id`, `preparation` (JSONB), `is_revealed`, `prepared_at` |
+| `rp_action_log` | All executed actions | `session_id`, `actor_id`, `target_id`, `action_type`, `stat_check_result`, `was_detected`, `outcome` (JSONB), `witnesses` (JSONB), `executed_at` |
+| `rp_perception_events` | Detection alerts | `session_id`, `observer_id`, `target_id`, `perception_roll`, `detection_level` (oblivious/alert/vigilant/hawkeye), `message`, `created_at` |
+
+**Action Categories & Requirements:**
+| Action | Range | Requires Item? | Requires Skill? | Detectable? |
+|--------|-------|---------------|-----------------|-------------|
+| Stab | Adjacent | Bladed weapon | Combat ≥ 3 | Perception vs Stealth |
+| Stab from behind | Adjacent | Concealed blade | Stealth ≥ 5 | Perception vs Stealth+2 |
+| Whisper | Close | No | — | Perception ≥ 7 to overhear |
+| Lie | Close/Mid | No | Charisma ≥ 4 | Wisdom vs Charisma |
+| Scream/Shout | Any | No | — | Always detected |
+| Pickpocket | Adjacent | No | Agility ≥ 6 | Perception vs Agility |
+| Throw item | Mid+ | Throwable item | Agility ≥ 3 | Always visible |
+| Block path | Close | No | Strength ≥ 4 | Always visible |
+| Follow silently | Mid | No | Stealth ≥ 5 | Perception vs Stealth |
+| Hide item on person | Self | Item | Stealth ≥ 3 | Not until used |
+| Signal ally | Far+ | No | — | Perception ≥ 5 |
+
+##### Creator Tools for PvP Interactions
+- [ ] **Interaction Zone Editor** — Define which scenes allow PvP interactions
+- [ ] **Lethality Settings** — Per-campaign: no-kill, wound-only, permadeath
+- [ ] **Custom Action Builder** — Creators add campaign-specific actions with custom requirements
+- [ ] **Consequence Templates** — Pre-built outcomes (wound, betray, ally, escape) creators can assign
+- [ ] **PvP Toggle** — Campaign-level setting to enable/disable player-vs-player actions
+
+---
+
+#### 13. Suggestion & Hint System
+A dynamic hint system that nudges players toward interesting paths — whether they follow or ignore hints affects the campaign trajectory and can trigger random events.
+
+##### Hint Mechanics
+- [ ] **Context-Aware Suggestions** — System analyzes player state (stats, inventory, flags, position) and suggests relevant actions
+- [ ] **Hint Types:**
+  - 🧭 **Direction hints** — "The eastern path seems less traveled..." (navigation)
+  - ⚔️ **Action hints** — "Your blade could serve you well here..." (combat/stealth)
+  - 🗣️ **Social hints** — "Perhaps diplomacy would yield better results..." (persuasion)
+  - 🔍 **Discovery hints** — "Something glints in the corner of your eye..." (exploration)
+  - ⚠️ **Warning hints** — "Your instincts tell you to be cautious..." (danger ahead)
+- [ ] **Hint Frequency** — Configurable per campaign (frequent/moderate/rare/none)
+- [ ] **Hint Accuracy** — Not all hints are helpful — some are traps or misdirection (creator-designed)
+
+##### Player Response & Consequences
+- [ ] **Follow Hint** — Player takes the suggested action → triggers "obedient path" outcomes
+- [ ] **Ignore Hint** — Player does something else → triggers "defiant path" outcomes
+- [ ] **Opposite Action** — Player deliberately does the opposite → triggers special "contrarian" events
+- [ ] **Hint Tracking** — Track how often a player follows/ignores hints (affects future hint accuracy)
+- [ ] **Hint as Random Event Trigger** — Hint responses serve as triggers for random events:
+  - Followed 3 hints in a row → "Guardian Angel" event (bonus)
+  - Ignored 3 hints in a row → "Lost Wanderer" event (penalty or surprise)
+  - Took opposite action → "Wildcard" random event
+
+##### Creator Hint Designer
+- [ ] **Hint Placement** — Attach hints to specific nodes, key points, or interaction zones
+- [ ] **Conditional Hints** — Hints only appear if certain conditions are met (stat threshold, item, flag)
+- [ ] **Hint Chains** — Sequence of hints that build toward a revelation or trap
+- [ ] **Red Herrings** — Deliberately misleading hints to test player judgment
+- [ ] **Multiplayer Divergent Hints** — Different players in same session get different/conflicting hints
+- [ ] **Hint Source Flavor** — Hints presented as: inner voice, companion whisper, environmental clue, divine sign
+
+**Database Addition:**
+| Table | Purpose | Key Columns |
+|-------|---------|-------------|
+| `rp_hints` | Hint definitions per campaign | `campaign_id`, `node_id`, `hint_type`, `hint_text`, `conditions` (JSONB), `follow_outcome` (JSONB), `ignore_outcome` (JSONB), `is_red_herring`, `source_flavor` |
+| `rp_hint_responses` | Player reactions to hints | `session_id`, `hint_id`, `character_id`, `response` (followed/ignored/opposite), `triggered_event_id`, `responded_at` |
+| `rp_hint_chains` | Linked hint sequences | `campaign_id`, `chain_name`, `hint_ids` (JSONB array), `completion_reward` (JSONB), `chain_order` |
+
+**Hint → Random Event Integration:**
+```
+Player receives hint: "The shadows whisper of danger ahead..."
+  ├─ Follows (takes cautious route) → No ambush, +5 XP, hint streak +1
+  ├─ Ignores (walks straight through) → 60% chance ambush random event fires
+  └─ Opposite (charges into shadows) → Triggers "Reckless Bravery" event
+       ├─ If Strength ≥ 6: Defeat ambushers, +30 XP, rare item drop
+       └─ If Strength < 6: Captured, injury, lose item
+```
+
+---
+
+### Implementation Phases (Advanced Systems — continued)
+
+**Phase 8: Player Physical Interactions**
+- [ ] Proximity tracking system with zone mechanics
+- [ ] Movement action UI (stop/walk/run/approach)
+- [ ] Physical action system with inventory + skill gates
+- [ ] Action preparation mechanic (hide knife, ready bow)
+- [ ] Perception and awareness engine
+- [ ] Action resolution with stat check rolls
+- [ ] Witness and detection notification system
+- [ ] Creator PvP tools (lethality settings, interaction zones, custom actions)
+
+**Phase 9: Hint & Suggestion Engine**
+- [ ] Context-aware hint generation based on player state
+- [ ] Hint response tracking (follow/ignore/opposite)
+- [ ] Hint → random event trigger integration
+- [ ] Creator hint designer with placement and conditions
+- [ ] Red herring and hint chain support
+- [ ] Multiplayer divergent hints
+
+---
+
+#### 14. Campaign Universe Mode — Original vs ThouArt Variation
+Creators choose whether their campaign uses the official ThouArt universe rules or an entirely original custom world system.
+
+##### Universe Mode Selection (Campaign Creation)
+- [ ] **Universe Toggle** — "ThouArt Variation" or "Original Universe" selected at campaign creation
+- [ ] **ThouArt Variation Mode:**
+  - Uses existing `almanac_races`, `almanac_magic`, factions, relics, etc.
+  - Stat system follows standard ThouArt rules
+  - Lore references auto-link to the Witness Almanac
+  - Community lore entries also available
+- [ ] **Original Universe Mode:**
+  - Creator defines **everything** from scratch
+  - Custom races, magic systems, beliefs, factions, physics, rules
+  - No cross-references to ThouArt almanac
+  - Fully self-contained universe
+
+##### Custom World Builder (Original Mode)
+- [ ] **Custom Races** — Name, description, stat bonuses, lore, portrait
+- [ ] **Custom Magic Systems** — Define magic types, casting rules, costs, effects
+- [ ] **Custom Beliefs/Religions** — Deity pantheons, rituals, divine powers, alignment effects
+- [ ] **Custom Factions** — Organizations with goals, ranks, perks, conflicts
+- [ ] **Custom Items & Weapons** — Define unique weapons, armor, consumables, artifacts
+- [ ] **Custom Stat Systems** — Override default stats (rename, add, remove stat categories)
+- [ ] **World Rules Document** — Free-text world bible that players see before joining
+- [ ] **Custom Titles & Ranks** — Rank hierarchies unique to the universe
+
+**Database Addition:**
+| Table | Purpose | Key Columns |
+|-------|---------|-------------|
+| `rp_campaign_universe` | Universe settings per campaign | `campaign_id`, `mode` (thouart/original), `world_name`, `world_description`, `rules_document`, `custom_stats` (JSONB) |
+| `rp_custom_races` | Creator-defined races | `campaign_id`, `name`, `description`, `stat_bonuses` (JSONB), `image_url`, `lore` |
+| `rp_custom_magic` | Creator-defined magic systems | `campaign_id`, `name`, `magic_type`, `rules`, `casting_cost` (JSONB), `effects` (JSONB) |
+| `rp_custom_beliefs` | Creator-defined religions/beliefs | `campaign_id`, `name`, `deity_name`, `description`, `rituals` (JSONB), `divine_powers` (JSONB) |
+| `rp_custom_items` | Creator-defined items | `campaign_id`, `name`, `item_type`, `description`, `effects` (JSONB), `rarity`, `icon_url` |
+
+---
+
+#### 15. Interaction Points — Relationship-Driven Events & Hidden Combat
+Interaction Points (IP) between players accumulate from all interactions and **dynamically unlock situations, events, and forced choices**.
+
+##### Interaction Point Accumulation
+- [ ] **Auto-Calculated IP** — Every interaction between two characters adjusts their IP score:
+  - Helped in combat → +15 IP
+  - Shared item → +10 IP
+  - Lied successfully → -5 IP (if discovered later: -20 IP)
+  - Stole from → -25 IP
+  - Saved their life → +30 IP
+  - Betrayed → -50 IP
+  - Whispered secret → +5 to +15 IP depending on value
+- [ ] **IP Thresholds** — Crossing thresholds triggers creator-defined events:
+  - **-75 to -100: Blood Feud** → Forced confrontation event
+  - **-50 to -74: Hostile** → "Kill or be killed" scenarios become available
+  - **-25 to -49: Distrustful** → Perception bonus against them, limited cooperation
+  - **-24 to +24: Neutral** → Standard interactions
+  - **+25 to +49: Friendly** → Share hints, cooperative bonuses
+  - **+50 to +74: Bonded** → Unlock duo abilities, shared quests
+  - **+75 to +100: Sworn** → Sacrifice events, combined stat checks, unbreakable alliance mechanics
+
+##### IP-Triggered Scenarios
+- [ ] **Forced Choice Events** — When IP is deeply negative, creator can trigger:
+  - "Choose who lives" — pick between two characters to save
+  - "Duel to the death" — mandatory PvP with no escape
+  - "Betray your ally or lose everything" — faction loyalty vs personal bond
+- [ ] **Alliance Events** — When IP is highly positive:
+  - "Combined strength" — merge stat checks for powerful joint actions
+  - "Shield wall" — one player can absorb damage for the other
+  - "Shared vision" — see each other's hints temporarily
+- [ ] **IP-Based Path Unlocks** — Certain story branches only available at specific IP thresholds
+
+##### Hidden Combat & Fog of War
+- [ ] **Hidden Stats in Combat** — Players do NOT see each other's ability scores during encounters
+- [ ] **Blind Decisions** — Must judge opponents based on:
+  - Visible equipment (armor, weapons)
+  - Prior interactions (did they seem strong?)
+  - Reputation/rumors from NPCs
+  - Their own perception skill
+- [ ] **Bluff System** — Players can bluff their strength:
+  - "Flex" action → Charisma check to appear stronger than you are
+  - "Feign weakness" → Stealth check to appear weaker (lure into trap)
+- [ ] **Combat Reveal** — Stats only revealed after combat resolves (post-fight summary)
+- [ ] **Scouting** — Spend a turn to attempt perception check → partial stat reveal ("They seem agile but frail")
+
+##### Free-Text Input → Dynamic Skill Calculation
+- [ ] **Open Input Actions** — Players can type custom actions instead of choosing from a list
+- [ ] **Action Parsing Engine** — System analyzes free-text input and calculates:
+  - Which stat(s) are required (e.g., "I try to climb the wall" → Agility + Strength)
+  - Difficulty rating based on context
+  - Required items (e.g., "I pick the lock" → needs lockpick in inventory)
+  - IP adjustment if targeting another player
+- [ ] **Interaction Input** — When interacting with another player via free text:
+  - "I compliment their armor" → Charisma check, +3 IP if passed
+  - "I secretly pocket their coin purse" → Agility + Stealth check, -25 IP if caught
+  - "I offer to share my food" → No check, +5 IP
+- [ ] **Creator Overrides** — Campaign creator can pre-define custom input responses for specific scenarios
+- [ ] **Fallback Resolution** — If input doesn't match any pattern, default to nearest stat check + narrator description
+
+**Database Addition:**
+| Table | Purpose | Key Columns |
+|-------|---------|-------------|
+| `rp_interaction_points` | IP score between character pairs | `session_id`, `character_a_id`, `character_b_id`, `score`, `last_interaction`, `updated_at` |
+| `rp_ip_events` | Events triggered by IP thresholds | `campaign_id`, `threshold_min`, `threshold_max`, `event_type`, `event_payload` (JSONB), `is_mandatory` |
+| `rp_ip_history` | Full log of IP changes | `session_id`, `character_a_id`, `character_b_id`, `change`, `reason`, `source_action_id`, `created_at` |
+| `rp_free_text_actions` | Player free-text input log | `session_id`, `character_id`, `input_text`, `parsed_stats` (JSONB), `difficulty`, `result`, `ip_change`, `created_at` |
+| `rp_combat_encounters` | PvP/PvE combat instances | `session_id`, `participants` (JSONB), `combat_type`, `stats_hidden`, `outcome` (JSONB), `started_at`, `resolved_at` |
+
+**Free-Text → Skill Mapping Examples:**
+| Player Input | Parsed Stats | Difficulty | Item Required? |
+|-------------|-------------|-----------|----------------|
+| "I climb the wall quietly" | Agility + Stealth | Medium | No |
+| "I stab him while he sleeps" | Stealth + Combat | Hard | Bladed weapon |
+| "I convince the guard to let us pass" | Charisma + Wisdom | Medium | No |
+| "I forge a document to enter the city" | Wisdom + Agility | Hard | Paper + Ink |
+| "I challenge him to an arm wrestle" | Strength | Easy | No |
+| "I pray to the old gods for guidance" | Wisdom + Magic | Varies | Belief alignment |
+
+---
+
+### Implementation Phases (Advanced Systems — continued)
+
+**Phase 10: Universe Mode & World Builder**
+- [ ] Universe toggle in campaign creation (ThouArt vs Original)
+- [ ] Custom race, magic, belief, faction, and item builders
+- [ ] World rules document editor
+- [ ] Custom stat system override
+
+**Phase 11: Interaction Points & Hidden Combat**
+- [ ] IP accumulation engine from all player interactions
+- [ ] IP threshold event triggers (forced choices, alliances, duels)
+- [ ] Hidden stats during combat encounters
+- [ ] Bluff and scouting mechanics
+- [ ] Free-text input parser with dynamic skill calculation
+- [ ] IP-based path unlocks in story progression
 
 ---
 
@@ -228,9 +709,9 @@ A choose-your-adventure roleplay experience where users create characters and em
 ### Gamification & Progression
 
 #### Experience & Leveling
-- [ ] **XP System** — Earn XP for completing nodes, finishing campaigns, making choices
-- [ ] **Character Levels** — Level up at XP thresholds (100, 300, 600, 1000...)
-- [ ] **Level Benefits** — Unlock stat points, new ability slots, cosmetic titles
+- [x] **XP System** — Earn XP for completing nodes, finishing campaigns, making choices
+- [x] **Character Levels** — Level up at XP thresholds (100, 300, 600, 1000...)
+- [x] **Level Benefits** — Unlock stat points, new ability slots, cosmetic titles
 - [ ] **XP Bonuses** — Bonus XP for first completions, difficult paths, group play
 
 **XP Awards:**
@@ -248,6 +729,7 @@ A choose-your-adventure roleplay experience where users create characters and em
 - [ ] **Inventory Slots** — Limited inventory (expand with levels)
 - [ ] **Item Effects** — Consumables, stat boosters, quest items
 - [ ] **Item Trading** — Trade items between characters (future)
+- [ ] **Item Requirements** — Nodes can require specific items to proceed
 
 **Database Addition:**
 | Table | Purpose | Key Columns |
@@ -261,6 +743,7 @@ A choose-your-adventure roleplay experience where users create characters and em
 - [ ] **Respawn System** — Default: restart from last checkpoint node
 - [ ] **Injury System** — Temporary stat penalties instead of death
 - [ ] **Legacy System** — Dead characters leave items/bonuses for next character
+- [ ] **Character Graveyard** — Display "fallen" characters with death context
 
 **Failure Handling:**
 - Soft fail: Retry the node with different choice
@@ -275,6 +758,7 @@ A choose-your-adventure roleplay experience where users create characters and em
 - [ ] **Explorer** — Visit 50 unique story nodes
 - [ ] **Charismatic** — Pass 10 Charisma checks
 - [ ] **Completionist** — See all endings of a campaign
+- [ ] **Worldbuilder** — Have 5 lore proposals approved
 
 ---
 
@@ -285,6 +769,7 @@ A choose-your-adventure roleplay experience where users create characters and em
 - [ ] **Inline Images** — Embed images within narrative text
 - [ ] **Image Library** — Campaign creators upload to dedicated bucket
 - [ ] **Stock Art Integration** — Curated fantasy art for common scenes
+- [ ] **Node Preview Thumbnails** — Thumbnails in campaign editor
 
 **Storage:**
 - Bucket: `rp-campaign-assets` (public, with RLS per campaign author)
@@ -296,6 +781,7 @@ A choose-your-adventure roleplay experience where users create characters and em
 - [ ] **Sound Effects** — Trigger sounds on choice selection
 - [ ] **Audio Library** — Pre-approved royalty-free tracks
 - [ ] **Custom Audio Upload** — Authors upload their own (with moderation)
+- [ ] **Volume Controls** — User-adjustable music/SFX volume
 
 **Audio Categories:**
 - Ambient (forest, tavern, dungeon, storm)
@@ -307,6 +793,7 @@ A choose-your-adventure roleplay experience where users create characters and em
 - [ ] **Expression Variants** — Happy, angry, sad, neutral per NPC
 - [ ] **Portrait Position** — Left, right, or center of narrative text
 - [ ] **Animated Portraits** — Subtle idle animations (future)
+- [ ] **NPC Voice Lines** — Optional text-to-speech or audio clips
 
 **Database Addition:**
 | Table | Purpose | Key Columns |
@@ -381,6 +868,32 @@ Draft v1 → Publish → Draft v2 (edit) → Publish v2
   ]
 }
 ```
+
+---
+
+### Community Lore Almanac
+
+> **Important:** The official Witness Almanac is author-curated only. Community-approved lore lives in a separate "Community Lore Almanac."
+
+#### Community Lore Tables
+| Table | Purpose | Key Columns |
+|-------|---------|-------------|
+| `community_lore_races` | Approved community races | `proposal_id`, `name`, `description`, `homeland`, `image_url`, `created_by` |
+| `community_lore_locations` | Approved community locations | `proposal_id`, `name`, `description`, `location_type`, `image_url`, `created_by` |
+| `community_lore_items` | Approved community items | `proposal_id`, `name`, `description`, `item_type`, `rarity`, `effect`, `created_by` |
+| `community_lore_factions` | Approved community factions | `proposal_id`, `name`, `description`, `faction_type`, `image_url`, `created_by` |
+| `community_lore_abilities` | Approved community abilities | `proposal_id`, `name`, `description`, `rarity`, `effect`, `created_by` |
+| `community_lore_concepts` | Approved community concepts | `proposal_id`, `name`, `description`, `concept_type`, `created_by` |
+
+#### Features
+- [ ] **Community Lore Page** — Browse all approved community lore entries
+- [ ] **Category Tabs** — Filter by races, locations, items, factions, abilities, concepts
+- [ ] **Contributor Attribution** — Show "Created by @username" on each entry
+- [ ] **Search & Filter** — Search community lore by name, creator, or keywords
+- [ ] **Link to Original Proposal** — View the original proposal with Loremaster notes
+- [ ] **Use in Campaigns** — Campaign creators can reference community lore in nodes
+- [ ] **Community Lore Stats** — Total entries, top contributors, recent additions
+- [ ] **Featured Community Lore** — Loremaster-highlighted exceptional entries
 
 ---
 
@@ -552,6 +1065,16 @@ Draft v1 → Publish → Draft v2 (edit) → Publish v2
 - [ ] **Rate Limiting** - Prevent spam and abuse on forms
 - [ ] **Error Boundary Components** - Graceful error handling throughout app
 - [x] **Skeleton Loaders Everywhere** - Consistent staggered loading states on all pages
+ - [x] **Grid/List Toggle** - View mode toggle for Books page with optimized images
+ 
+ ### Lore Chronicles Game System
+ - [x] **Character Creation Wizard** - Multi-step wizard with race selection, stat allocation, and backstory
+ - [x] **Character Sheet View** - D&D-style character sheet with stats, XP, and adventure history
+ - [x] **Campaign Creator** - Create campaigns with title, description, genre, and difficulty
+ - [x] **Campaign Node Editor** - Visual editor for creating/editing story nodes with choices
+ - [x] **Story Player** - Play campaigns with choice-based navigation and stat checks
+ - [x] **Session Management** - Start, save, and resume campaign sessions
+ - [x] **Campaign Browser** - Browse and filter published campaigns by genre/difficulty
 
 ---
 

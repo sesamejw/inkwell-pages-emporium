@@ -16,6 +16,7 @@ import {
   X,
   BookOpen,
   MessageSquare,
+  Sparkles,
 } from "lucide-react";
 import thouartLogo from "@/assets/thouart-logo.png";
 import { ThemeToggle } from "./ThemeToggle";
@@ -36,6 +37,7 @@ export const Header = () => {
   const navigation = [
     { name: "Books", href: "/books", icon: BookOpen },
     { name: "Community", href: "/community", icon: MessageSquare },
+   { name: "Lore Chronicles", href: "/lore-chronicles", icon: Sparkles },
   ];
 
   const isActive = (path: string) => location.pathname === path;

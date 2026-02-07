@@ -1928,6 +1928,7 @@ export type Database = {
           full_name: string | null
           id: string
           last_active: string | null
+          lore_contributions: number | null
           total_forum_posts: number
           total_forum_replies: number
           updated_at: string
@@ -1939,6 +1940,7 @@ export type Database = {
           full_name?: string | null
           id: string
           last_active?: string | null
+          lore_contributions?: number | null
           total_forum_posts?: number
           total_forum_replies?: number
           updated_at?: string
@@ -1950,6 +1952,7 @@ export type Database = {
           full_name?: string | null
           id?: string
           last_active?: string | null
+          lore_contributions?: number | null
           total_forum_posts?: number
           total_forum_replies?: number
           updated_at?: string
@@ -2100,6 +2103,1016 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      rp_abilities: {
+        Row: {
+          ability_type: string
+          created_at: string
+          description: string
+          icon: string | null
+          id: string
+          name: string
+          rarity: string
+          stat_bonus: Json | null
+          unlock_requirements: Json | null
+        }
+        Insert: {
+          ability_type?: string
+          created_at?: string
+          description: string
+          icon?: string | null
+          id?: string
+          name: string
+          rarity?: string
+          stat_bonus?: Json | null
+          unlock_requirements?: Json | null
+        }
+        Update: {
+          ability_type?: string
+          created_at?: string
+          description?: string
+          icon?: string | null
+          id?: string
+          name?: string
+          rarity?: string
+          stat_bonus?: Json | null
+          unlock_requirements?: Json | null
+        }
+        Relationships: []
+      }
+      rp_campaign_npcs: {
+        Row: {
+          campaign_id: string
+          created_at: string
+          description: string | null
+          expressions: Json | null
+          id: string
+          name: string
+          portrait_url: string | null
+        }
+        Insert: {
+          campaign_id: string
+          created_at?: string
+          description?: string | null
+          expressions?: Json | null
+          id?: string
+          name: string
+          portrait_url?: string | null
+        }
+        Update: {
+          campaign_id?: string
+          created_at?: string
+          description?: string | null
+          expressions?: Json | null
+          id?: string
+          name?: string
+          portrait_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rp_campaign_npcs_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "rp_campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rp_campaign_reviews: {
+        Row: {
+          campaign_id: string
+          content: string | null
+          created_at: string
+          id: string
+          rating: number
+          title: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          campaign_id: string
+          content?: string | null
+          created_at?: string
+          id?: string
+          rating: number
+          title?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          campaign_id?: string
+          content?: string | null
+          created_at?: string
+          id?: string
+          rating?: number
+          title?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rp_campaign_reviews_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "rp_campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rp_campaigns: {
+        Row: {
+          author_id: string
+          average_rating: number | null
+          cover_image_url: string | null
+          created_at: string
+          description: string | null
+          difficulty: string
+          estimated_duration: number | null
+          genre: string
+          id: string
+          is_featured: boolean
+          is_published: boolean
+          play_count: number
+          review_count: number | null
+          start_node_id: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          author_id: string
+          average_rating?: number | null
+          cover_image_url?: string | null
+          created_at?: string
+          description?: string | null
+          difficulty?: string
+          estimated_duration?: number | null
+          genre?: string
+          id?: string
+          is_featured?: boolean
+          is_published?: boolean
+          play_count?: number
+          review_count?: number | null
+          start_node_id?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string
+          average_rating?: number | null
+          cover_image_url?: string | null
+          created_at?: string
+          description?: string | null
+          difficulty?: string
+          estimated_duration?: number | null
+          genre?: string
+          id?: string
+          is_featured?: boolean
+          is_published?: boolean
+          play_count?: number
+          review_count?: number | null
+          start_node_id?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rp_campaigns_start_node_fkey"
+            columns: ["start_node_id"]
+            isOneToOne: false
+            referencedRelation: "rp_story_nodes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rp_character_abilities: {
+        Row: {
+          ability_id: string | null
+          ability_name: string
+          character_id: string
+          description: string | null
+          id: string
+          source_node_id: string | null
+          source_session_id: string | null
+          unlocked_at: string
+        }
+        Insert: {
+          ability_id?: string | null
+          ability_name: string
+          character_id: string
+          description?: string | null
+          id?: string
+          source_node_id?: string | null
+          source_session_id?: string | null
+          unlocked_at?: string
+        }
+        Update: {
+          ability_id?: string | null
+          ability_name?: string
+          character_id?: string
+          description?: string | null
+          id?: string
+          source_node_id?: string | null
+          source_session_id?: string | null
+          unlocked_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rp_character_abilities_ability_id_fkey"
+            columns: ["ability_id"]
+            isOneToOne: false
+            referencedRelation: "rp_abilities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rp_character_abilities_character_id_fkey"
+            columns: ["character_id"]
+            isOneToOne: false
+            referencedRelation: "rp_characters"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rp_character_abilities_source_session_id_fkey"
+            columns: ["source_session_id"]
+            isOneToOne: false
+            referencedRelation: "rp_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rp_character_factions: {
+        Row: {
+          character_id: string
+          faction_id: string
+          id: string
+          joined_at: string | null
+          rank: string | null
+          reputation: number
+          updated_at: string
+        }
+        Insert: {
+          character_id: string
+          faction_id: string
+          id?: string
+          joined_at?: string | null
+          rank?: string | null
+          reputation?: number
+          updated_at?: string
+        }
+        Update: {
+          character_id?: string
+          faction_id?: string
+          id?: string
+          joined_at?: string | null
+          rank?: string | null
+          reputation?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rp_character_factions_character_id_fkey"
+            columns: ["character_id"]
+            isOneToOne: false
+            referencedRelation: "rp_characters"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rp_character_factions_faction_id_fkey"
+            columns: ["faction_id"]
+            isOneToOne: false
+            referencedRelation: "rp_factions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rp_character_inventory: {
+        Row: {
+          acquired_at: string
+          character_id: string
+          id: string
+          item_id: string
+          quantity: number
+          source_node_id: string | null
+        }
+        Insert: {
+          acquired_at?: string
+          character_id: string
+          id?: string
+          item_id: string
+          quantity?: number
+          source_node_id?: string | null
+        }
+        Update: {
+          acquired_at?: string
+          character_id?: string
+          id?: string
+          item_id?: string
+          quantity?: number
+          source_node_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rp_character_inventory_character_id_fkey"
+            columns: ["character_id"]
+            isOneToOne: false
+            referencedRelation: "rp_characters"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rp_character_inventory_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "rp_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rp_character_progress: {
+        Row: {
+          character_id: string
+          current_node_id: string | null
+          id: string
+          nodes_visited: string[] | null
+          session_id: string
+          stats_snapshot: Json
+          story_flags: Json
+          updated_at: string
+          xp_earned: number
+        }
+        Insert: {
+          character_id: string
+          current_node_id?: string | null
+          id?: string
+          nodes_visited?: string[] | null
+          session_id: string
+          stats_snapshot?: Json
+          story_flags?: Json
+          updated_at?: string
+          xp_earned?: number
+        }
+        Update: {
+          character_id?: string
+          current_node_id?: string | null
+          id?: string
+          nodes_visited?: string[] | null
+          session_id?: string
+          stats_snapshot?: Json
+          story_flags?: Json
+          updated_at?: string
+          xp_earned?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rp_character_progress_character_id_fkey"
+            columns: ["character_id"]
+            isOneToOne: false
+            referencedRelation: "rp_characters"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rp_character_progress_current_node_id_fkey"
+            columns: ["current_node_id"]
+            isOneToOne: false
+            referencedRelation: "rp_story_nodes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rp_character_progress_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "rp_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rp_characters: {
+        Row: {
+          ability_slots: number
+          backstory: string | null
+          created_at: string
+          current_session_id: string | null
+          id: string
+          is_active: boolean
+          is_public: boolean | null
+          level: number
+          name: string
+          portrait_url: string | null
+          race_id: string | null
+          stats: Json
+          title: string | null
+          updated_at: string
+          user_id: string
+          xp: number
+        }
+        Insert: {
+          ability_slots?: number
+          backstory?: string | null
+          created_at?: string
+          current_session_id?: string | null
+          id?: string
+          is_active?: boolean
+          is_public?: boolean | null
+          level?: number
+          name: string
+          portrait_url?: string | null
+          race_id?: string | null
+          stats?: Json
+          title?: string | null
+          updated_at?: string
+          user_id: string
+          xp?: number
+        }
+        Update: {
+          ability_slots?: number
+          backstory?: string | null
+          created_at?: string
+          current_session_id?: string | null
+          id?: string
+          is_active?: boolean
+          is_public?: boolean | null
+          level?: number
+          name?: string
+          portrait_url?: string | null
+          race_id?: string | null
+          stats?: Json
+          title?: string | null
+          updated_at?: string
+          user_id?: string
+          xp?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rp_characters_race_id_fkey"
+            columns: ["race_id"]
+            isOneToOne: false
+            referencedRelation: "almanac_races"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rp_characters_session_fkey"
+            columns: ["current_session_id"]
+            isOneToOne: false
+            referencedRelation: "rp_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rp_community_lore: {
+        Row: {
+          approved_at: string
+          approved_by: string | null
+          article: string | null
+          category: string
+          created_at: string
+          creator_id: string
+          description: string
+          id: string
+          image_url: string | null
+          is_featured: boolean | null
+          name: string
+          proposal_id: string | null
+          updated_at: string
+          view_count: number | null
+        }
+        Insert: {
+          approved_at?: string
+          approved_by?: string | null
+          article?: string | null
+          category: string
+          created_at?: string
+          creator_id: string
+          description: string
+          id?: string
+          image_url?: string | null
+          is_featured?: boolean | null
+          name: string
+          proposal_id?: string | null
+          updated_at?: string
+          view_count?: number | null
+        }
+        Update: {
+          approved_at?: string
+          approved_by?: string | null
+          article?: string | null
+          category?: string
+          created_at?: string
+          creator_id?: string
+          description?: string
+          id?: string
+          image_url?: string | null
+          is_featured?: boolean | null
+          name?: string
+          proposal_id?: string | null
+          updated_at?: string
+          view_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rp_community_lore_proposal_id_fkey"
+            columns: ["proposal_id"]
+            isOneToOne: false
+            referencedRelation: "rp_lore_proposals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rp_factions: {
+        Row: {
+          color: string | null
+          created_at: string
+          description: string
+          id: string
+          image_url: string | null
+          name: string
+          reputation_levels: Json | null
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          description: string
+          id?: string
+          image_url?: string | null
+          name: string
+          reputation_levels?: Json | null
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          description?: string
+          id?: string
+          image_url?: string | null
+          name?: string
+          reputation_levels?: Json | null
+        }
+        Relationships: []
+      }
+      rp_items: {
+        Row: {
+          created_at: string
+          description: string | null
+          effect: Json | null
+          icon_url: string | null
+          id: string
+          item_type: string
+          name: string
+          rarity: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          effect?: Json | null
+          icon_url?: string | null
+          id?: string
+          item_type?: string
+          name: string
+          rarity?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          effect?: Json | null
+          icon_url?: string | null
+          id?: string
+          item_type?: string
+          name?: string
+          rarity?: string
+        }
+        Relationships: []
+      }
+      rp_level_benefits: {
+        Row: {
+          ability_slots_granted: number
+          description: string | null
+          id: string
+          level: number
+          stat_points_granted: number
+          title: string | null
+          xp_required: number
+        }
+        Insert: {
+          ability_slots_granted?: number
+          description?: string | null
+          id?: string
+          level: number
+          stat_points_granted?: number
+          title?: string | null
+          xp_required: number
+        }
+        Update: {
+          ability_slots_granted?: number
+          description?: string | null
+          id?: string
+          level?: number
+          stat_points_granted?: number
+          title?: string | null
+          xp_required?: number
+        }
+        Relationships: []
+      }
+      rp_lore_proposals: {
+        Row: {
+          category: string
+          content: Json
+          created_at: string
+          id: string
+          reviewed_at: string | null
+          reviewer_id: string | null
+          reviewer_notes: string | null
+          status: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category: string
+          content?: Json
+          created_at?: string
+          id?: string
+          reviewed_at?: string | null
+          reviewer_id?: string | null
+          reviewer_notes?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: string
+          content?: Json
+          created_at?: string
+          id?: string
+          reviewed_at?: string | null
+          reviewer_id?: string | null
+          reviewer_notes?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      rp_loremasters: {
+        Row: {
+          appointed_at: string
+          appointed_by: string | null
+          id: string
+          user_id: string
+        }
+        Insert: {
+          appointed_at?: string
+          appointed_by?: string | null
+          id?: string
+          user_id: string
+        }
+        Update: {
+          appointed_at?: string
+          appointed_by?: string | null
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      rp_node_choices: {
+        Row: {
+          choice_text: string
+          created_at: string
+          id: string
+          item_requirement: string | null
+          item_reward: string | null
+          node_id: string
+          order_index: number
+          stat_effect: Json | null
+          stat_requirement: Json | null
+          target_node_id: string | null
+        }
+        Insert: {
+          choice_text: string
+          created_at?: string
+          id?: string
+          item_requirement?: string | null
+          item_reward?: string | null
+          node_id: string
+          order_index?: number
+          stat_effect?: Json | null
+          stat_requirement?: Json | null
+          target_node_id?: string | null
+        }
+        Update: {
+          choice_text?: string
+          created_at?: string
+          id?: string
+          item_requirement?: string | null
+          item_reward?: string | null
+          node_id?: string
+          order_index?: number
+          stat_effect?: Json | null
+          stat_requirement?: Json | null
+          target_node_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rp_node_choices_item_requirement_fkey"
+            columns: ["item_requirement"]
+            isOneToOne: false
+            referencedRelation: "rp_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rp_node_choices_item_reward_fkey"
+            columns: ["item_reward"]
+            isOneToOne: false
+            referencedRelation: "rp_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rp_node_choices_node_id_fkey"
+            columns: ["node_id"]
+            isOneToOne: false
+            referencedRelation: "rp_story_nodes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rp_node_choices_target_node_id_fkey"
+            columns: ["target_node_id"]
+            isOneToOne: false
+            referencedRelation: "rp_story_nodes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rp_node_media: {
+        Row: {
+          created_at: string
+          id: string
+          media_type: string
+          node_id: string
+          position: string | null
+          should_loop: boolean | null
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          media_type: string
+          node_id: string
+          position?: string | null
+          should_loop?: boolean | null
+          url: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          media_type?: string
+          node_id?: string
+          position?: string | null
+          should_loop?: boolean | null
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rp_node_media_node_id_fkey"
+            columns: ["node_id"]
+            isOneToOne: false
+            referencedRelation: "rp_story_nodes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rp_session_invitations: {
+        Row: {
+          created_at: string | null
+          id: string
+          invited_by: string
+          invited_user_id: string
+          responded_at: string | null
+          session_id: string
+          status: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          invited_by: string
+          invited_user_id: string
+          responded_at?: string | null
+          session_id: string
+          status?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          invited_by?: string
+          invited_user_id?: string
+          responded_at?: string | null
+          session_id?: string
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rp_session_invitations_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "rp_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rp_session_messages: {
+        Row: {
+          content: string
+          created_at: string | null
+          id: string
+          message_type: string | null
+          metadata: Json | null
+          session_id: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          id?: string
+          message_type?: string | null
+          metadata?: Json | null
+          session_id: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          id?: string
+          message_type?: string | null
+          metadata?: Json | null
+          session_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rp_session_messages_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "rp_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rp_session_participants: {
+        Row: {
+          character_id: string
+          id: string
+          is_active: boolean
+          joined_at: string
+          session_id: string
+        }
+        Insert: {
+          character_id: string
+          id?: string
+          is_active?: boolean
+          joined_at?: string
+          session_id: string
+        }
+        Update: {
+          character_id?: string
+          id?: string
+          is_active?: boolean
+          joined_at?: string
+          session_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rp_session_participants_character_id_fkey"
+            columns: ["character_id"]
+            isOneToOne: false
+            referencedRelation: "rp_characters"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rp_session_participants_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "rp_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rp_sessions: {
+        Row: {
+          campaign_id: string
+          completed_at: string | null
+          created_by: string
+          current_node_id: string | null
+          current_turn_player_id: string | null
+          id: string
+          last_played_at: string
+          max_players: number | null
+          mode: string
+          session_code: string | null
+          started_at: string
+          status: string
+          story_flags: Json
+          turn_deadline: string | null
+          turn_order: string[] | null
+        }
+        Insert: {
+          campaign_id: string
+          completed_at?: string | null
+          created_by: string
+          current_node_id?: string | null
+          current_turn_player_id?: string | null
+          id?: string
+          last_played_at?: string
+          max_players?: number | null
+          mode?: string
+          session_code?: string | null
+          started_at?: string
+          status?: string
+          story_flags?: Json
+          turn_deadline?: string | null
+          turn_order?: string[] | null
+        }
+        Update: {
+          campaign_id?: string
+          completed_at?: string | null
+          created_by?: string
+          current_node_id?: string | null
+          current_turn_player_id?: string | null
+          id?: string
+          last_played_at?: string
+          max_players?: number | null
+          mode?: string
+          session_code?: string | null
+          started_at?: string
+          status?: string
+          story_flags?: Json
+          turn_deadline?: string | null
+          turn_order?: string[] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rp_sessions_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "rp_campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rp_sessions_current_node_id_fkey"
+            columns: ["current_node_id"]
+            isOneToOne: false
+            referencedRelation: "rp_story_nodes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rp_story_nodes: {
+        Row: {
+          audio_url: string | null
+          campaign_id: string
+          content: Json
+          created_at: string
+          id: string
+          image_url: string | null
+          node_type: string
+          position_x: number
+          position_y: number
+          title: string | null
+          updated_at: string
+          xp_reward: number
+        }
+        Insert: {
+          audio_url?: string | null
+          campaign_id: string
+          content?: Json
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          node_type?: string
+          position_x?: number
+          position_y?: number
+          title?: string | null
+          updated_at?: string
+          xp_reward?: number
+        }
+        Update: {
+          audio_url?: string | null
+          campaign_id?: string
+          content?: Json
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          node_type?: string
+          position_x?: number
+          position_y?: number
+          title?: string | null
+          updated_at?: string
+          xp_reward?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rp_story_nodes_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "rp_campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       social_notifications: {
         Row: {
@@ -2620,6 +3633,8 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      generate_session_code: { Args: never; Returns: string }
+      get_level_from_xp: { Args: { xp_amount: number }; Returns: number }
       get_submission_comments_count: {
         Args: { submission_uuid: string }
         Returns: number
@@ -2628,6 +3643,7 @@ export type Database = {
         Args: { submission_uuid: string }
         Returns: number
       }
+      get_xp_for_next_level: { Args: { current_xp: number }; Returns: number }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
