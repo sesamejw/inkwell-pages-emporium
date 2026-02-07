@@ -2615,6 +2615,50 @@ export type Database = {
           },
         ]
       }
+      rp_event_triggers: {
+        Row: {
+          campaign_id: string
+          conditions: Json
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          name: string
+          trigger_type: string
+          updated_at: string
+        }
+        Insert: {
+          campaign_id: string
+          conditions?: Json
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          trigger_type: string
+          updated_at?: string
+        }
+        Update: {
+          campaign_id?: string
+          conditions?: Json
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          trigger_type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rp_event_triggers_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "rp_campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       rp_factions: {
         Row: {
           color: string | null
@@ -2677,6 +2721,108 @@ export type Database = {
           rarity?: string
         }
         Relationships: []
+      }
+      rp_key_point_paths: {
+        Row: {
+          conditions: Json | null
+          created_at: string
+          id: string
+          path_type: string
+          source_key_point_id: string
+          target_key_point_id: string
+          weight: number
+        }
+        Insert: {
+          conditions?: Json | null
+          created_at?: string
+          id?: string
+          path_type?: string
+          source_key_point_id: string
+          target_key_point_id: string
+          weight?: number
+        }
+        Update: {
+          conditions?: Json | null
+          created_at?: string
+          id?: string
+          path_type?: string
+          source_key_point_id?: string
+          target_key_point_id?: string
+          weight?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rp_key_point_paths_source_key_point_id_fkey"
+            columns: ["source_key_point_id"]
+            isOneToOne: false
+            referencedRelation: "rp_key_points"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rp_key_point_paths_target_key_point_id_fkey"
+            columns: ["target_key_point_id"]
+            isOneToOne: false
+            referencedRelation: "rp_key_points"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rp_key_points: {
+        Row: {
+          campaign_id: string
+          conditions: Json | null
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string | null
+          is_required: boolean
+          node_id: string | null
+          order_index: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          campaign_id: string
+          conditions?: Json | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_required?: boolean
+          node_id?: string | null
+          order_index?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          campaign_id?: string
+          conditions?: Json | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_required?: boolean
+          node_id?: string | null
+          order_index?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rp_key_points_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "rp_campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rp_key_points_node_id_fkey"
+            columns: ["node_id"]
+            isOneToOne: false
+            referencedRelation: "rp_story_nodes"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       rp_level_benefits: {
         Row: {
@@ -2992,6 +3138,55 @@ export type Database = {
           },
         ]
       }
+      rp_session_trigger_log: {
+        Row: {
+          character_id: string | null
+          context: Json | null
+          fired_at: string
+          id: string
+          session_id: string
+          trigger_id: string
+        }
+        Insert: {
+          character_id?: string | null
+          context?: Json | null
+          fired_at?: string
+          id?: string
+          session_id: string
+          trigger_id: string
+        }
+        Update: {
+          character_id?: string | null
+          context?: Json | null
+          fired_at?: string
+          id?: string
+          session_id?: string
+          trigger_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rp_session_trigger_log_character_id_fkey"
+            columns: ["character_id"]
+            isOneToOne: false
+            referencedRelation: "rp_characters"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rp_session_trigger_log_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "rp_sessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rp_session_trigger_log_trigger_id_fkey"
+            columns: ["trigger_id"]
+            isOneToOne: false
+            referencedRelation: "rp_event_triggers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       rp_sessions: {
         Row: {
           campaign_id: string
@@ -3110,6 +3305,51 @@ export type Database = {
             columns: ["campaign_id"]
             isOneToOne: false
             referencedRelation: "rp_campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rp_triggered_events: {
+        Row: {
+          campaign_id: string
+          created_at: string
+          event_type: string
+          id: string
+          name: string
+          payload: Json
+          trigger_id: string
+        }
+        Insert: {
+          campaign_id: string
+          created_at?: string
+          event_type: string
+          id?: string
+          name: string
+          payload?: Json
+          trigger_id: string
+        }
+        Update: {
+          campaign_id?: string
+          created_at?: string
+          event_type?: string
+          id?: string
+          name?: string
+          payload?: Json
+          trigger_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rp_triggered_events_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "rp_campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rp_triggered_events_trigger_id_fkey"
+            columns: ["trigger_id"]
+            isOneToOne: false
+            referencedRelation: "rp_event_triggers"
             referencedColumns: ["id"]
           },
         ]

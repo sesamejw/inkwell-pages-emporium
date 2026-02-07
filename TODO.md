@@ -61,9 +61,9 @@ A choose-your-adventure roleplay experience where users create characters and em
 #### 5. Loremaster Role
 - [x] **Loremaster Permissions** — Special role for trusted users/admins
 - [x] **Moderation Dashboard** — Review proposals, flag content, feature campaigns
-- [ ] **Universe Consistency Tools** — Check new lore against existing almanac
+- [x] **Universe Consistency Tools** — Check new lore against existing almanac
 - [x] **Loremaster Applications** — Users can apply for the role
-- [ ] **Loremaster Leaderboard** — Track reviews completed by each Loremaster
+- [x] **Loremaster Leaderboard** — Track reviews completed by each Loremaster
 
 ---
 

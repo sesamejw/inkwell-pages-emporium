@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Scroll, Sparkles, MapPin, Sword, Users, Wand2, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useLoreProposals, ProposalCategory, LoreProposalContent } from "@/hooks/useLoreProposals";
 import { useAuth } from "@/contexts/AuthContext";
+import { useLoreConflictChecker } from "@/hooks/useLoreConflictChecker";
+import { LoreConflictWarnings } from "@/components/lore-chronicles/LoreConflictWarnings";
+import { useDebounce } from "@/hooks/useDebounce";
 
 const CATEGORIES: { value: ProposalCategory; label: string; icon: React.ReactNode; description: string }[] = [
   { value: "race", label: "Race", icon: <Users className="h-5 w-5" />, description: "A new playable race for characters" },
@@ -26,6 +29,7 @@ interface Props {
 export const LoreProposalForm = ({ onSuccess }: Props) => {
   const { user } = useAuth();
   const { createProposal } = useLoreProposals();
+  const { conflicts, checkConflicts } = useLoreConflictChecker();
   const [submitting, setSubmitting] = useState(false);
   const [category, setCategory] = useState<ProposalCategory | "">("");
   const [title, setTitle] = useState("");
@@ -34,6 +38,14 @@ export const LoreProposalForm = ({ onSuccess }: Props) => {
     description: "",
     details: ""
   });
+  
+  const debouncedName = useDebounce(content.name, 500);
+  
+  useEffect(() => {
+    if (debouncedName) {
+      checkConflicts(debouncedName, category || undefined);
+    }
+  }, [debouncedName, category, checkConflicts]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -133,6 +145,8 @@ export const LoreProposalForm = ({ onSuccess }: Props) => {
               placeholder="Enter the name"
               required
             />
+            {/* Universe Consistency Check */}
+            <LoreConflictWarnings conflicts={conflicts} />
           </div>
 
           {/* Description */}

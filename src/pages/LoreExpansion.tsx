@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Scroll, FileText, Shield, Sparkles, ArrowLeft, UserPlus } from "lucide-react";
+import { Scroll, FileText, Shield, Sparkles, ArrowLeft, UserPlus, Trophy } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -12,6 +12,7 @@ import { MyProposalsList } from "@/components/lore-chronicles/MyProposalsList";
 import { LoremasterDashboard } from "@/components/lore-chronicles/LoremasterDashboard";
 import { LoremasterApplicationForm } from "@/components/lore-chronicles/LoremasterApplicationForm";
 import { LoremasterApplicationsReview } from "@/components/lore-chronicles/LoremasterApplicationsReview";
+import { LoremasterLeaderboard } from "@/components/lore-chronicles/LoremasterLeaderboard";
 import { useLoreProposals } from "@/hooks/useLoreProposals";
 import { useLoremasterApplications } from "@/hooks/useLoremasterApplications";
 
@@ -62,7 +63,7 @@ const LoreExpansion = () => {
       <section className="py-8 px-4">
         <div className="container mx-auto max-w-4xl">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className={`grid w-full max-w-xl mx-auto mb-8 ${isLoremaster || isAdmin ? 'grid-cols-5' : 'grid-cols-4'}`}>
+            <TabsList className={`grid w-full max-w-2xl mx-auto mb-8 ${isLoremaster || isAdmin ? 'grid-cols-6' : 'grid-cols-5'}`}>
               <TabsTrigger value="submit" className="gap-2">
                 <Sparkles className="h-4 w-4" />
                 <span className="hidden sm:inline">Submit</span>
@@ -74,6 +75,10 @@ const LoreExpansion = () => {
               <TabsTrigger value="apply" className="gap-2">
                 <UserPlus className="h-4 w-4" />
                 <span className="hidden sm:inline">Apply</span>
+              </TabsTrigger>
+              <TabsTrigger value="leaderboard" className="gap-2">
+                <Trophy className="h-4 w-4" />
+                <span className="hidden sm:inline">Leaderboard</span>
               </TabsTrigger>
               {isLoremaster && (
                 <TabsTrigger value="review" className="gap-2 relative">
@@ -123,6 +128,10 @@ const LoreExpansion = () => {
 
             <TabsContent value="apply">
               <LoremasterApplicationForm />
+            </TabsContent>
+
+            <TabsContent value="leaderboard">
+              <LoremasterLeaderboard />
             </TabsContent>
 
             {isLoremaster && (
