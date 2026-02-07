@@ -2140,6 +2140,138 @@ export type Database = {
         }
         Relationships: []
       }
+      rp_action_definitions: {
+        Row: {
+          action_type: string
+          campaign_id: string
+          category: string | null
+          cooldown_turns: number | null
+          created_at: string
+          description: string | null
+          detection_difficulty: number | null
+          failure_effect: Json | null
+          id: string
+          is_detectable: boolean | null
+          is_enabled: boolean
+          name: string
+          required_item: string | null
+          required_range: string
+          required_stat: string | null
+          required_stat_value: number | null
+          success_effect: Json | null
+        }
+        Insert: {
+          action_type: string
+          campaign_id: string
+          category?: string | null
+          cooldown_turns?: number | null
+          created_at?: string
+          description?: string | null
+          detection_difficulty?: number | null
+          failure_effect?: Json | null
+          id?: string
+          is_detectable?: boolean | null
+          is_enabled?: boolean
+          name: string
+          required_item?: string | null
+          required_range?: string
+          required_stat?: string | null
+          required_stat_value?: number | null
+          success_effect?: Json | null
+        }
+        Update: {
+          action_type?: string
+          campaign_id?: string
+          category?: string | null
+          cooldown_turns?: number | null
+          created_at?: string
+          description?: string | null
+          detection_difficulty?: number | null
+          failure_effect?: Json | null
+          id?: string
+          is_detectable?: boolean | null
+          is_enabled?: boolean
+          name?: string
+          required_item?: string | null
+          required_range?: string
+          required_stat?: string | null
+          required_stat_value?: number | null
+          success_effect?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rp_action_definitions_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "rp_campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rp_action_log: {
+        Row: {
+          action_category: string | null
+          action_type: string
+          actor_id: string
+          executed_at: string
+          id: string
+          outcome: Json | null
+          session_id: string
+          stat_check_result: Json | null
+          target_id: string | null
+          was_detected: boolean | null
+          witnesses: Json | null
+        }
+        Insert: {
+          action_category?: string | null
+          action_type: string
+          actor_id: string
+          executed_at?: string
+          id?: string
+          outcome?: Json | null
+          session_id: string
+          stat_check_result?: Json | null
+          target_id?: string | null
+          was_detected?: boolean | null
+          witnesses?: Json | null
+        }
+        Update: {
+          action_category?: string | null
+          action_type?: string
+          actor_id?: string
+          executed_at?: string
+          id?: string
+          outcome?: Json | null
+          session_id?: string
+          stat_check_result?: Json | null
+          target_id?: string | null
+          was_detected?: boolean | null
+          witnesses?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rp_action_log_actor_id_fkey"
+            columns: ["actor_id"]
+            isOneToOne: false
+            referencedRelation: "rp_characters"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rp_action_log_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "rp_sessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rp_action_log_target_id_fkey"
+            columns: ["target_id"]
+            isOneToOne: false
+            referencedRelation: "rp_characters"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       rp_campaign_entry_points: {
         Row: {
           campaign_id: string
@@ -2404,6 +2536,102 @@ export type Database = {
             columns: ["start_node_id"]
             isOneToOne: false
             referencedRelation: "rp_story_nodes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rp_cascade_log: {
+        Row: {
+          applied_at: string
+          cascade_rule_id: string
+          character_id: string
+          context: Json
+          id: string
+          session_id: string
+        }
+        Insert: {
+          applied_at?: string
+          cascade_rule_id: string
+          character_id: string
+          context?: Json
+          id?: string
+          session_id: string
+        }
+        Update: {
+          applied_at?: string
+          cascade_rule_id?: string
+          character_id?: string
+          context?: Json
+          id?: string
+          session_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rp_cascade_log_cascade_rule_id_fkey"
+            columns: ["cascade_rule_id"]
+            isOneToOne: false
+            referencedRelation: "rp_cascade_rules"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rp_cascade_log_character_id_fkey"
+            columns: ["character_id"]
+            isOneToOne: false
+            referencedRelation: "rp_characters"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rp_cascade_log_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "rp_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rp_cascade_rules: {
+        Row: {
+          campaign_id: string
+          created_at: string
+          effect_type: string
+          effect_value: Json
+          id: string
+          is_active: boolean
+          priority: number
+          source_interaction_id: string
+          source_outcome_type: string
+          target_interaction_id: string
+        }
+        Insert: {
+          campaign_id: string
+          created_at?: string
+          effect_type?: string
+          effect_value?: Json
+          id?: string
+          is_active?: boolean
+          priority?: number
+          source_interaction_id: string
+          source_outcome_type?: string
+          target_interaction_id: string
+        }
+        Update: {
+          campaign_id?: string
+          created_at?: string
+          effect_type?: string
+          effect_value?: Json
+          id?: string
+          is_active?: boolean
+          priority?: number
+          source_interaction_id?: string
+          source_outcome_type?: string
+          target_interaction_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rp_cascade_rules_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "rp_campaigns"
             referencedColumns: ["id"]
           },
         ]
@@ -2805,36 +3033,61 @@ export type Database = {
       }
       rp_convergence_nodes: {
         Row: {
+          ally_node_id: string | null
           campaign_id: string
           convergence_type: string
           created_at: string | null
           description: string | null
+          enemy_node_id: string | null
           id: string
+          is_reconvergence: boolean
           name: string
+          neutral_node_id: string | null
           node_id: string
+          reconverge_order: number
           required_entry_points: Json | null
+          split_from_convergence_id: string | null
         }
         Insert: {
+          ally_node_id?: string | null
           campaign_id: string
           convergence_type?: string
           created_at?: string | null
           description?: string | null
+          enemy_node_id?: string | null
           id?: string
+          is_reconvergence?: boolean
           name: string
+          neutral_node_id?: string | null
           node_id: string
+          reconverge_order?: number
           required_entry_points?: Json | null
+          split_from_convergence_id?: string | null
         }
         Update: {
+          ally_node_id?: string | null
           campaign_id?: string
           convergence_type?: string
           created_at?: string | null
           description?: string | null
+          enemy_node_id?: string | null
           id?: string
+          is_reconvergence?: boolean
           name?: string
+          neutral_node_id?: string | null
           node_id?: string
+          reconverge_order?: number
           required_entry_points?: Json | null
+          split_from_convergence_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "rp_convergence_nodes_ally_node_id_fkey"
+            columns: ["ally_node_id"]
+            isOneToOne: false
+            referencedRelation: "rp_story_nodes"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "rp_convergence_nodes_campaign_id_fkey"
             columns: ["campaign_id"]
@@ -2843,10 +3096,31 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "rp_convergence_nodes_enemy_node_id_fkey"
+            columns: ["enemy_node_id"]
+            isOneToOne: false
+            referencedRelation: "rp_story_nodes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rp_convergence_nodes_neutral_node_id_fkey"
+            columns: ["neutral_node_id"]
+            isOneToOne: false
+            referencedRelation: "rp_story_nodes"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "rp_convergence_nodes_node_id_fkey"
             columns: ["node_id"]
             isOneToOne: false
             referencedRelation: "rp_story_nodes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rp_convergence_nodes_split_from_convergence_id_fkey"
+            columns: ["split_from_convergence_id"]
+            isOneToOne: false
+            referencedRelation: "rp_convergence_nodes"
             referencedColumns: ["id"]
           },
         ]
@@ -3028,6 +3302,55 @@ export type Database = {
         }
         Relationships: []
       }
+      rp_free_text_responses: {
+        Row: {
+          character_id: string
+          created_at: string
+          id: string
+          node_id: string
+          response_text: string
+          session_id: string
+        }
+        Insert: {
+          character_id: string
+          created_at?: string
+          id?: string
+          node_id: string
+          response_text: string
+          session_id: string
+        }
+        Update: {
+          character_id?: string
+          created_at?: string
+          id?: string
+          node_id?: string
+          response_text?: string
+          session_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rp_free_text_responses_character_id_fkey"
+            columns: ["character_id"]
+            isOneToOne: false
+            referencedRelation: "rp_characters"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rp_free_text_responses_node_id_fkey"
+            columns: ["node_id"]
+            isOneToOne: false
+            referencedRelation: "rp_story_nodes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rp_free_text_responses_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "rp_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       rp_interaction_log: {
         Row: {
           context: Json | null
@@ -3187,6 +3510,54 @@ export type Database = {
           },
           {
             foreignKeyName: "rp_interaction_points_node_id_fkey"
+            columns: ["node_id"]
+            isOneToOne: false
+            referencedRelation: "rp_story_nodes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rp_interaction_zones: {
+        Row: {
+          campaign_id: string
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          name: string
+          node_id: string | null
+          zone_type: string
+        }
+        Insert: {
+          campaign_id: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          node_id?: string | null
+          zone_type?: string
+        }
+        Update: {
+          campaign_id?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          node_id?: string | null
+          zone_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rp_interaction_zones_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "rp_campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rp_interaction_zones_node_id_fkey"
             columns: ["node_id"]
             isOneToOne: false
             referencedRelation: "rp_story_nodes"
@@ -3524,6 +3895,240 @@ export type Database = {
             columns: ["node_id"]
             isOneToOne: false
             referencedRelation: "rp_story_nodes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rp_perception_events: {
+        Row: {
+          created_at: string
+          detection_level: string
+          id: string
+          is_read: boolean
+          message: string | null
+          observer_id: string
+          perception_roll: number | null
+          session_id: string
+          target_id: string
+        }
+        Insert: {
+          created_at?: string
+          detection_level?: string
+          id?: string
+          is_read?: boolean
+          message?: string | null
+          observer_id: string
+          perception_roll?: number | null
+          session_id: string
+          target_id: string
+        }
+        Update: {
+          created_at?: string
+          detection_level?: string
+          id?: string
+          is_read?: boolean
+          message?: string | null
+          observer_id?: string
+          perception_roll?: number | null
+          session_id?: string
+          target_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rp_perception_events_observer_id_fkey"
+            columns: ["observer_id"]
+            isOneToOne: false
+            referencedRelation: "rp_characters"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rp_perception_events_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "rp_sessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rp_perception_events_target_id_fkey"
+            columns: ["target_id"]
+            isOneToOne: false
+            referencedRelation: "rp_characters"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rp_player_positions: {
+        Row: {
+          character_id: string
+          created_at: string
+          id: string
+          position_x: number | null
+          position_y: number | null
+          relative_to_character_id: string | null
+          scene_node_id: string | null
+          session_id: string
+          updated_at: string
+          zone: string
+        }
+        Insert: {
+          character_id: string
+          created_at?: string
+          id?: string
+          position_x?: number | null
+          position_y?: number | null
+          relative_to_character_id?: string | null
+          scene_node_id?: string | null
+          session_id: string
+          updated_at?: string
+          zone?: string
+        }
+        Update: {
+          character_id?: string
+          created_at?: string
+          id?: string
+          position_x?: number | null
+          position_y?: number | null
+          relative_to_character_id?: string | null
+          scene_node_id?: string | null
+          session_id?: string
+          updated_at?: string
+          zone?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rp_player_positions_character_id_fkey"
+            columns: ["character_id"]
+            isOneToOne: false
+            referencedRelation: "rp_characters"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rp_player_positions_relative_to_character_id_fkey"
+            columns: ["relative_to_character_id"]
+            isOneToOne: false
+            referencedRelation: "rp_characters"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rp_player_positions_scene_node_id_fkey"
+            columns: ["scene_node_id"]
+            isOneToOne: false
+            referencedRelation: "rp_story_nodes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rp_player_positions_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "rp_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rp_prepared_actions: {
+        Row: {
+          action_type: string
+          character_id: string
+          cooldown_until: string | null
+          id: string
+          is_revealed: boolean
+          is_used: boolean
+          item_id: string | null
+          preparation: Json | null
+          prepared_at: string
+          session_id: string
+          target_character_id: string | null
+        }
+        Insert: {
+          action_type: string
+          character_id: string
+          cooldown_until?: string | null
+          id?: string
+          is_revealed?: boolean
+          is_used?: boolean
+          item_id?: string | null
+          preparation?: Json | null
+          prepared_at?: string
+          session_id: string
+          target_character_id?: string | null
+        }
+        Update: {
+          action_type?: string
+          character_id?: string
+          cooldown_until?: string | null
+          id?: string
+          is_revealed?: boolean
+          is_used?: boolean
+          item_id?: string | null
+          preparation?: Json | null
+          prepared_at?: string
+          session_id?: string
+          target_character_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rp_prepared_actions_character_id_fkey"
+            columns: ["character_id"]
+            isOneToOne: false
+            referencedRelation: "rp_characters"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rp_prepared_actions_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "rp_sessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rp_prepared_actions_target_character_id_fkey"
+            columns: ["target_character_id"]
+            isOneToOne: false
+            referencedRelation: "rp_characters"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rp_pvp_settings: {
+        Row: {
+          campaign_id: string
+          created_at: string
+          friendly_fire: boolean
+          id: string
+          lethality_mode: string
+          pvp_enabled: boolean
+          pvp_zones_only: boolean
+          require_consent: boolean
+          updated_at: string
+        }
+        Insert: {
+          campaign_id: string
+          created_at?: string
+          friendly_fire?: boolean
+          id?: string
+          lethality_mode?: string
+          pvp_enabled?: boolean
+          pvp_zones_only?: boolean
+          require_consent?: boolean
+          updated_at?: string
+        }
+        Update: {
+          campaign_id?: string
+          created_at?: string
+          friendly_fire?: boolean
+          id?: string
+          lethality_mode?: string
+          pvp_enabled?: boolean
+          pvp_zones_only?: boolean
+          require_consent?: boolean
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rp_pvp_settings_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: true
+            referencedRelation: "rp_campaigns"
             referencedColumns: ["id"]
           },
         ]
@@ -3881,10 +4486,12 @@ export type Database = {
       }
       rp_story_nodes: {
         Row: {
+          allows_free_text: boolean
           audio_url: string | null
           campaign_id: string
           content: Json
           created_at: string
+          free_text_prompt: string | null
           id: string
           image_url: string | null
           node_type: string
@@ -3895,10 +4502,12 @@ export type Database = {
           xp_reward: number
         }
         Insert: {
+          allows_free_text?: boolean
           audio_url?: string | null
           campaign_id: string
           content?: Json
           created_at?: string
+          free_text_prompt?: string | null
           id?: string
           image_url?: string | null
           node_type?: string
@@ -3909,10 +4518,12 @@ export type Database = {
           xp_reward?: number
         }
         Update: {
+          allows_free_text?: boolean
           audio_url?: string | null
           campaign_id?: string
           content?: Json
           created_at?: string
+          free_text_prompt?: string | null
           id?: string
           image_url?: string | null
           node_type?: string

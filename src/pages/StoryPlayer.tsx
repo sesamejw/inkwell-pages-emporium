@@ -1,16 +1,17 @@
- import { useState, useEffect } from "react";
- import { useNavigate, useParams } from "react-router-dom";
- import { motion, AnimatePresence } from "framer-motion";
- import { ArrowLeft, BookOpen, Lock, Sparkles, User, CheckCircle, XCircle } from "lucide-react";
- import { Button } from "@/components/ui/button";
- import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
- import { Badge } from "@/components/ui/badge";
- import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
- import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
- import { supabase } from "@/integrations/supabase/client";
- import { useAuth } from "@/contexts/AuthContext";
- import { useLoreChronicles, RpCampaign, RpStoryNode, RpNodeChoice, RpCharacter, CharacterStats } from "@/hooks/useLoreChronicles";
- import { toast } from "@/hooks/use-toast";
+  import { useState, useEffect } from "react";
+  import { useNavigate, useParams } from "react-router-dom";
+  import { motion, AnimatePresence } from "framer-motion";
+  import { ArrowLeft, BookOpen, Lock, Sparkles, User, CheckCircle, XCircle } from "lucide-react";
+  import { Button } from "@/components/ui/button";
+  import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+  import { Badge } from "@/components/ui/badge";
+  import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+  import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+  import { supabase } from "@/integrations/supabase/client";
+  import { useAuth } from "@/contexts/AuthContext";
+  import { useLoreChronicles, RpCampaign, RpStoryNode, RpNodeChoice, RpCharacter, CharacterStats } from "@/hooks/useLoreChronicles";
+  import { toast } from "@/hooks/use-toast";
+  import { FreeTextInput } from "@/components/lore-chronicles/FreeTextInput";
  
  const StoryPlayer = () => {
    const { campaignId } = useParams<{ campaignId: string }>();
@@ -388,68 +389,110 @@
                  </CardContent>
                </Card>
  
-               {/* Choices */}
-               {choices.length > 0 ? (
-                 <div className="space-y-3">
-                   {choices.map((choice, index) => {
-                     const { available, reason } = canMakeChoice(choice);
-                     
-                     return (
-                       <motion.div
-                         key={choice.id}
-                         initial={{ opacity: 0, x: -20 }}
-                         animate={{ opacity: 1, x: 0 }}
-                         transition={{ delay: index * 0.1 }}
-                       >
-                         <Button
-                           variant={available ? "outline" : "ghost"}
-                           className={`w-full justify-start text-left h-auto py-4 px-6 ${
-                             !available ? "opacity-50" : "hover:bg-primary/10 hover:border-primary"
-                           }`}
-                           onClick={() => available && makeChoice(choice)}
-                           disabled={processing || !available}
-                         >
-                           <div className="flex items-start gap-3 w-full">
-                             {!available && <Lock className="h-4 w-4 mt-0.5 shrink-0" />}
-                             <div className="flex-1">
-                               <p>{choice.choice_text}</p>
-                               {reason && (
-                                 <p className="text-xs text-muted-foreground mt-1">{reason}</p>
-                               )}
-                               {choice.stat_effect && available && (
-                                 <div className="flex gap-2 mt-2">
-                                   {Object.entries(choice.stat_effect).map(([stat, value]) => (
-                                     <Badge 
-                                       key={stat} 
-                                       variant="secondary" 
-                                       className="text-xs"
-                                     >
-                                      {stat}: {typeof value === "number" && value > 0 ? "+" : ""}{String(value)}
-                                     </Badge>
-                                   ))}
-                                 </div>
-                               )}
-                             </div>
-                           </div>
-                         </Button>
-                       </motion.div>
-                     );
-                   })}
-                 </div>
-               ) : currentNode.node_type === "ending" ? (
-                 <Card className="text-center py-8 border-primary">
-                   <CardContent>
-                     <CheckCircle className="h-16 w-16 text-primary mx-auto mb-4" />
-                     <h3 className="text-2xl font-bold mb-2">The End</h3>
-                     <p className="text-muted-foreground mb-6">
-                       Your adventure has concluded. Well done, hero!
-                     </p>
-                     <Button onClick={() => navigate('/lore-chronicles')}>
-                       Return to Lore Chronicles
-                     </Button>
-                   </CardContent>
-                 </Card>
-               ) : null}
+                {/* Choices */}
+                {choices.length > 0 ? (
+                  <div className="space-y-3">
+                    {choices.map((choice, index) => {
+                      const { available, reason } = canMakeChoice(choice);
+                      
+                      return (
+                        <motion.div
+                          key={choice.id}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: index * 0.1 }}
+                        >
+                          <Button
+                            variant={available ? "outline" : "ghost"}
+                            className={`w-full justify-start text-left h-auto py-4 px-6 ${
+                              !available ? "opacity-50" : "hover:bg-primary/10 hover:border-primary"
+                            }`}
+                            onClick={() => available && makeChoice(choice)}
+                            disabled={processing || !available}
+                          >
+                            <div className="flex items-start gap-3 w-full">
+                              {!available && <Lock className="h-4 w-4 mt-0.5 shrink-0" />}
+                              <div className="flex-1">
+                                <p>{choice.choice_text}</p>
+                                {reason && (
+                                  <p className="text-xs text-muted-foreground mt-1">{reason}</p>
+                                )}
+                                {choice.stat_effect && available && (
+                                  <div className="flex gap-2 mt-2">
+                                    {Object.entries(choice.stat_effect).map(([stat, value]) => (
+                                      <Badge 
+                                        key={stat} 
+                                        variant="secondary" 
+                                        className="text-xs"
+                                      >
+                                       {stat}: {typeof value === "number" && value > 0 ? "+" : ""}{String(value)}
+                                      </Badge>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </Button>
+                        </motion.div>
+                      );
+                    })}
+                  </div>
+                ) : null}
+
+                {/* Free-Text Input */}
+                {(currentNode as any).allows_free_text && (
+                  <FreeTextInput
+                    prompt={(currentNode as any).free_text_prompt}
+                    disabled={processing}
+                    onSubmit={async (text) => {
+                      if (!sessionId || !selectedCharacter || !currentNode) return;
+                      setProcessing(true);
+                      
+                      await supabase.from("rp_free_text_responses").insert({
+                        session_id: sessionId,
+                        character_id: selectedCharacter.id,
+                        node_id: currentNode.id,
+                        response_text: text,
+                      });
+
+                      // Store in story flags
+                      const { data: progress } = await supabase
+                        .from("rp_character_progress")
+                        .select("story_flags")
+                        .eq("session_id", sessionId)
+                        .eq("character_id", selectedCharacter.id)
+                        .single();
+
+                      const flags = (progress?.story_flags as Record<string, unknown>) || {};
+                      await supabase
+                        .from("rp_character_progress")
+                        .update({
+                          story_flags: JSON.parse(JSON.stringify({ ...flags, [`free_text_${currentNode.id}`]: text })),
+                        })
+                        .eq("session_id", sessionId)
+                        .eq("character_id", selectedCharacter.id);
+
+                      toast({ title: "Response recorded!" });
+                      setProcessing(false);
+                    }}
+                  />
+                )}
+
+                {/* Ending */}
+                {currentNode.node_type === "ending" && choices.length === 0 ? (
+                  <Card className="text-center py-8 border-primary">
+                    <CardContent>
+                      <CheckCircle className="h-16 w-16 text-primary mx-auto mb-4" />
+                      <h3 className="text-2xl font-bold mb-2">The End</h3>
+                      <p className="text-muted-foreground mb-6">
+                        Your adventure has concluded. Well done, hero!
+                      </p>
+                      <Button onClick={() => navigate('/lore-chronicles')}>
+                        Return to Lore Chronicles
+                      </Button>
+                    </CardContent>
+                  </Card>
+                ) : null}
              </motion.div>
            ) : !campaign?.start_node_id ? (
              <Card className="text-center py-12">

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { Sword, Users, BookOpen, Sparkles, Plus, Play, Scroll, Crown, Book, Trophy } from "lucide-react";
+import { Sword, Users, BookOpen, Sparkles, Plus, Play, Scroll, Crown, Book, Trophy, Shield, Flag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -14,6 +14,8 @@ import { JoinSessionDialog } from "@/components/lore-chronicles/JoinSessionDialo
 import { CharacterShowcase } from "@/components/lore-chronicles/CharacterShowcase";
 import { CommunityLoreAlmanac } from "@/components/lore-chronicles/CommunityLoreAlmanac";
 import { CharacterLeaderboard } from "@/components/lore-chronicles/CharacterLeaderboard";
+import { LoremasterDashboard } from "@/components/lore-chronicles/LoremasterDashboard";
+import { FactionLeaderboard } from "@/components/lore-chronicles/FactionLeaderboard";
 import { useLoreProposals } from "@/hooks/useLoreProposals";
  
  const LoreChronicles = () => {
@@ -159,57 +161,73 @@ import { useLoreProposals } from "@/hooks/useLoreProposals";
        <section className="py-8 px-4">
          <div className="container mx-auto">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid w-full max-w-3xl mx-auto grid-cols-6 mb-8">
-                <TabsTrigger value="campaigns" className="gap-2">
-                  <BookOpen className="h-4 w-4" />
-                  <span className="hidden sm:inline">Campaigns</span>
-                </TabsTrigger>
-                <TabsTrigger value="characters" className="gap-2">
-                  <Sword className="h-4 w-4" />
-                  <span className="hidden sm:inline">My Characters</span>
-                </TabsTrigger>
-                <TabsTrigger value="sessions" className="gap-2">
-                  <Play className="h-4 w-4" />
-                  <span className="hidden sm:inline">Sessions</span>
-                </TabsTrigger>
-                <TabsTrigger value="showcase" className="gap-2">
-                  <Crown className="h-4 w-4" />
-                  <span className="hidden sm:inline">Showcase</span>
-                </TabsTrigger>
-                <TabsTrigger value="leaderboard" className="gap-2">
-                  <Trophy className="h-4 w-4" />
-                  <span className="hidden sm:inline">Leaderboard</span>
-                </TabsTrigger>
-                <TabsTrigger value="lore" className="gap-2">
-                  <Book className="h-4 w-4" />
-                  <span className="hidden sm:inline">Lore</span>
-                </TabsTrigger>
-              </TabsList>
+             <TabsList className="grid w-full max-w-5xl mx-auto grid-cols-8 mb-8">
+                 <TabsTrigger value="campaigns" className="gap-2">
+                   <BookOpen className="h-4 w-4" />
+                   <span className="hidden sm:inline">Campaigns</span>
+                 </TabsTrigger>
+                 <TabsTrigger value="characters" className="gap-2">
+                   <Sword className="h-4 w-4" />
+                   <span className="hidden sm:inline">My Characters</span>
+                 </TabsTrigger>
+                 <TabsTrigger value="sessions" className="gap-2">
+                   <Play className="h-4 w-4" />
+                   <span className="hidden sm:inline">Sessions</span>
+                 </TabsTrigger>
+                 <TabsTrigger value="showcase" className="gap-2">
+                   <Crown className="h-4 w-4" />
+                   <span className="hidden sm:inline">Showcase</span>
+                 </TabsTrigger>
+                 <TabsTrigger value="leaderboard" className="gap-2">
+                   <Trophy className="h-4 w-4" />
+                   <span className="hidden sm:inline">Leaderboard</span>
+                 </TabsTrigger>
+                 <TabsTrigger value="factions" className="gap-2">
+                   <Flag className="h-4 w-4" />
+                   <span className="hidden sm:inline">Factions</span>
+                 </TabsTrigger>
+                 <TabsTrigger value="lore" className="gap-2">
+                   <Book className="h-4 w-4" />
+                   <span className="hidden sm:inline">Lore</span>
+                 </TabsTrigger>
+                 <TabsTrigger value="loremaster" className="gap-2">
+                   <Shield className="h-4 w-4" />
+                   <span className="hidden sm:inline">Loremaster</span>
+                 </TabsTrigger>
+               </TabsList>
 
-              <TabsContent value="campaigns">
-                <CampaignBrowser />
-              </TabsContent>
+               <TabsContent value="campaigns">
+                 <CampaignBrowser />
+               </TabsContent>
 
-              <TabsContent value="characters">
-                <CharacterList />
-              </TabsContent>
+               <TabsContent value="characters">
+                 <CharacterList />
+               </TabsContent>
 
-              <TabsContent value="sessions">
-                <ActiveSessions />
-              </TabsContent>
+               <TabsContent value="sessions">
+                 <ActiveSessions />
+               </TabsContent>
 
-              <TabsContent value="showcase">
-                <CharacterShowcase />
-              </TabsContent>
+               <TabsContent value="showcase">
+                 <CharacterShowcase />
+               </TabsContent>
 
-              <TabsContent value="leaderboard">
-                <CharacterLeaderboard />
-              </TabsContent>
+               <TabsContent value="leaderboard">
+                 <CharacterLeaderboard />
+               </TabsContent>
 
-              <TabsContent value="lore">
-                <CommunityLoreAlmanac />
-              </TabsContent>
-            </Tabs>
+               <TabsContent value="factions">
+                 <FactionLeaderboard />
+               </TabsContent>
+
+               <TabsContent value="lore">
+                 <CommunityLoreAlmanac />
+               </TabsContent>
+
+               <TabsContent value="loremaster">
+                 <LoremasterDashboard />
+               </TabsContent>
+             </Tabs>
          </div>
        </section>
  

@@ -205,7 +205,7 @@ A choose-your-adventure roleplay experience where users create characters and em
 - [x] Lore proposal submission form
 - [x] Loremaster dashboard with approval workflow
 - [x] Community Lore Almanac (separate from official Witness Almanac)
-- [ ] Automated lore conflict detection
+- [x] Automated lore conflict detection
 - [x] Loremaster application system
 - [x] Contributor recognition system
 
@@ -276,7 +276,7 @@ Character-to-character (and character-to-NPC) interactions that trigger **differ
 - [x] **Interaction History** — Track all interactions per character pair
 - [x] **Creator Outcome Designer** — UI for creators to design good/bad outcomes per interaction
 - [x] **Stat-Influenced Interactions** — Interaction results modified by participant stats
-- [ ] **Cascading Effects** — One interaction's outcome affects future available interactions
+- [x] **Cascading Effects** — One interaction's outcome affects future available interactions
 
 **Outcome Matrix Example:**
 ```
@@ -319,9 +319,9 @@ Each player starts from a **different campaign beginning** which later merges �
 - [x] **Convergence Conditions** — Creators define when/how paths collide (after X key points, specific triggers, etc.)
 - [x] **Prior Choice Impact** — Players' decisions before convergence determine their relationship at meeting
 - [x] **Alliance/Enemy Resolution** — Automatic determination: allies, enemies, or neutral based on faction, flags, and choices
-- [ ] **Post-Convergence Branching** — Story continues differently for allied vs enemy player groups
-- [ ] **Convergence Reveal UI** — Dramatic reveal moment when players discover each other's histories
-- [ ] **Split & Reconverge** — Paths can split and merge multiple times
+- [x] **Post-Convergence Branching** — Story continues differently for allied vs enemy player groups
+- [x] **Convergence Reveal UI** — Dramatic reveal moment when players discover each other's histories
+- [x] **Split & Reconverge** — Paths can split and merge multiple times
 
 **Convergence Flow:**
 ```
@@ -353,7 +353,7 @@ Factions within campaigns that players can join, betray, or destroy — affectin
 - [x] **Faction Perks** — High reputation unlocks faction-specific choices, items, abilities
 - [x] **Faction Betrayal** — Leaving/betraying a faction has severe consequences
 - [x] **Multiplayer Faction Wars** — In convergence, faction alignment determines ally/enemy status
-- [ ] **Faction Leaderboard** — Track which factions are most popular across all sessions
+- [x] **Faction Leaderboard** — Track which factions are most popular across all sessions
 
 **Database Addition:**
 | Table | Purpose | Key Columns |
@@ -370,19 +370,19 @@ Factions within campaigns that players can join, betray, or destroy — affectin
 - [x] Key Points system with conditional branching
 - [x] Event Trigger system with visual editor
 - [x] Random Events pool with condition builder
-- [ ] Free-text input handling for player responses
+- [x] Free-text input handling for player responses
 
 **Phase 6: Interaction & Consequences**
 - [x] Interaction Point system with dual outcomes
 - [x] Creator Outcome Designer UI
-- [ ] Cascading effects engine
+- [x] Cascading effects engine
 - [x] Interaction history tracking
 
 **Phase 7: Multiplayer Convergence**
 - [x] Multiple entry points per campaign
 - [x] Convergence node system
 - [x] Alliance/Enemy resolution engine
-- [ ] Convergence reveal UI
+- [x] Convergence reveal UI
 - [x] Faction system with reputation tracking
 - [x] Faction conflicts affecting multiplayer dynamics
 
@@ -390,9 +390,9 @@ Factions within campaigns that players can join, betray, or destroy — affectin
 Real-time physical and social interactions between players when they meet in multiplayer campaigns — proximity-based, skill-gated, and inventory-dependent.
 
 ##### Proximity Mechanics
-- [ ] **Proximity Tracking** — Track relative distance between players in a scene (close/mid/far)
-- [ ] **Movement Actions** — Players can: stop, walk, run, approach a specific player, retreat, circle around
-- [ ] **Proximity Zones** — Actions unlock based on distance:
+- [x] **Proximity Tracking** — Track relative distance between players in a scene (close/mid/far)
+- [x] **Movement Actions** — Players can: stop, walk, run, approach a specific player, retreat, circle around
+- [x] **Proximity Zones** — Actions unlock based on distance:
   - **Far** (10+ paces): Shout, signal, observe
   - **Mid** (3-9 paces): Speak normally, gesture, throw item
   - **Close** (1-2 paces): Whisper, hand item, grab, shove
@@ -469,11 +469,11 @@ Can player A "stab" player B?
 | Signal ally | Far+ | No | — | Perception ≥ 5 |
 
 ##### Creator Tools for PvP Interactions
-- [ ] **Interaction Zone Editor** — Define which scenes allow PvP interactions
-- [ ] **Lethality Settings** — Per-campaign: no-kill, wound-only, permadeath
+- [x] **Interaction Zone Editor** — Define which scenes allow PvP interactions
+- [x] **Lethality Settings** — Per-campaign: no-kill, wound-only, permadeath
 - [ ] **Custom Action Builder** — Creators add campaign-specific actions with custom requirements
 - [ ] **Consequence Templates** — Pre-built outcomes (wound, betray, ally, escape) creators can assign
-- [ ] **PvP Toggle** — Campaign-level setting to enable/disable player-vs-player actions
+- [x] **PvP Toggle** — Campaign-level setting to enable/disable player-vs-player actions
 
 ---
 
@@ -531,14 +531,14 @@ Player receives hint: "The shadows whisper of danger ahead..."
 ### Implementation Phases (Advanced Systems — continued)
 
 **Phase 8: Player Physical Interactions**
-- [ ] Proximity tracking system with zone mechanics
-- [ ] Movement action UI (stop/walk/run/approach)
+- [x] Proximity tracking system with zone mechanics
+- [x] Movement action UI (stop/walk/run/approach)
 - [ ] Physical action system with inventory + skill gates
 - [ ] Action preparation mechanic (hide knife, ready bow)
 - [ ] Perception and awareness engine
 - [ ] Action resolution with stat check rolls
 - [ ] Witness and detection notification system
-- [ ] Creator PvP tools (lethality settings, interaction zones, custom actions)
+- [x] Creator PvP tools (lethality settings, interaction zones, custom actions)
 
 **Phase 9: Hint & Suggestion Engine**
 - [ ] Context-aware hint generation based on player state
