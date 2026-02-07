@@ -3,7 +3,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   ArrowLeft, BookOpen, Lock, Sparkles, User, CheckCircle, XCircle, 
-  Users, Clock, Send, MessageSquare, Share2, Copy, Check
+  Users, Clock, Send, MessageSquare, Share2, Copy, Check,
+  Flag, Zap, PanelRight, PanelRightClose
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,6 +19,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLoreChronicles, RpCampaign, RpStoryNode, RpNodeChoice, RpCharacter, CharacterStats } from "@/hooks/useLoreChronicles";
 import { toast } from "@/hooks/use-toast";
+import { useSessionTriggers } from "@/hooks/useSessionTriggers";
+import { TriggerLog } from "@/components/lore-chronicles/TriggerLog";
+import { KeyPointProgress } from "@/components/lore-chronicles/KeyPointProgress";
 
 interface SessionParticipant {
   id: string;
@@ -75,7 +79,20 @@ const SessionPlayer = () => {
   const [processing, setProcessing] = useState(false);
   const [showInviteDialog, setShowInviteDialog] = useState(false);
   const [copiedCode, setCopiedCode] = useState(false);
-  const [sidePanel, setSidePanel] = useState<"chat" | "party">("party");
+  const [sidePanel, setSidePanel] = useState<"chat" | "party" | "triggers" | "milestones">("party");
+  const [showSidePanel, setShowSidePanel] = useState(true);
+  const [visitedNodeIds, setVisitedNodeIds] = useState<string[]>([]);
+  const [firedTriggerIds, setFiredTriggerIds] = useState<string[]>([]);
+  const [triggerMessages, setTriggerMessages] = useState<string[]>([]);
+
+  // Get campaign ID for triggers
+  const activeCampaignId = campaign?.id || session?.campaign_id || "";
+  const {
+    triggerLog,
+    loadTriggers,
+    loadTriggerLog,
+    evaluateTriggers,
+  } = useSessionTriggers(activeCampaignId);
 
   // Check if it's current player's turn in async/group mode
   const isMyTurn = useCallback(() => {
@@ -192,6 +209,20 @@ const SessionPlayer = () => {
       setShowCharacterSelect(true);
     }
   }, [campaign, user, session]);
+
+  // Load triggers when campaign is available
+  useEffect(() => {
+    if (activeCampaignId) {
+      loadTriggers();
+    }
+  }, [activeCampaignId, loadTriggers]);
+
+  // Load trigger log when session exists
+  useEffect(() => {
+    if (session?.id) {
+      loadTriggerLog(session.id);
+    }
+  }, [session?.id, loadTriggerLog]);
 
   // Subscribe to realtime updates for group/async sessions
   useEffect(() => {
@@ -479,6 +510,54 @@ const SessionPlayer = () => {
       });
     }
 
+    // Track the choice in story flags for trigger evaluation
+    const currentFlags = characterProgress?.story_flags || {};
+    const choicesMade = (currentFlags.choices_made || []) as Array<{ node_id: string; choice_text: string }>;
+    const updatedFlags = {
+      ...currentFlags,
+      choices_made: [...choicesMade, { node_id: currentNode.id, choice_text: choice.choice_text }],
+    };
+
+    // Evaluate triggers against the new state
+    const sessionState = {
+      stats: newStats,
+      storyFlags: updatedFlags,
+      items: (currentFlags.items || []) as string[],
+      nodeId: choice.target_node_id || undefined,
+      playerCount: participants.length || 1,
+    };
+
+    const triggerResult = await evaluateTriggers(
+      session.id,
+      selectedCharacter.id,
+      sessionState,
+      firedTriggerIds
+    );
+
+    // Apply trigger effects to stats and flags
+    if (triggerResult.stateUpdates.stats) {
+      newStats = { ...newStats, ...triggerResult.stateUpdates.stats };
+    }
+    const finalFlags = {
+      ...updatedFlags,
+      ...(triggerResult.stateUpdates.storyFlags || {}),
+    };
+    const finalItems = triggerResult.stateUpdates.items || (currentFlags.items as string[]) || [];
+
+    xpGained += triggerResult.xpAwarded;
+
+    // Track which triggers have fired
+    const newFiredIds = triggerResult.firedTriggers.map((ft) => ft.trigger_id);
+    setFiredTriggerIds((prev) => [...prev, ...newFiredIds]);
+
+    // Show trigger messages
+    if (triggerResult.messages.length > 0) {
+      setTriggerMessages(triggerResult.messages);
+      for (const msg of triggerResult.messages) {
+        toast({ title: "⚡ Event Triggered", description: msg });
+      }
+    }
+
     // Update progress in database
     const { data: progress } = await supabase
       .from("rp_character_progress")
@@ -487,7 +566,11 @@ const SessionPlayer = () => {
       .eq("character_id", selectedCharacter.id)
       .single();
 
-    const visitedNodes = progress?.nodes_visited || [];
+    const newVisitedNodes = choice.target_node_id
+      ? [...(progress?.nodes_visited || []), choice.target_node_id]
+      : progress?.nodes_visited || [];
+
+    setVisitedNodeIds(newVisitedNodes as string[]);
     
     await supabase
       .from("rp_character_progress")
@@ -495,9 +578,8 @@ const SessionPlayer = () => {
         current_node_id: choice.target_node_id,
         stats_snapshot: newStats,
         xp_earned: (progress?.xp_earned || 0) + xpGained,
-        nodes_visited: choice.target_node_id 
-          ? [...visitedNodes, choice.target_node_id]
-          : visitedNodes
+        nodes_visited: newVisitedNodes,
+        story_flags: JSON.parse(JSON.stringify({ ...finalFlags, items: finalItems })),
       })
       .eq("session_id", session.id)
       .eq("character_id", selectedCharacter.id);
@@ -533,7 +615,8 @@ const SessionPlayer = () => {
     setCharacterProgress({
       ...characterProgress,
       stats_snapshot: newStats,
-      xp_earned: (characterProgress?.xp_earned || 0) + xpGained
+      xp_earned: (characterProgress?.xp_earned || 0) + xpGained,
+      story_flags: { ...finalFlags, items: finalItems },
     });
 
     // Load next node or end
@@ -663,23 +746,38 @@ const SessionPlayer = () => {
                 {selectedCharacter && (
                   <p className="text-sm text-muted-foreground">
                     Playing as {selectedCharacter.name}
-                    {!isMyTurn() && <span className="text-amber-500 ml-2">• Waiting for other players...</span>}
+                    {!isMyTurn() && <span className="text-destructive ml-2">• Waiting for other players...</span>}
                   </p>
                 )}
               </div>
             </div>
 
-            <div className="flex items-center gap-2">
+             <div className="flex items-center gap-2">
               {selectedCharacter && characterProgress && (
                 <Badge variant="outline" className="gap-1">
                   <Sparkles className="h-3 w-3" />
                   +{characterProgress.xp_earned} XP
                 </Badge>
               )}
+              {triggerLog.length > 0 && (
+                <Badge variant="secondary" className="gap-1">
+                  <Zap className="h-3 w-3" />
+                  {triggerLog.length}
+                </Badge>
+              )}
               {isGroupSession && session?.session_code && (
                 <Button variant="outline" size="sm" className="gap-2" onClick={() => setShowInviteDialog(true)}>
                   <Share2 className="h-4 w-4" />
                   Invite
+                </Button>
+              )}
+              {session && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setShowSidePanel(!showSidePanel)}
+                >
+                  {showSidePanel ? <PanelRightClose className="h-4 w-4" /> : <PanelRight className="h-4 w-4" />}
                 </Button>
               )}
             </div>
@@ -819,99 +917,132 @@ const SessionPlayer = () => {
         </main>
       </div>
 
-      {/* Side Panel for Group Sessions */}
-      {isGroupSession && session && (
+      {/* Side Panel — always available when session is active */}
+      {session && showSidePanel && (
         <aside className="w-80 border-l bg-muted/30 flex flex-col">
           <Tabs value={sidePanel} onValueChange={(v) => setSidePanel(v as typeof sidePanel)} className="flex-1 flex flex-col">
-            <TabsList className="w-full rounded-none border-b">
-              <TabsTrigger value="party" className="flex-1 gap-2">
-                <Users className="h-4 w-4" />
-                Party ({participants.length})
+            <TabsList className="w-full rounded-none border-b flex-wrap h-auto gap-0">
+              <TabsTrigger value="milestones" className="flex-1 gap-1 text-xs px-2">
+                <Flag className="h-3.5 w-3.5" />
+                Milestones
               </TabsTrigger>
-              <TabsTrigger value="chat" className="flex-1 gap-2">
-                <MessageSquare className="h-4 w-4" />
-                Chat
+              <TabsTrigger value="triggers" className="flex-1 gap-1 text-xs px-2">
+                <Zap className="h-3.5 w-3.5" />
+                Events
+                {triggerLog.length > 0 && (
+                  <span className="ml-1 text-[10px] bg-primary text-primary-foreground rounded-full px-1.5">
+                    {triggerLog.length}
+                  </span>
+                )}
               </TabsTrigger>
+              {isGroupSession && (
+                <>
+                  <TabsTrigger value="party" className="flex-1 gap-1 text-xs px-2">
+                    <Users className="h-3.5 w-3.5" />
+                    Party
+                  </TabsTrigger>
+                  <TabsTrigger value="chat" className="flex-1 gap-1 text-xs px-2">
+                    <MessageSquare className="h-3.5 w-3.5" />
+                    Chat
+                  </TabsTrigger>
+                </>
+              )}
             </TabsList>
 
-            <TabsContent value="party" className="flex-1 p-4 m-0">
-              <div className="space-y-3">
-                {participants.map((p) => (
-                  <Card key={p.id} className={`${p.character?.user_id === session.current_turn_player_id ? "border-primary" : ""}`}>
-                    <CardContent className="p-3 flex items-center gap-3">
-                      <Avatar>
-                        <AvatarImage src={p.character?.portrait_url || undefined} />
-                        <AvatarFallback>{p.character?.name?.slice(0, 2).toUpperCase()}</AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium truncate">{p.character?.name}</p>
-                        <p className="text-xs text-muted-foreground">{p.user?.username || "Unknown"}</p>
-                      </div>
-                      {p.character?.user_id === session.current_turn_player_id && (
-                        <Badge variant="default" className="shrink-0">Turn</Badge>
-                      )}
-                    </CardContent>
-                  </Card>
-                ))}
-
-                {participants.length < (session.max_players || 4) && (
-                  <Button 
-                    variant="outline" 
-                    className="w-full gap-2"
-                    onClick={() => setShowInviteDialog(true)}
-                  >
-                    <Users className="h-4 w-4" />
-                    Invite Players
-                  </Button>
-                )}
-              </div>
+            <TabsContent value="milestones" className="flex-1 p-4 m-0">
+              <KeyPointProgress
+                campaignId={activeCampaignId}
+                visitedNodeIds={visitedNodeIds}
+                storyFlags={characterProgress?.story_flags || {}}
+              />
             </TabsContent>
 
-            <TabsContent value="chat" className="flex-1 flex flex-col p-0 m-0">
-              <ScrollArea className="flex-1 p-4">
-                <div className="space-y-3">
-                  {messages.map((msg) => (
-                    <div 
-                      key={msg.id} 
-                      className={`${
-                        msg.message_type === "system" 
-                          ? "text-center text-xs text-muted-foreground italic" 
-                          : msg.message_type === "action"
-                          ? "text-center text-sm text-primary italic"
-                          : ""
-                      }`}
-                    >
-                      {msg.message_type === "chat" && (
-                        <div className="flex gap-2">
-                          <Avatar className="h-6 w-6">
-                            <AvatarImage src={msg.user?.avatar_url || undefined} />
-                            <AvatarFallback className="text-xs">
-                              {msg.user?.username?.slice(0, 2).toUpperCase()}
-                            </AvatarFallback>
+            <TabsContent value="triggers" className="flex-1 p-4 m-0">
+              <TriggerLog entries={triggerLog} />
+            </TabsContent>
+
+            {isGroupSession && (
+              <>
+                <TabsContent value="party" className="flex-1 p-4 m-0">
+                  <div className="space-y-3">
+                    {participants.map((p) => (
+                      <Card key={p.id} className={`${p.character?.user_id === session.current_turn_player_id ? "border-primary" : ""}`}>
+                        <CardContent className="p-3 flex items-center gap-3">
+                          <Avatar>
+                            <AvatarImage src={p.character?.portrait_url || undefined} />
+                            <AvatarFallback>{p.character?.name?.slice(0, 2).toUpperCase()}</AvatarFallback>
                           </Avatar>
-                          <div>
-                            <span className="text-xs font-medium">{msg.user?.username}</span>
-                            <p className="text-sm">{msg.content}</p>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium truncate">{p.character?.name}</p>
+                            <p className="text-xs text-muted-foreground">{p.user?.username || "Unknown"}</p>
                           </div>
+                          {p.character?.user_id === session.current_turn_player_id && (
+                            <Badge variant="default" className="shrink-0">Turn</Badge>
+                          )}
+                        </CardContent>
+                      </Card>
+                    ))}
+
+                    {participants.length < (session.max_players || 4) && (
+                      <Button 
+                        variant="outline" 
+                        className="w-full gap-2"
+                        onClick={() => setShowInviteDialog(true)}
+                      >
+                        <Users className="h-4 w-4" />
+                        Invite Players
+                      </Button>
+                    )}
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="chat" className="flex-1 flex flex-col p-0 m-0">
+                  <ScrollArea className="flex-1 p-4">
+                    <div className="space-y-3">
+                      {messages.map((msg) => (
+                        <div 
+                          key={msg.id} 
+                          className={`${
+                            msg.message_type === "system" 
+                              ? "text-center text-xs text-muted-foreground italic" 
+                              : msg.message_type === "action"
+                              ? "text-center text-sm text-primary italic"
+                              : ""
+                          }`}
+                        >
+                          {msg.message_type === "chat" && (
+                            <div className="flex gap-2">
+                              <Avatar className="h-6 w-6">
+                                <AvatarImage src={msg.user?.avatar_url || undefined} />
+                                <AvatarFallback className="text-xs">
+                                  {msg.user?.username?.slice(0, 2).toUpperCase()}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div>
+                                <span className="text-xs font-medium">{msg.user?.username}</span>
+                                <p className="text-sm">{msg.content}</p>
+                              </div>
+                            </div>
+                          )}
+                          {msg.message_type !== "chat" && msg.content}
                         </div>
-                      )}
-                      {msg.message_type !== "chat" && msg.content}
+                      ))}
                     </div>
-                  ))}
-                </div>
-              </ScrollArea>
-              <div className="p-3 border-t flex gap-2">
-                <Input
-                  placeholder="Type a message..."
-                  value={chatInput}
-                  onChange={(e) => setChatInput(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && sendMessage()}
-                />
-                <Button size="icon" onClick={sendMessage}>
-                  <Send className="h-4 w-4" />
-                </Button>
-              </div>
-            </TabsContent>
+                  </ScrollArea>
+                  <div className="p-3 border-t flex gap-2">
+                    <Input
+                      placeholder="Type a message..."
+                      value={chatInput}
+                      onChange={(e) => setChatInput(e.target.value)}
+                      onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+                    />
+                    <Button size="icon" onClick={sendMessage}>
+                      <Send className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </TabsContent>
+              </>
+            )}
           </Tabs>
         </aside>
       )}

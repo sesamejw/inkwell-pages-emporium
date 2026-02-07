@@ -216,14 +216,14 @@ A choose-your-adventure roleplay experience where users create characters and em
 #### 6. Key Points & Dynamic Pathways
 Campaign creators define **Key Points** (major story milestones) — what happens *between* them is driven by the player.
 
-- [ ] **Key Point Nodes** — Special high-priority milestone nodes that anchor the narrative arc
-- [ ] **Dynamic Path Generation** — Between key points, players navigate via:
+- [x] **Key Point Nodes** — Special high-priority milestone nodes that anchor the narrative arc
+- [x] **Dynamic Path Generation** — Between key points, players navigate via:
   - Pre-built response selections (creator-authored choices)
   - Activity-based interactions (mini-challenges, puzzles, trades)
   - Free-text player input (open-ended responses interpreted by game logic)
-- [ ] **Key Point Branching** — Which key points even occur depends on prior player actions
-- [ ] **Key Point Editor UI** — Visual editor showing key points as anchors with flexible paths between
-- [ ] **Path Weighting** — Creator assigns probability/conditions for which paths appear
+- [x] **Key Point Branching** — Which key points even occur depends on prior player actions
+- [x] **Key Point Editor UI** — Visual editor showing key points as anchors with flexible paths between
+- [x] **Path Weighting** — Creator assigns probability/conditions for which paths appear
 
 **Key Point Structure:**
 ```
@@ -241,12 +241,12 @@ Campaign creators define **Key Points** (major story milestones) — what happen
 #### 7. Event Trigger System
 Events require specific **triggers** set by the creator — player actions, stat thresholds, item possession, or time-based conditions.
 
-- [ ] **Trigger Definitions** — Creators define triggers on nodes (stat check, item held, flag set, relationship threshold)
-- [ ] **Trigger Chains** — Multiple triggers can be combined (AND/OR logic)
-- [ ] **Triggered Events** — When conditions are met, fire events (unlock path, spawn encounter, modify stats)
-- [ ] **Conditional Visibility** — Choices/paths only appear when triggers are satisfied
-- [ ] **Trigger Editor UI** — Visual builder for creating trigger conditions in the campaign editor
-- [ ] **Trigger Log** — Players can see which triggers they've activated (optional transparency)
+- [x] **Trigger Definitions** — Creators define triggers on nodes (stat check, item held, flag set, relationship threshold)
+- [x] **Trigger Chains** — Multiple triggers can be combined (AND/OR logic)
+- [x] **Triggered Events** — When conditions are met, fire events (unlock path, spawn encounter, modify stats)
+- [x] **Conditional Visibility** — Choices/paths only appear when triggers are satisfied
+- [x] **Trigger Editor UI** — Visual builder for creating trigger conditions in the campaign editor
+- [x] **Trigger Log** — Players can see which triggers they've activated (optional transparency)
 
 **Trigger Types:**
 | Trigger | Example |
@@ -270,12 +270,12 @@ Events require specific **triggers** set by the creator — player actions, stat
 #### 8. Interaction Point System
 Character-to-character (and character-to-NPC) interactions that trigger **different progressions** for each participant.
 
-- [ ] **Interaction Nodes** — Special node type where two+ characters/NPCs interact
-- [ ] **Dual Outcomes** — Each interaction produces separate outcomes per participant (one gains, other loses — or both benefit/suffer)
-- [ ] **Interaction Types** — Dialogue, trade, combat, persuasion, alliance proposal, betrayal
-- [ ] **Interaction History** — Track all interactions per character pair
-- [ ] **Creator Outcome Designer** — UI for creators to design good/bad outcomes per interaction
-- [ ] **Stat-Influenced Interactions** — Interaction results modified by participant stats
+- [x] **Interaction Nodes** — Special node type where two+ characters/NPCs interact
+- [x] **Dual Outcomes** — Each interaction produces separate outcomes per participant (one gains, other loses — or both benefit/suffer)
+- [x] **Interaction Types** — Dialogue, trade, combat, persuasion, alliance proposal, betrayal
+- [x] **Interaction History** — Track all interactions per character pair
+- [x] **Creator Outcome Designer** — UI for creators to design good/bad outcomes per interaction
+- [x] **Stat-Influenced Interactions** — Interaction results modified by participant stats
 - [ ] **Cascading Effects** — One interaction's outcome affects future available interactions
 
 **Outcome Matrix Example:**
@@ -297,13 +297,13 @@ Creator designs BOTH branches with full consequences.
 #### 9. Random Events System
 Creator-defined events that fire when **certain conditions are met** — adding unpredictability and replayability.
 
-- [ ] **Random Event Pool** — Creators add events to a pool with activation conditions
-- [ ] **Condition-Based Triggering** — Events fire based on player state, location, turn count, etc.
-- [ ] **Probability Weighting** — Each event has a % chance when conditions are met
-- [ ] **One-Time vs Recurring** — Events can fire once or repeat
-- [ ] **Random Event Categories** — Encounter, weather, fortune, misfortune, discovery, ambush
-- [ ] **Random Event Editor** — Drag-and-drop event creation with condition builder
-- [ ] **Event Cooldowns** — Prevent same random event firing too frequently
+- [x] **Random Event Pool** — Creators add events to a pool with activation conditions
+- [x] **Condition-Based Triggering** — Events fire based on player state, location, turn count, etc.
+- [x] **Probability Weighting** — Each event has a % chance when conditions are met
+- [x] **One-Time vs Recurring** — Events can fire once or repeat
+- [x] **Random Event Categories** — Encounter, weather, fortune, misfortune, discovery, ambush
+- [x] **Random Event Editor** — Drag-and-drop event creation with condition builder
+- [x] **Event Cooldowns** — Prevent same random event firing too frequently
 
 **Database Addition:**
 | Table | Purpose | Key Columns |
@@ -314,11 +314,11 @@ Creator-defined events that fire when **certain conditions are met** — adding 
 #### 10. Multiplayer Convergence System
 Each player starts from a **different campaign beginning** which later merges — resulting in allies or enemies based on prior choices.
 
-- [ ] **Multiple Entry Points** — Campaign has 2-4+ distinct starting branches (one per player/faction)
-- [ ] **Convergence Nodes** — Special nodes where player paths merge
-- [ ] **Convergence Conditions** — Creators define when/how paths collide (after X key points, specific triggers, etc.)
-- [ ] **Prior Choice Impact** — Players' decisions before convergence determine their relationship at meeting
-- [ ] **Alliance/Enemy Resolution** — Automatic determination: allies, enemies, or neutral based on faction, flags, and choices
+- [x] **Multiple Entry Points** — Campaign has 2-4+ distinct starting branches (one per player/faction)
+- [x] **Convergence Nodes** — Special nodes where player paths merge
+- [x] **Convergence Conditions** — Creators define when/how paths collide (after X key points, specific triggers, etc.)
+- [x] **Prior Choice Impact** — Players' decisions before convergence determine their relationship at meeting
+- [x] **Alliance/Enemy Resolution** — Automatic determination: allies, enemies, or neutral based on faction, flags, and choices
 - [ ] **Post-Convergence Branching** — Story continues differently for allied vs enemy player groups
 - [ ] **Convergence Reveal UI** — Dramatic reveal moment when players discover each other's histories
 - [ ] **Split & Reconverge** — Paths can split and merge multiple times
@@ -346,13 +346,13 @@ Convergence checks:
 #### 11. Faction System (Campaign-Level)
 Factions within campaigns that players can join, betray, or destroy — affecting the entire story arc.
 
-- [ ] **Campaign Factions** — Creators define factions per campaign with lore, goals, and values
-- [ ] **Faction Joining** — Players join factions through story choices or interaction points
-- [ ] **Faction Reputation** — Per-player reputation with each faction (-100 to +100)
-- [ ] **Faction Conflicts** — Factions can be allied, neutral, or at war — affecting player interactions
-- [ ] **Faction Perks** — High reputation unlocks faction-specific choices, items, abilities
-- [ ] **Faction Betrayal** — Leaving/betraying a faction has severe consequences
-- [ ] **Multiplayer Faction Wars** — In convergence, faction alignment determines ally/enemy status
+- [x] **Campaign Factions** — Creators define factions per campaign with lore, goals, and values
+- [x] **Faction Joining** — Players join factions through story choices or interaction points
+- [x] **Faction Reputation** — Per-player reputation with each faction (-100 to +100)
+- [x] **Faction Conflicts** — Factions can be allied, neutral, or at war — affecting player interactions
+- [x] **Faction Perks** — High reputation unlocks faction-specific choices, items, abilities
+- [x] **Faction Betrayal** — Leaving/betraying a faction has severe consequences
+- [x] **Multiplayer Faction Wars** — In convergence, faction alignment determines ally/enemy status
 - [ ] **Faction Leaderboard** — Track which factions are most popular across all sessions
 
 **Database Addition:**
@@ -367,24 +367,24 @@ Factions within campaigns that players can join, betray, or destroy — affectin
 ### Implementation Phases (Advanced Systems)
 
 **Phase 5: Dynamic Campaigns**
-- [ ] Key Points system with conditional branching
-- [ ] Event Trigger system with visual editor
-- [ ] Random Events pool with condition builder
+- [x] Key Points system with conditional branching
+- [x] Event Trigger system with visual editor
+- [x] Random Events pool with condition builder
 - [ ] Free-text input handling for player responses
 
 **Phase 6: Interaction & Consequences**
-- [ ] Interaction Point system with dual outcomes
-- [ ] Creator Outcome Designer UI
+- [x] Interaction Point system with dual outcomes
+- [x] Creator Outcome Designer UI
 - [ ] Cascading effects engine
-- [ ] Interaction history tracking
+- [x] Interaction history tracking
 
 **Phase 7: Multiplayer Convergence**
-- [ ] Multiple entry points per campaign
-- [ ] Convergence node system
-- [ ] Alliance/Enemy resolution engine
+- [x] Multiple entry points per campaign
+- [x] Convergence node system
+- [x] Alliance/Enemy resolution engine
 - [ ] Convergence reveal UI
-- [ ] Faction system with reputation tracking
-- [ ] Faction conflicts affecting multiplayer dynamics
+- [x] Faction system with reputation tracking
+- [x] Faction conflicts affecting multiplayer dynamics
 
 #### 12. Player-to-Player Physical Interaction System
 Real-time physical and social interactions between players when they meet in multiplayer campaigns — proximity-based, skill-gated, and inventory-dependent.

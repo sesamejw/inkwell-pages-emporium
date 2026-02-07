@@ -1,27 +1,31 @@
- import { useState, useEffect, useCallback } from "react";
- import { useNavigate, useParams } from "react-router-dom";
- import { motion } from "framer-motion";
- import { 
-   ArrowLeft, Plus, Save, Play, Trash2, Link2, 
-   BookOpen, MessageSquare, GitBranch, CheckCircle,
-   Settings, Eye, EyeOff, Flag, Zap
- } from "lucide-react";
- import { Button } from "@/components/ui/button";
- import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
- import { Input } from "@/components/ui/input";
- import { Label } from "@/components/ui/label";
- import { Textarea } from "@/components/ui/textarea";
- import { Badge } from "@/components/ui/badge";
- import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
- import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
- import { Switch } from "@/components/ui/switch";
- import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
- import { supabase } from "@/integrations/supabase/client";
- import { useAuth } from "@/contexts/AuthContext";
- import { toast } from "@/hooks/use-toast";
- import { RpCampaign, RpStoryNode, RpNodeChoice } from "@/hooks/useLoreChronicles";
- import { KeyPointsEditor } from "@/components/lore-chronicles/KeyPointsEditor";
- import { EventTriggersEditor } from "@/components/lore-chronicles/EventTriggersEditor";
+import { useState, useEffect, useCallback } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { motion } from "framer-motion";
+import { 
+  ArrowLeft, Plus, Save, Play, Trash2, Link2, 
+  BookOpen, MessageSquare, GitBranch, CheckCircle,
+  Settings, Eye, EyeOff, Flag, Zap, Dice1, Users, GitMerge, Shield
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Switch } from "@/components/ui/switch";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "@/hooks/use-toast";
+import { RpCampaign, RpStoryNode, RpNodeChoice } from "@/hooks/useLoreChronicles";
+import { KeyPointsEditor } from "@/components/lore-chronicles/KeyPointsEditor";
+import { EventTriggersEditor } from "@/components/lore-chronicles/EventTriggersEditor";
+import { RandomEventsEditor } from "@/components/lore-chronicles/RandomEventsEditor";
+import { InteractionPointsEditor } from "@/components/lore-chronicles/InteractionPointsEditor";
+import { ConvergenceEditor } from "@/components/lore-chronicles/ConvergenceEditor";
+import { CampaignFactionsEditor } from "@/components/lore-chronicles/CampaignFactionsEditor";
  
  interface NodeWithChoices extends RpStoryNode {
    choices: RpNodeChoice[];
@@ -302,23 +306,39 @@
  
        {/* Main Content */}
        <main className="container mx-auto px-4 py-8">
-         <Tabs defaultValue="nodes" className="w-full">
-           <TabsList className="mb-6">
-             <TabsTrigger value="nodes" className="gap-2">
-               <GitBranch className="h-4 w-4" />
-               Story Nodes
-             </TabsTrigger>
-             <TabsTrigger value="key-points" className="gap-2">
-               <Flag className="h-4 w-4" />
-               Key Points
-             </TabsTrigger>
-             <TabsTrigger value="triggers" className="gap-2">
-               <Zap className="h-4 w-4" />
-               Event Triggers
-             </TabsTrigger>
-           </TabsList>
+        <Tabs defaultValue="nodes" className="w-full">
+            <TabsList className="mb-6 flex-wrap h-auto gap-1">
+              <TabsTrigger value="nodes" className="gap-2">
+                <GitBranch className="h-4 w-4" />
+                Nodes
+              </TabsTrigger>
+              <TabsTrigger value="key-points" className="gap-2">
+                <Flag className="h-4 w-4" />
+                Key Points
+              </TabsTrigger>
+              <TabsTrigger value="triggers" className="gap-2">
+                <Zap className="h-4 w-4" />
+                Triggers
+              </TabsTrigger>
+              <TabsTrigger value="random-events" className="gap-2">
+                <Dice1 className="h-4 w-4" />
+                Random Events
+              </TabsTrigger>
+              <TabsTrigger value="interactions" className="gap-2">
+                <Users className="h-4 w-4" />
+                Interactions
+              </TabsTrigger>
+              <TabsTrigger value="convergence" className="gap-2">
+                <GitMerge className="h-4 w-4" />
+                Convergence
+              </TabsTrigger>
+              <TabsTrigger value="factions" className="gap-2">
+                <Shield className="h-4 w-4" />
+                Factions
+              </TabsTrigger>
+            </TabsList>
 
-           <TabsContent value="nodes">
+            <TabsContent value="nodes">
              {/* Add Node Buttons */}
              <div className="flex flex-wrap gap-2 mb-8">
                <span className="text-sm text-muted-foreground self-center mr-2">Add Node:</span>
@@ -415,10 +435,29 @@
              />
            </TabsContent>
 
-           <TabsContent value="triggers">
-             <EventTriggersEditor campaignId={campaignId!} />
-           </TabsContent>
-         </Tabs>
+            <TabsContent value="triggers">
+              <EventTriggersEditor campaignId={campaignId!} />
+            </TabsContent>
+
+            <TabsContent value="random-events">
+              <RandomEventsEditor campaignId={campaignId!} />
+            </TabsContent>
+
+            <TabsContent value="interactions">
+              <InteractionPointsEditor campaignId={campaignId!} />
+            </TabsContent>
+
+            <TabsContent value="convergence">
+              <ConvergenceEditor 
+                campaignId={campaignId!} 
+                storyNodes={nodes.map(n => ({ id: n.id, node_type: n.node_type }))} 
+              />
+            </TabsContent>
+
+            <TabsContent value="factions">
+              <CampaignFactionsEditor campaignId={campaignId!} />
+            </TabsContent>
+          </Tabs>
        </main>
  
        {/* Node Editor Dialog */}

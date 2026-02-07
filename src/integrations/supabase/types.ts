@@ -2140,6 +2140,130 @@ export type Database = {
         }
         Relationships: []
       }
+      rp_campaign_entry_points: {
+        Row: {
+          campaign_id: string
+          created_at: string | null
+          description: string | null
+          entry_label: string
+          faction_id: string | null
+          id: string
+          image_url: string | null
+          is_active: boolean | null
+          max_players: number | null
+          order_index: number | null
+          start_node_id: string | null
+        }
+        Insert: {
+          campaign_id: string
+          created_at?: string | null
+          description?: string | null
+          entry_label: string
+          faction_id?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          max_players?: number | null
+          order_index?: number | null
+          start_node_id?: string | null
+        }
+        Update: {
+          campaign_id?: string
+          created_at?: string | null
+          description?: string | null
+          entry_label?: string
+          faction_id?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          max_players?: number | null
+          order_index?: number | null
+          start_node_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rp_campaign_entry_points_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "rp_campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rp_campaign_entry_points_faction_id_fkey"
+            columns: ["faction_id"]
+            isOneToOne: false
+            referencedRelation: "rp_factions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rp_campaign_entry_points_start_node_id_fkey"
+            columns: ["start_node_id"]
+            isOneToOne: false
+            referencedRelation: "rp_story_nodes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rp_campaign_factions: {
+        Row: {
+          campaign_id: string
+          color: string | null
+          created_at: string | null
+          description: string | null
+          faction_id: string | null
+          id: string
+          image_url: string | null
+          is_joinable: boolean | null
+          name: string
+          perks: Json | null
+          updated_at: string | null
+          values: Json | null
+        }
+        Insert: {
+          campaign_id: string
+          color?: string | null
+          created_at?: string | null
+          description?: string | null
+          faction_id?: string | null
+          id?: string
+          image_url?: string | null
+          is_joinable?: boolean | null
+          name: string
+          perks?: Json | null
+          updated_at?: string | null
+          values?: Json | null
+        }
+        Update: {
+          campaign_id?: string
+          color?: string | null
+          created_at?: string | null
+          description?: string | null
+          faction_id?: string | null
+          id?: string
+          image_url?: string | null
+          is_joinable?: boolean | null
+          name?: string
+          perks?: Json | null
+          updated_at?: string | null
+          values?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rp_campaign_factions_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "rp_campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rp_campaign_factions_faction_id_fkey"
+            columns: ["faction_id"]
+            isOneToOne: false
+            referencedRelation: "rp_factions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       rp_campaign_npcs: {
         Row: {
           campaign_id: string
@@ -2333,6 +2457,70 @@ export type Database = {
           {
             foreignKeyName: "rp_character_abilities_source_session_id_fkey"
             columns: ["source_session_id"]
+            isOneToOne: false
+            referencedRelation: "rp_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rp_character_faction_standing: {
+        Row: {
+          betrayed_at: string | null
+          campaign_faction_id: string
+          character_id: string
+          created_at: string | null
+          id: string
+          is_member: boolean | null
+          joined_at: string | null
+          rank: string | null
+          reputation_score: number | null
+          session_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          betrayed_at?: string | null
+          campaign_faction_id: string
+          character_id: string
+          created_at?: string | null
+          id?: string
+          is_member?: boolean | null
+          joined_at?: string | null
+          rank?: string | null
+          reputation_score?: number | null
+          session_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          betrayed_at?: string | null
+          campaign_faction_id?: string
+          character_id?: string
+          created_at?: string | null
+          id?: string
+          is_member?: boolean | null
+          joined_at?: string | null
+          rank?: string | null
+          reputation_score?: number | null
+          session_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rp_character_faction_standing_campaign_faction_id_fkey"
+            columns: ["campaign_faction_id"]
+            isOneToOne: false
+            referencedRelation: "rp_campaign_factions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rp_character_faction_standing_character_id_fkey"
+            columns: ["character_id"]
+            isOneToOne: false
+            referencedRelation: "rp_characters"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rp_character_faction_standing_session_id_fkey"
+            columns: ["session_id"]
             isOneToOne: false
             referencedRelation: "rp_sessions"
             referencedColumns: ["id"]
@@ -2615,6 +2803,105 @@ export type Database = {
           },
         ]
       }
+      rp_convergence_nodes: {
+        Row: {
+          campaign_id: string
+          convergence_type: string
+          created_at: string | null
+          description: string | null
+          id: string
+          name: string
+          node_id: string
+          required_entry_points: Json | null
+        }
+        Insert: {
+          campaign_id: string
+          convergence_type?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          node_id: string
+          required_entry_points?: Json | null
+        }
+        Update: {
+          campaign_id?: string
+          convergence_type?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          node_id?: string
+          required_entry_points?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rp_convergence_nodes_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "rp_campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rp_convergence_nodes_node_id_fkey"
+            columns: ["node_id"]
+            isOneToOne: false
+            referencedRelation: "rp_story_nodes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rp_convergence_rules: {
+        Row: {
+          condition_type: string
+          conditions: Json
+          convergence_id: string
+          created_at: string | null
+          id: string
+          priority: number | null
+          result: string
+          result_narrative: string | null
+          target_node_id: string | null
+        }
+        Insert: {
+          condition_type?: string
+          conditions?: Json
+          convergence_id: string
+          created_at?: string | null
+          id?: string
+          priority?: number | null
+          result?: string
+          result_narrative?: string | null
+          target_node_id?: string | null
+        }
+        Update: {
+          condition_type?: string
+          conditions?: Json
+          convergence_id?: string
+          created_at?: string | null
+          id?: string
+          priority?: number | null
+          result?: string
+          result_narrative?: string | null
+          target_node_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rp_convergence_rules_convergence_id_fkey"
+            columns: ["convergence_id"]
+            isOneToOne: false
+            referencedRelation: "rp_convergence_nodes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rp_convergence_rules_target_node_id_fkey"
+            columns: ["target_node_id"]
+            isOneToOne: false
+            referencedRelation: "rp_story_nodes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       rp_event_triggers: {
         Row: {
           campaign_id: string
@@ -2659,6 +2946,58 @@ export type Database = {
           },
         ]
       }
+      rp_faction_relations: {
+        Row: {
+          campaign_id: string
+          created_at: string | null
+          description: string | null
+          faction_a_id: string
+          faction_b_id: string
+          id: string
+          relation_type: string
+        }
+        Insert: {
+          campaign_id: string
+          created_at?: string | null
+          description?: string | null
+          faction_a_id: string
+          faction_b_id: string
+          id?: string
+          relation_type?: string
+        }
+        Update: {
+          campaign_id?: string
+          created_at?: string | null
+          description?: string | null
+          faction_a_id?: string
+          faction_b_id?: string
+          id?: string
+          relation_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rp_faction_relations_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "rp_campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rp_faction_relations_faction_a_id_fkey"
+            columns: ["faction_a_id"]
+            isOneToOne: false
+            referencedRelation: "rp_campaign_factions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rp_faction_relations_faction_b_id_fkey"
+            columns: ["faction_b_id"]
+            isOneToOne: false
+            referencedRelation: "rp_campaign_factions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       rp_factions: {
         Row: {
           color: string | null
@@ -2688,6 +3027,172 @@ export type Database = {
           reputation_levels?: Json | null
         }
         Relationships: []
+      }
+      rp_interaction_log: {
+        Row: {
+          context: Json | null
+          id: string
+          interaction_id: string
+          occurred_at: string | null
+          outcome_id: string | null
+          participants: Json
+          session_id: string
+        }
+        Insert: {
+          context?: Json | null
+          id?: string
+          interaction_id: string
+          occurred_at?: string | null
+          outcome_id?: string | null
+          participants?: Json
+          session_id: string
+        }
+        Update: {
+          context?: Json | null
+          id?: string
+          interaction_id?: string
+          occurred_at?: string | null
+          outcome_id?: string | null
+          participants?: Json
+          session_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rp_interaction_log_interaction_id_fkey"
+            columns: ["interaction_id"]
+            isOneToOne: false
+            referencedRelation: "rp_interaction_points"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rp_interaction_log_outcome_id_fkey"
+            columns: ["outcome_id"]
+            isOneToOne: false
+            referencedRelation: "rp_interaction_outcomes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rp_interaction_log_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "rp_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rp_interaction_outcomes: {
+        Row: {
+          condition: Json | null
+          created_at: string | null
+          flag_effects: Json | null
+          id: string
+          interaction_id: string
+          narrative_text: string | null
+          participant_role: string
+          reputation_effects: Json | null
+          result_type: string
+          stat_effects: Json | null
+          target_node_id: string | null
+        }
+        Insert: {
+          condition?: Json | null
+          created_at?: string | null
+          flag_effects?: Json | null
+          id?: string
+          interaction_id: string
+          narrative_text?: string | null
+          participant_role?: string
+          reputation_effects?: Json | null
+          result_type?: string
+          stat_effects?: Json | null
+          target_node_id?: string | null
+        }
+        Update: {
+          condition?: Json | null
+          created_at?: string | null
+          flag_effects?: Json | null
+          id?: string
+          interaction_id?: string
+          narrative_text?: string | null
+          participant_role?: string
+          reputation_effects?: Json | null
+          result_type?: string
+          stat_effects?: Json | null
+          target_node_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rp_interaction_outcomes_interaction_id_fkey"
+            columns: ["interaction_id"]
+            isOneToOne: false
+            referencedRelation: "rp_interaction_points"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rp_interaction_outcomes_target_node_id_fkey"
+            columns: ["target_node_id"]
+            isOneToOne: false
+            referencedRelation: "rp_story_nodes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rp_interaction_points: {
+        Row: {
+          campaign_id: string
+          created_at: string | null
+          description: string | null
+          id: string
+          interaction_type: string
+          is_active: boolean | null
+          name: string
+          node_id: string | null
+          participants: Json | null
+          stat_requirements: Json | null
+          updated_at: string | null
+        }
+        Insert: {
+          campaign_id: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          interaction_type?: string
+          is_active?: boolean | null
+          name: string
+          node_id?: string | null
+          participants?: Json | null
+          stat_requirements?: Json | null
+          updated_at?: string | null
+        }
+        Update: {
+          campaign_id?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          interaction_type?: string
+          is_active?: boolean | null
+          name?: string
+          node_id?: string | null
+          participants?: Json | null
+          stat_requirements?: Json | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rp_interaction_points_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "rp_campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rp_interaction_points_node_id_fkey"
+            columns: ["node_id"]
+            isOneToOne: false
+            referencedRelation: "rp_story_nodes"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       rp_items: {
         Row: {
@@ -3023,6 +3528,114 @@ export type Database = {
           },
         ]
       }
+      rp_random_event_log: {
+        Row: {
+          character_id: string | null
+          event_id: string
+          fired_at: string | null
+          id: string
+          outcome: Json | null
+          session_id: string
+          was_positive: boolean | null
+        }
+        Insert: {
+          character_id?: string | null
+          event_id: string
+          fired_at?: string | null
+          id?: string
+          outcome?: Json | null
+          session_id: string
+          was_positive?: boolean | null
+        }
+        Update: {
+          character_id?: string | null
+          event_id?: string
+          fired_at?: string | null
+          id?: string
+          outcome?: Json | null
+          session_id?: string
+          was_positive?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rp_random_event_log_character_id_fkey"
+            columns: ["character_id"]
+            isOneToOne: false
+            referencedRelation: "rp_characters"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rp_random_event_log_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "rp_random_events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rp_random_event_log_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "rp_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rp_random_events: {
+        Row: {
+          campaign_id: string
+          category: string
+          conditions: Json | null
+          cooldown_turns: number | null
+          created_at: string | null
+          description: string | null
+          effects: Json | null
+          id: string
+          is_active: boolean | null
+          is_recurring: boolean | null
+          name: string
+          probability: number
+          updated_at: string | null
+        }
+        Insert: {
+          campaign_id: string
+          category?: string
+          conditions?: Json | null
+          cooldown_turns?: number | null
+          created_at?: string | null
+          description?: string | null
+          effects?: Json | null
+          id?: string
+          is_active?: boolean | null
+          is_recurring?: boolean | null
+          name: string
+          probability?: number
+          updated_at?: string | null
+        }
+        Update: {
+          campaign_id?: string
+          category?: string
+          conditions?: Json | null
+          cooldown_turns?: number | null
+          created_at?: string | null
+          description?: string | null
+          effects?: Json | null
+          id?: string
+          is_active?: boolean | null
+          is_recurring?: boolean | null
+          name?: string
+          probability?: number
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rp_random_events_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "rp_campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       rp_session_invitations: {
         Row: {
           created_at: string | null
@@ -3102,6 +3715,7 @@ export type Database = {
       rp_session_participants: {
         Row: {
           character_id: string
+          entry_point_id: string | null
           id: string
           is_active: boolean
           joined_at: string
@@ -3109,6 +3723,7 @@ export type Database = {
         }
         Insert: {
           character_id: string
+          entry_point_id?: string | null
           id?: string
           is_active?: boolean
           joined_at?: string
@@ -3116,6 +3731,7 @@ export type Database = {
         }
         Update: {
           character_id?: string
+          entry_point_id?: string | null
           id?: string
           is_active?: boolean
           joined_at?: string
@@ -3127,6 +3743,13 @@ export type Database = {
             columns: ["character_id"]
             isOneToOne: false
             referencedRelation: "rp_characters"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rp_session_participants_entry_point_id_fkey"
+            columns: ["entry_point_id"]
+            isOneToOne: false
+            referencedRelation: "rp_campaign_entry_points"
             referencedColumns: ["id"]
           },
           {
