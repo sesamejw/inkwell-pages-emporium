@@ -37,7 +37,6 @@ export const Header = () => {
   const navigation = [
     { name: "Books", href: "/books", icon: BookOpen },
     { name: "Community", href: "/community", icon: MessageSquare },
-   { name: "Lore Chronicles", href: "/lore-chronicles", icon: Sparkles },
   ];
 
   const isActive = (path: string) => location.pathname === path;
