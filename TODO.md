@@ -399,11 +399,11 @@ Real-time physical and social interactions between players when they meet in mul
   - **Adjacent** (touching): Stab, pickpocket, embrace, restrain
 
 ##### Physical Actions (Proximity + Inventory + Skill Gated)
-- [ ] **Melee Actions** — Stab, slash, punch, shove (requires: adjacent + weapon in inventory + combat skill)
-- [ ] **Stealth Actions** — Stab from behind, pickpocket, plant item (requires: adjacent + stealth skill + concealed item)
-- [ ] **Social Actions** — Whisper, lie, persuade, intimidate, bargain (requires: close/adjacent + charisma/wisdom checks)
-- [ ] **Ranged Actions** — Throw item, shoot bow, cast spell (requires: mid+ range + item/ability)
-- [ ] **Movement Actions** — Walk closer, run away, block path, follow silently
+- [x] **Melee Actions** — Stab, slash, punch, shove (requires: adjacent + weapon in inventory + combat skill)
+- [x] **Stealth Actions** — Stab from behind, pickpocket, plant item (requires: adjacent + stealth skill + concealed item)
+- [x] **Social Actions** — Whisper, lie, persuade, intimidate, bargain (requires: close/adjacent + charisma/wisdom checks)
+- [x] **Ranged Actions** — Throw item, shoot bow, cast spell (requires: mid+ range + item/ability)
+- [x] **Movement Actions** — Walk closer, run away, block path, follow silently
 
 **Action Availability Logic:**
 ```
@@ -416,34 +416,34 @@ Can player A "stab" player B?
 ```
 
 ##### Pre-Planning & Preparation
-- [ ] **Action Preparation** — Players must prepare actions in advance (hidden from others):
+- [x] **Action Preparation** — Players must prepare actions in advance (hidden from others):
   - "Hide knife in cloak" → Conceals weapon, enables surprise attacks later
   - "Ready bow" → Enables ranged attack next turn but visible to perceptive players
   - "Prepare lie" → Pre-write a deceptive statement for upcoming conversation
   - "Signal ally" → Set up a secret signal with another player
-- [ ] **Preparation Slots** — Limited number of preparations based on level/wisdom
-- [ ] **Preparation Reveal** — Preparations only revealed when used or detected by perception
-- [ ] **Preparation Cooldowns** — Can't re-prepare immediately after use
+- [x] **Preparation Slots** — Limited number of preparations based on level/wisdom
+- [x] **Preparation Reveal** — Preparations only revealed when used or detected by perception
+- [x] **Preparation Cooldowns** — Can't re-prepare immediately after use
 
 ##### Awareness & Perception System
-- [ ] **Passive Perception** — Auto-calculated from wisdom + agility + level
-- [ ] **Perception Checks** — Automatic rolls when nearby players prepare/execute hidden actions
-- [ ] **Awareness Levels:**
+- [x] **Passive Perception** — Auto-calculated from wisdom + agility + level
+- [x] **Perception Checks** — Automatic rolls when nearby players prepare/execute hidden actions
+- [x] **Awareness Levels:**
   - **Oblivious** (low perception): No warnings, easily surprised
   - **Alert** (mid perception): "You sense something is off" hints
   - **Vigilant** (high perception): "Player X reached into their cloak" — partial reveal
   - **Hawkeye** (max perception): Full action detection — "Player X concealed a dagger"
-- [ ] **Perception Modifiers** — Environment (dark = harder), fatigue, distraction, magic
-- [ ] **Detection Notifications** — Private alerts to perceptive players about suspicious actions
-- [ ] **Counter-Actions** — If you detect a threat, unlock reactive options (dodge, block, call out, counter-attack)
+- [x] **Perception Modifiers** — Environment (dark = harder), fatigue, distraction, magic
+- [x] **Detection Notifications** — Private alerts to perceptive players about suspicious actions
+- [x] **Counter-Actions** — If you detect a threat, unlock reactive options (dodge, block, call out, counter-attack)
 
 ##### Action Resolution
-- [ ] **Stat Check Rolls** — Actions resolved via stat checks (attacker stat vs defender stat)
-- [ ] **Surprise Bonus** — Undetected actions get +3 to stat check
-- [ ] **Consequence Engine** — Each action has success/fail outcomes defined by campaign creator
-- [ ] **Witness System** — Other nearby players may witness actions and gain knowledge/flags
-- [ ] **Reputation Impact** — Aggressive actions affect faction standing and NPC relationships
-- [ ] **Death/Injury from PvP** — Stab can wound or kill based on damage system (creator-configured lethality)
+- [x] **Stat Check Rolls** — Actions resolved via stat checks (attacker stat vs defender stat)
+- [x] **Surprise Bonus** — Undetected actions get +3 to stat check
+- [x] **Consequence Engine** — Each action has success/fail outcomes defined by campaign creator
+- [x] **Witness System** — Other nearby players may witness actions and gain knowledge/flags
+- [x] **Reputation Impact** — Aggressive actions affect faction standing and NPC relationships
+- [x] **Death/Injury from PvP** — Stab can wound or kill based on damage system (creator-configured lethality)
 
 **Database Addition:**
 | Table | Purpose | Key Columns |
@@ -471,8 +471,8 @@ Can player A "stab" player B?
 ##### Creator Tools for PvP Interactions
 - [x] **Interaction Zone Editor** — Define which scenes allow PvP interactions
 - [x] **Lethality Settings** — Per-campaign: no-kill, wound-only, permadeath
-- [ ] **Custom Action Builder** — Creators add campaign-specific actions with custom requirements
-- [ ] **Consequence Templates** — Pre-built outcomes (wound, betray, ally, escape) creators can assign
+- [x] **Custom Action Builder** — Creators add campaign-specific actions with custom requirements
+- [x] **Consequence Templates** — Pre-built outcomes (wound, betray, ally, escape) creators can assign
 - [x] **PvP Toggle** — Campaign-level setting to enable/disable player-vs-player actions
 
 ---
@@ -533,11 +533,11 @@ Player receives hint: "The shadows whisper of danger ahead..."
 **Phase 8: Player Physical Interactions**
 - [x] Proximity tracking system with zone mechanics
 - [x] Movement action UI (stop/walk/run/approach)
-- [ ] Physical action system with inventory + skill gates
-- [ ] Action preparation mechanic (hide knife, ready bow)
-- [ ] Perception and awareness engine
-- [ ] Action resolution with stat check rolls
-- [ ] Witness and detection notification system
+- [x] Physical action system with inventory + skill gates
+- [x] Action preparation mechanic (hide knife, ready bow)
+- [x] Perception and awareness engine
+- [x] Action resolution with stat check rolls
+- [x] Witness and detection notification system
 - [x] Creator PvP tools (lethality settings, interaction zones, custom actions)
 
 **Phase 9: Hint & Suggestion Engine**
