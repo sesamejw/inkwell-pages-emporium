@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { 
   ArrowLeft, Plus, Save, Play, Trash2, Link2, 
   BookOpen, MessageSquare, GitBranch, CheckCircle,
-  Settings, Eye, EyeOff, Flag, Zap, Dice1, Users, GitMerge, Shield
+  Settings, Eye, EyeOff, Flag, Zap, Dice1, Users, GitMerge, Shield, Lightbulb, Globe
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -26,6 +26,8 @@ import { RandomEventsEditor } from "@/components/lore-chronicles/RandomEventsEdi
 import { InteractionPointsEditor } from "@/components/lore-chronicles/InteractionPointsEditor";
 import { ConvergenceEditor } from "@/components/lore-chronicles/ConvergenceEditor";
 import { CampaignFactionsEditor } from "@/components/lore-chronicles/CampaignFactionsEditor";
+import { HintDesigner } from "@/components/lore-chronicles/HintDesigner";
+import { WorldBuilder } from "@/components/lore-chronicles/WorldBuilder";
  
  interface NodeWithChoices extends RpStoryNode {
    choices: RpNodeChoice[];
@@ -336,7 +338,15 @@ import { CampaignFactionsEditor } from "@/components/lore-chronicles/CampaignFac
                 <Shield className="h-4 w-4" />
                 Factions
               </TabsTrigger>
-            </TabsList>
+               <TabsTrigger value="hints" className="gap-2">
+                 <Lightbulb className="h-4 w-4" />
+                 Hints
+               </TabsTrigger>
+               <TabsTrigger value="world-builder" className="gap-2">
+                 <Globe className="h-4 w-4" />
+                 World Builder
+               </TabsTrigger>
+             </TabsList>
 
             <TabsContent value="nodes">
              {/* Add Node Buttons */}
@@ -454,9 +464,17 @@ import { CampaignFactionsEditor } from "@/components/lore-chronicles/CampaignFac
               />
             </TabsContent>
 
-            <TabsContent value="factions">
-              <CampaignFactionsEditor campaignId={campaignId!} />
-            </TabsContent>
+             <TabsContent value="factions">
+               <CampaignFactionsEditor campaignId={campaignId!} />
+             </TabsContent>
+
+             <TabsContent value="hints">
+               <HintDesigner campaignId={campaignId!} />
+              </TabsContent>
+
+              <TabsContent value="world-builder">
+                <WorldBuilder campaignId={campaignId!} />
+              </TabsContent>
           </Tabs>
        </main>
  

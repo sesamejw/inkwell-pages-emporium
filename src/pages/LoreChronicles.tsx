@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { Sword, Users, BookOpen, Sparkles, Plus, Play, Scroll, Crown, Book, Trophy, Shield, Flag } from "lucide-react";
+import { Sword, Users, BookOpen, Sparkles, Plus, Play, Scroll, Crown, Book, Trophy, Shield, Flag, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -16,12 +16,14 @@ import { CommunityLoreAlmanac } from "@/components/lore-chronicles/CommunityLore
 import { CharacterLeaderboard } from "@/components/lore-chronicles/CharacterLeaderboard";
 import { LoremasterDashboard } from "@/components/lore-chronicles/LoremasterDashboard";
 import { FactionLeaderboard } from "@/components/lore-chronicles/FactionLeaderboard";
+import { LoreAssistantPanel } from "@/components/lore-chronicles/LoreAssistantPanel";
 import { useLoreProposals } from "@/hooks/useLoreProposals";
  
  const LoreChronicles = () => {
    const navigate = useNavigate();
    const { user } = useAuth();
    const [activeTab, setActiveTab] = useState("campaigns");
+   const [isLoreAssistantOpen, setIsLoreAssistantOpen] = useState(false);
  
    return (
      <div className="min-h-screen bg-background">
@@ -229,11 +231,26 @@ import { useLoreProposals } from "@/hooks/useLoreProposals";
                </TabsContent>
              </Tabs>
          </div>
-       </section>
- 
-       <Footer />
-     </div>
-   );
- };
- 
- export default LoreChronicles;
+        </section>
+  
+        {/* Floating Lore Assistant Button */}
+        <Button
+          onClick={() => setIsLoreAssistantOpen(true)}
+          className="fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-lg z-30"
+          size="icon"
+        >
+          <MessageCircle className="h-6 w-6" />
+        </Button>
+
+        {/* Lore Assistant Panel */}
+        <LoreAssistantPanel
+          isOpen={isLoreAssistantOpen}
+          onClose={() => setIsLoreAssistantOpen(false)}
+        />
+
+        <Footer />
+      </div>
+    );
+  };
+  
+  export default LoreChronicles;

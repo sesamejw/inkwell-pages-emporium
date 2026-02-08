@@ -1,7 +1,7 @@
  import { useState } from "react";
  import { useNavigate } from "react-router-dom";
  import { motion, AnimatePresence } from "framer-motion";
- import { ArrowLeft, ArrowRight, Check, Sparkles, User } from "lucide-react";
+ import { ArrowLeft, ArrowRight, Check, Sparkles, User, Wand2, Loader2 } from "lucide-react";
  import { Button } from "@/components/ui/button";
  import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
  import { Input } from "@/components/ui/input";
@@ -10,7 +10,9 @@
  import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
  import { Progress } from "@/components/ui/progress";
  import { useAuth } from "@/contexts/AuthContext";
- import { useLoreChronicles, CharacterStats } from "@/hooks/useLoreChronicles";
+  import { useLoreChronicles, CharacterStats } from "@/hooks/useLoreChronicles";
+  import { useRpAchievements } from "@/hooks/useRpAchievements";
+ import { useBackstoryGenerator } from "@/hooks/useBackstoryGenerator";
  import { supabase } from "@/integrations/supabase/client";
  import { useEffect } from "react";
  
@@ -41,7 +43,8 @@
  const CharacterCreator = () => {
    const navigate = useNavigate();
    const { user } = useAuth();
-   const { createCharacter } = useLoreChronicles();
+    const { createCharacter } = useLoreChronicles();
+    const { checkAchievements } = useRpAchievements();
    
    const [step, setStep] = useState(1);
    const [races, setRaces] = useState<Race[]>([]);
@@ -94,10 +97,12 @@
        portrait_url: portraitUrl.trim() || null
      });
  
-     setCreating(false);
-     if (result) {
-       navigate('/lore-chronicles');
-     }
+      setCreating(false);
+      if (result) {
+        // Check for "First Steps" achievement
+        await checkAchievements();
+        navigate('/lore-chronicles');
+      }
    };
  
    if (!user) {
@@ -185,16 +190,18 @@
                />
              )}
  
-             {step === 3 && (
-               <CharacterDetails
-                 name={name}
-                 backstory={backstory}
-                 portraitUrl={portraitUrl}
-                 onNameChange={setName}
-                 onBackstoryChange={setBackstory}
-                 onPortraitChange={setPortraitUrl}
-               />
-             )}
+              {step === 3 && (
+                <CharacterDetails
+                  name={name}
+                  backstory={backstory}
+                  portraitUrl={portraitUrl}
+                  onNameChange={setName}
+                  onBackstoryChange={setBackstory}
+                  onPortraitChange={setPortraitUrl}
+                  selectedRace={selectedRace}
+                  stats={stats}
+                />
+              )}
  
              {step === 4 && (
                <ReviewCharacter
@@ -395,72 +402,163 @@
    );
  };
  
- // Step 3: Character Details
- const CharacterDetails = ({ name, backstory, portraitUrl, onNameChange, onBackstoryChange, onPortraitChange }: {
-   name: string;
-   backstory: string;
-   portraitUrl: string;
-   onNameChange: (value: string) => void;
-   onBackstoryChange: (value: string) => void;
-   onPortraitChange: (value: string) => void;
- }) => {
-   return (
-     <div className="space-y-6">
-       <div>
-         <h2 className="text-xl font-semibold mb-4">Character Details</h2>
-         <p className="text-muted-foreground mb-6">
-           Give your character a name and backstory to bring them to life.
-         </p>
-       </div>
- 
-       <div className="space-y-4">
-         <div className="space-y-2">
-           <Label htmlFor="name">Character Name *</Label>
-           <Input
-             id="name"
-             value={name}
-             onChange={(e) => onNameChange(e.target.value)}
-             placeholder="Enter your character's name"
-             maxLength={50}
-           />
-         </div>
- 
-         <div className="space-y-2">
-           <Label htmlFor="portrait">Portrait URL (optional)</Label>
-           <Input
-             id="portrait"
-             value={portraitUrl}
-             onChange={(e) => onPortraitChange(e.target.value)}
-             placeholder="https://example.com/portrait.jpg"
-           />
-           {portraitUrl && (
-             <div className="flex justify-center mt-2">
-               <Avatar className="h-24 w-24">
-                 <AvatarImage src={portraitUrl} />
-                 <AvatarFallback>{name.slice(0, 2).toUpperCase()}</AvatarFallback>
-               </Avatar>
-             </div>
-           )}
-         </div>
- 
-         <div className="space-y-2">
-           <Label htmlFor="backstory">Backstory (optional)</Label>
-           <Textarea
-             id="backstory"
-             value={backstory}
-             onChange={(e) => onBackstoryChange(e.target.value)}
-             placeholder="Write your character's history, motivations, and personality..."
-             rows={6}
-             maxLength={2000}
-           />
-           <p className="text-xs text-muted-foreground text-right">
-             {backstory.length}/2000
-           </p>
-         </div>
-       </div>
-     </div>
-   );
- };
+// Step 3: Character Details
+const CharacterDetails = ({ name, backstory, portraitUrl, onNameChange, onBackstoryChange, onPortraitChange, selectedRace, stats }: {
+  name: string;
+  backstory: string;
+  portraitUrl: string;
+  onNameChange: (value: string) => void;
+  onBackstoryChange: (value: string) => void;
+  onPortraitChange: (value: string) => void;
+  selectedRace: Race | null;
+  stats: CharacterStats;
+}) => {
+  const { generateBackstory, isGenerating, error } = useBackstoryGenerator();
+  const [prompt, setPrompt] = useState("");
+  const [showPromptInput, setShowPromptInput] = useState(false);
+
+  const handleGenerate = async () => {
+    const result = await generateBackstory({
+      raceId: selectedRace?.id || null,
+      raceName: selectedRace?.name || null,
+      stats,
+      playerPrompt: prompt.trim() || undefined,
+      existingBackstory: backstory.trim() || undefined,
+    });
+
+    if (result) {
+      onBackstoryChange(result);
+      setShowPromptInput(false);
+      setPrompt("");
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-xl font-semibold mb-4">Character Details</h2>
+        <p className="text-muted-foreground mb-6">
+          Give your character a name and backstory to bring them to life.
+        </p>
+      </div>
+
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="name">Character Name *</Label>
+          <Input
+            id="name"
+            value={name}
+            onChange={(e) => onNameChange(e.target.value)}
+            placeholder="Enter your character's name"
+            maxLength={50}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="portrait">Portrait URL (optional)</Label>
+          <Input
+            id="portrait"
+            value={portraitUrl}
+            onChange={(e) => onPortraitChange(e.target.value)}
+            placeholder="https://example.com/portrait.jpg"
+          />
+          {portraitUrl && (
+            <div className="flex justify-center mt-2">
+              <Avatar className="h-24 w-24">
+                <AvatarImage src={portraitUrl} />
+                <AvatarFallback>{name.slice(0, 2).toUpperCase()}</AvatarFallback>
+              </Avatar>
+            </div>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <Label htmlFor="backstory">Backstory (optional)</Label>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setShowPromptInput(!showPromptInput)}
+              className="gap-2"
+            >
+              <Wand2 className="h-4 w-4" />
+              AI Generate
+            </Button>
+          </div>
+          
+          {showPromptInput && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="space-y-3 p-4 border border-primary/20 rounded-lg bg-primary/5"
+            >
+              <div className="space-y-2">
+                <Label htmlFor="prompt" className="text-sm">
+                  Any preferences? (optional)
+                </Label>
+                <Input
+                  id="prompt"
+                  value={prompt}
+                  onChange={(e) => setPrompt(e.target.value)}
+                  placeholder="e.g., 'exiled warrior', 'orphan mage', 'disgraced noble'"
+                />
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  onClick={handleGenerate}
+                  disabled={isGenerating}
+                  size="sm"
+                  className="gap-2"
+                >
+                  {isGenerating ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Generating...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="h-4 w-4" />
+                      Generate
+                    </>
+                  )}
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setShowPromptInput(false);
+                    setPrompt("");
+                  }}
+                >
+                  Cancel
+                </Button>
+              </div>
+              {error && (
+                <p className="text-sm text-destructive">{error}</p>
+              )}
+            </motion.div>
+          )}
+
+          <Textarea
+            id="backstory"
+            value={backstory}
+            onChange={(e) => onBackstoryChange(e.target.value)}
+            placeholder="Write your character's history, motivations, and personality..."
+            rows={6}
+            maxLength={2000}
+          />
+          <p className="text-xs text-muted-foreground text-right">
+            {backstory.length}/2000
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+};
  
  // Step 4: Review
  const ReviewCharacter = ({ race, stats, name, backstory, portraitUrl }: {

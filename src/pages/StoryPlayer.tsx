@@ -1,17 +1,21 @@
-  import { useState, useEffect } from "react";
-  import { useNavigate, useParams } from "react-router-dom";
-  import { motion, AnimatePresence } from "framer-motion";
-  import { ArrowLeft, BookOpen, Lock, Sparkles, User, CheckCircle, XCircle } from "lucide-react";
-  import { Button } from "@/components/ui/button";
-  import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-  import { Badge } from "@/components/ui/badge";
-  import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-  import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-  import { supabase } from "@/integrations/supabase/client";
-  import { useAuth } from "@/contexts/AuthContext";
-  import { useLoreChronicles, RpCampaign, RpStoryNode, RpNodeChoice, RpCharacter, CharacterStats } from "@/hooks/useLoreChronicles";
-  import { toast } from "@/hooks/use-toast";
-  import { FreeTextInput } from "@/components/lore-chronicles/FreeTextInput";
+   import { useState, useEffect, useCallback } from "react";
+   import { useNavigate, useParams } from "react-router-dom";
+   import { motion, AnimatePresence } from "framer-motion";
+   import { ArrowLeft, BookOpen, Lock, Sparkles, User, CheckCircle, XCircle } from "lucide-react";
+   import { Button } from "@/components/ui/button";
+   import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+   import { Badge } from "@/components/ui/badge";
+   import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+   import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+   import { supabase } from "@/integrations/supabase/client";
+   import { useAuth } from "@/contexts/AuthContext";
+   import { useLoreChronicles, RpCampaign, RpStoryNode, RpNodeChoice, RpCharacter, CharacterStats } from "@/hooks/useLoreChronicles";
+    import { toast } from "@/hooks/use-toast";
+    import { FreeTextInput } from "@/components/lore-chronicles/FreeTextInput";
+    import { HintDisplay } from "@/components/lore-chronicles/HintDisplay";
+    import { useHints, Hint, HintResponse as HintResponseType } from "@/hooks/useHints";
+    import { useRpAchievements } from "@/hooks/useRpAchievements";
+    import { useInventory } from "@/hooks/useInventory";
  
  const StoryPlayer = () => {
    const { campaignId } = useParams<{ campaignId: string }>();
@@ -26,9 +30,14 @@
    const [sessionId, setSessionId] = useState<string | null>(null);
    const [characterProgress, setCharacterProgress] = useState<any>(null);
    
-   const [showCharacterSelect, setShowCharacterSelect] = useState(false);
-   const [selectedCharacter, setSelectedCharacter] = useState<RpCharacter | null>(null);
-   const [processing, setProcessing] = useState(false);
+    const [showCharacterSelect, setShowCharacterSelect] = useState(false);
+    const [selectedCharacter, setSelectedCharacter] = useState<RpCharacter | null>(null);
+     const [processing, setProcessing] = useState(false);
+     const [activeHints, setActiveHints] = useState<Hint[]>([]);
+     const [statChecksPassed, setStatChecksPassed] = useState(0);
+     const [statChecksFailed, setStatChecksFailed] = useState(0);
+     const [isFirstCompletion, setIsFirstCompletion] = useState(true);
+     const { checkAchievements } = useRpAchievements();
  
    // Load campaign data
    useEffect(() => {
@@ -110,21 +119,31 @@
        .update({ play_count: (campaign.play_count || 0) + 1 })
        .eq("id", campaign.id);
  
-     setSessionId(session.id);
-     setSelectedCharacter(character);
-     setCharacterProgress({
-       stats_snapshot: character.stats,
-       xp_earned: 0,
-       story_flags: {}
-     });
-     setShowCharacterSelect(false);
- 
-     // Load first node
-     if (campaign.start_node_id) {
-       await loadNode(campaign.start_node_id);
-     }
- 
-     setProcessing(false);
+      setSessionId(session.id);
+      setSelectedCharacter(character);
+      setCharacterProgress({
+        stats_snapshot: character.stats,
+        xp_earned: 0,
+        story_flags: {}
+      });
+      setShowCharacterSelect(false);
+
+      // Check if this is the first time playing this campaign
+      const { data: previousSessions } = await supabase
+        .from("rp_sessions")
+        .select("id")
+        .eq("campaign_id", campaign.id)
+        .eq("created_by", user.id)
+        .eq("status", "completed");
+      
+      setIsFirstCompletion(!previousSessions || previousSessions.length === 0);
+
+      // Load first node
+      if (campaign.start_node_id) {
+        await loadNode(campaign.start_node_id);
+      }
+
+      setProcessing(false);
    };
  
    // Load a story node
@@ -166,21 +185,25 @@
  
      const stats = characterProgress?.stats_snapshot || selectedCharacter.stats;
  
-     // Check stat requirement
-     if (choice.stat_requirement) {
-       const { stat, min_value } = choice.stat_requirement;
-       const currentValue = stats[stat as keyof CharacterStats] || 0;
-       
-       if (currentValue < min_value) {
-         toast({ 
-           title: "Requirement not met", 
-           description: `You need at least ${min_value} ${stat} for this choice.`,
-           variant: "destructive" 
-         });
-         setProcessing(false);
-         return;
-       }
-     }
+      // Check stat requirement & track stat checks
+      if (choice.stat_requirement) {
+        const { stat, min_value } = choice.stat_requirement;
+        const currentValue = stats[stat as keyof CharacterStats] || 0;
+        
+        if (currentValue < min_value) {
+          setStatChecksFailed(prev => prev + 1);
+          toast({ 
+            title: "Requirement not met", 
+            description: `You need at least ${min_value} ${stat} for this choice.`,
+            variant: "destructive" 
+          });
+          setProcessing(false);
+          return;
+        }
+        
+        // Stat check passed — bonus XP
+        setStatChecksPassed(prev => prev + 1);
+      }
  
      // Apply stat effects
      let newStats = { ...stats };
@@ -232,31 +255,55 @@
        xp_earned: (characterProgress?.xp_earned || 0) + xpGained
      });
  
-     // Load next node or end
-     if (choice.target_node_id) {
-       await loadNode(choice.target_node_id);
-     } else {
-       // End of story
-       await supabase
-         .from("rp_sessions")
-         .update({ status: "completed", completed_at: new Date().toISOString() })
-         .eq("id", sessionId);
- 
-       // Award XP to character
-       const totalXp = (characterProgress?.xp_earned || 0) + xpGained + 100; // +100 completion bonus
-       await supabase
-         .from("rp_characters")
-         .update({ 
-           xp: selectedCharacter.xp + totalXp,
-           stats: newStats
-         })
-         .eq("id", selectedCharacter.id);
- 
-       toast({ 
-         title: "Adventure Complete!", 
-         description: `You earned ${totalXp} XP!` 
-       });
-     }
+      // Load next node or end
+      if (choice.target_node_id) {
+        await loadNode(choice.target_node_id);
+      } else {
+        // End of story
+        await supabase
+          .from("rp_sessions")
+          .update({ status: "completed", completed_at: new Date().toISOString() })
+          .eq("id", sessionId);
+
+        // Calculate XP with bonuses
+        let baseXp = (characterProgress?.xp_earned || 0) + xpGained;
+        let completionBonus = 100;
+        let firstTimeBonus = isFirstCompletion ? 50 : 0;
+        let statCheckBonus = statChecksPassed * 20; // +20 per passed stat check
+        let perfectRunBonus = statChecksFailed === 0 && statChecksPassed > 0 ? 50 : 0;
+        
+        // Difficulty bonus
+        let difficultyMultiplier = 1;
+        if (campaign?.difficulty === "hard") difficultyMultiplier = 1.5;
+        else if (campaign?.difficulty === "expert") difficultyMultiplier = 2;
+
+        const totalXp = Math.floor(
+          (baseXp + completionBonus + firstTimeBonus + statCheckBonus + perfectRunBonus) * difficultyMultiplier
+        );
+
+        await supabase
+          .from("rp_characters")
+          .update({ 
+            xp: selectedCharacter.xp + totalXp,
+            stats: newStats
+          })
+          .eq("id", selectedCharacter.id);
+
+        // Build XP breakdown for toast
+        const bonusParts: string[] = [];
+        if (firstTimeBonus > 0) bonusParts.push(`First clear +${firstTimeBonus}`);
+        if (statCheckBonus > 0) bonusParts.push(`Stat checks +${statCheckBonus}`);
+        if (perfectRunBonus > 0) bonusParts.push(`Perfect run +${perfectRunBonus}`);
+        if (difficultyMultiplier > 1) bonusParts.push(`Difficulty x${difficultyMultiplier}`);
+
+        toast({ 
+          title: "Adventure Complete! 🎉", 
+          description: `You earned ${totalXp} XP!${bonusParts.length > 0 ? ` (${bonusParts.join(', ')})` : ''}`
+        });
+
+        // Check for achievements after completion
+        await checkAchievements();
+      }
  
      setProcessing(false);
    };
@@ -387,8 +434,23 @@
                      {currentNode.content.text || "The story continues..."}
                    </p>
                  </CardContent>
-               </Card>
- 
+                </Card>
+
+                {/* Hints */}
+                {activeHints.length > 0 && (
+                  <HintDisplay
+                    hints={activeHints}
+                    onRespond={async (hintId, response) => {
+                      // Record response — outcome can be used for random event triggers
+                      toast({
+                        title: response === "followed" ? "You heed the hint..." : 
+                               response === "opposite" ? "You defy the suggestion!" : 
+                               "You ignore the hint...",
+                      });
+                    }}
+                    disabled={processing}
+                  />
+                )}
                 {/* Choices */}
                 {choices.length > 0 ? (
                   <div className="space-y-3">

@@ -481,33 +481,33 @@ Can player A "stab" player B?
 A dynamic hint system that nudges players toward interesting paths — whether they follow or ignore hints affects the campaign trajectory and can trigger random events.
 
 ##### Hint Mechanics
-- [ ] **Context-Aware Suggestions** — System analyzes player state (stats, inventory, flags, position) and suggests relevant actions
-- [ ] **Hint Types:**
+- [x] **Context-Aware Suggestions** — System analyzes player state (stats, inventory, flags, position) and suggests relevant actions
+- [x] **Hint Types:**
   - 🧭 **Direction hints** — "The eastern path seems less traveled..." (navigation)
   - ⚔️ **Action hints** — "Your blade could serve you well here..." (combat/stealth)
   - 🗣️ **Social hints** — "Perhaps diplomacy would yield better results..." (persuasion)
   - 🔍 **Discovery hints** — "Something glints in the corner of your eye..." (exploration)
   - ⚠️ **Warning hints** — "Your instincts tell you to be cautious..." (danger ahead)
-- [ ] **Hint Frequency** — Configurable per campaign (frequent/moderate/rare/none)
-- [ ] **Hint Accuracy** — Not all hints are helpful — some are traps or misdirection (creator-designed)
+- [x] **Hint Frequency** — Configurable per campaign (frequent/moderate/rare/none)
+- [x] **Hint Accuracy** — Not all hints are helpful — some are traps or misdirection (creator-designed)
 
 ##### Player Response & Consequences
-- [ ] **Follow Hint** — Player takes the suggested action → triggers "obedient path" outcomes
-- [ ] **Ignore Hint** — Player does something else → triggers "defiant path" outcomes
-- [ ] **Opposite Action** — Player deliberately does the opposite → triggers special "contrarian" events
-- [ ] **Hint Tracking** — Track how often a player follows/ignores hints (affects future hint accuracy)
-- [ ] **Hint as Random Event Trigger** — Hint responses serve as triggers for random events:
+- [x] **Follow Hint** — Player takes the suggested action → triggers "obedient path" outcomes
+- [x] **Ignore Hint** — Player does something else → triggers "defiant path" outcomes
+- [x] **Opposite Action** — Player deliberately does the opposite → triggers special "contrarian" events
+- [x] **Hint Tracking** — Track how often a player follows/ignores hints (affects future hint accuracy)
+- [x] **Hint as Random Event Trigger** — Hint responses serve as triggers for random events:
   - Followed 3 hints in a row → "Guardian Angel" event (bonus)
   - Ignored 3 hints in a row → "Lost Wanderer" event (penalty or surprise)
   - Took opposite action → "Wildcard" random event
 
 ##### Creator Hint Designer
-- [ ] **Hint Placement** — Attach hints to specific nodes, key points, or interaction zones
-- [ ] **Conditional Hints** — Hints only appear if certain conditions are met (stat threshold, item, flag)
-- [ ] **Hint Chains** — Sequence of hints that build toward a revelation or trap
-- [ ] **Red Herrings** — Deliberately misleading hints to test player judgment
-- [ ] **Multiplayer Divergent Hints** — Different players in same session get different/conflicting hints
-- [ ] **Hint Source Flavor** — Hints presented as: inner voice, companion whisper, environmental clue, divine sign
+- [x] **Hint Placement** — Attach hints to specific nodes, key points, or interaction zones
+- [x] **Conditional Hints** — Hints only appear if certain conditions are met (stat threshold, item, flag)
+- [x] **Hint Chains** — Sequence of hints that build toward a revelation or trap
+- [x] **Red Herrings** — Deliberately misleading hints to test player judgment
+- [x] **Multiplayer Divergent Hints** — Different players in same session get different/conflicting hints
+- [x] **Hint Source Flavor** — Hints presented as: inner voice, companion whisper, environmental clue, divine sign
 
 **Database Addition:**
 | Table | Purpose | Key Columns |
@@ -541,12 +541,12 @@ Player receives hint: "The shadows whisper of danger ahead..."
 - [x] Creator PvP tools (lethality settings, interaction zones, custom actions)
 
 **Phase 9: Hint & Suggestion Engine**
-- [ ] Context-aware hint generation based on player state
-- [ ] Hint response tracking (follow/ignore/opposite)
-- [ ] Hint → random event trigger integration
-- [ ] Creator hint designer with placement and conditions
-- [ ] Red herring and hint chain support
-- [ ] Multiplayer divergent hints
+- [x] Context-aware hint generation based on player state
+- [x] Hint response tracking (follow/ignore/opposite)
+- [x] Hint → random event trigger integration
+- [x] Creator hint designer with placement and conditions
+- [x] Red herring and hint chain support
+- [x] Multiplayer divergent hints
 
 ---
 
@@ -731,15 +731,15 @@ Generate rich, lore-consistent character backstories based on the player's chose
 #### AI Implementation Phases
 
 **Phase AI-1: Foundation**
-- [ ] Create `ai-lore-assistant` edge function with almanac context injection
-- [ ] Build LoreAssistant chat panel component
-- [ ] Create `rp_lore_conversations` table
+- [x] Create `ai-lore-assistant` edge function with almanac context injection
+- [x] Build LoreAssistant chat panel component
+- [x] Create `rp_lore_conversations` table
 - [ ] Test with existing almanac data
 
 **Phase AI-2: Character Backstory**
-- [ ] Create `ai-generate-backstory` edge function
-- [ ] Add "Generate Backstory" button to CharacterCreator
-- [ ] Build generation modal with regenerate/edit flow
+- [x] Create `ai-generate-backstory` edge function
+- [x] Add "Generate Backstory" button to CharacterCreator
+- [x] Build generation modal with regenerate/edit flow
 - [ ] Test with all existing races
 
 **Phase AI-3: Free-Text Interpreter**
@@ -773,13 +773,13 @@ Generate rich, lore-consistent character backstories based on the player's chose
 Creators choose whether their campaign uses the official ThouArt universe rules or an entirely original custom world system.
 
 ##### Universe Mode Selection (Campaign Creation)
-- [ ] **Universe Toggle** — "ThouArt Variation" or "Original Universe" selected at campaign creation
-- [ ] **ThouArt Variation Mode:**
+- [x] **Universe Toggle** — "ThouArt Variation" or "Original Universe" selected at campaign creation
+- [x] **ThouArt Variation Mode:**
   - Uses existing `almanac_races`, `almanac_magic`, factions, relics, etc.
   - Stat system follows standard ThouArt rules
   - Lore references auto-link to the Witness Almanac
   - Community lore entries also available
-- [ ] **Original Universe Mode:**
+- [x] **Original Universe Mode:**
   - Creator defines **everything** from scratch
   - Custom races, magic systems, beliefs, factions, physics, rules
   - No cross-references to ThouArt almanac
@@ -889,16 +889,16 @@ Interaction Points (IP) between players accumulate from all interactions and **d
 ### Implementation Phases (Advanced Systems — continued)
 
 **Phase 10: Universe Mode & World Builder**
-- [ ] Universe toggle in campaign creation (ThouArt vs Original)
-- [ ] Custom race, magic, belief, faction, and item builders
-- [ ] World rules document editor
-- [ ] Custom stat system override
+- [x] Universe toggle in campaign creation (ThouArt vs Original)
+- [x] Custom race, magic, belief, faction, and item builders
+- [x] World rules document editor
+- [x] Custom stat system override
 
 **Phase 11: Interaction Points & Hidden Combat**
-- [ ] IP accumulation engine from all player interactions
-- [ ] IP threshold event triggers (forced choices, alliances, duels)
-- [ ] Hidden stats during combat encounters
-- [ ] Bluff and scouting mechanics
+- [x] IP accumulation engine from all player interactions
+- [x] IP threshold event triggers (forced choices, alliances, duels)
+- [x] Hidden stats during combat encounters
+- [x] Bluff and scouting mechanics
 - [ ] Free-text input parser with dynamic skill calculation
 - [ ] IP-based path unlocks in story progression
 
@@ -931,7 +931,7 @@ Interaction Points (IP) between players accumulate from all interactions and **d
 - [x] **XP System** — Earn XP for completing nodes, finishing campaigns, making choices
 - [x] **Character Levels** — Level up at XP thresholds (100, 300, 600, 1000...)
 - [x] **Level Benefits** — Unlock stat points, new ability slots, cosmetic titles
-- [ ] **XP Bonuses** — Bonus XP for first completions, difficult paths, group play
+- [x] **XP Bonuses** — Bonus XP for first completions, difficult paths, group play
 
 **XP Awards:**
 | Action | XP |
@@ -944,9 +944,9 @@ Interaction Points (IP) between players accumulate from all interactions and **d
 | First-time campaign bonus | +50 |
 
 #### Inventory System
-- [ ] **Item Pickups** — Nodes can grant items (relics, weapons, potions)
-- [ ] **Inventory Slots** — Limited inventory (expand with levels)
-- [ ] **Item Effects** — Consumables, stat boosters, quest items
+- [x] **Item Pickups** — Nodes can grant items (relics, weapons, potions)
+- [x] **Inventory Slots** — Limited inventory (expand with levels)
+- [x] **Item Effects** — Consumables, stat boosters, quest items
 - [ ] **Item Trading** — Trade items between characters (future)
 - [ ] **Item Requirements** — Nodes can require specific items to proceed
 
@@ -970,14 +970,14 @@ Interaction Points (IP) between players accumulate from all interactions and **d
 - Death: Campaign ends, character marked as "fallen" (visible in graveyard)
 
 #### Achievements (Roleplay-Specific)
-- [ ] **First Steps** — Create your first character
-- [ ] **Storyteller** — Complete 5 campaigns
-- [ ] **Lorekeeper** — Have a lore proposal approved
-- [ ] **Survivor** — Complete a campaign without failing any stat check
-- [ ] **Explorer** — Visit 50 unique story nodes
+- [x] **First Steps** — Create your first character
+- [x] **Storyteller** — Complete 5 campaigns
+- [x] **Lorekeeper** — Have a lore proposal approved
+- [x] **Survivor** — Complete a campaign without failing any stat check
+- [x] **Explorer** — Visit 50 unique story nodes
 - [ ] **Charismatic** — Pass 10 Charisma checks
 - [ ] **Completionist** — See all endings of a campaign
-- [ ] **Worldbuilder** — Have 5 lore proposals approved
+- [x] **Worldbuilder** — Have 5 lore proposals approved
 
 ---
 
